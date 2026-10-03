@@ -1,0 +1,40 @@
+{
+  "cli": { "version": ">= 16.0.0", "appVersionSource": "remote" },
+  "build": {
+    "base": {
+      "node": "24.11.0",
+      "env": { "EXPO_PUBLIC_APP_ENV": "development" }
+    },
+    "development": {
+      "extends": "base",
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": { "EXPO_PUBLIC_API_URL": "http://10.0.2.2:4000" }
+    },
+    "admin-device": {
+      "extends": "base",
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": { "HYDRA_ENABLE_MISSED_CALL_MONITOR": "true", "EXPO_PUBLIC_APP_ENV": "production", "EXPO_PUBLIC_API_URL": "https://api.hydra.psgelectrical.co.za" }
+    },
+    "preview": {
+      "extends": "base",
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "env": { "EXPO_PUBLIC_APP_ENV": "staging", "EXPO_PUBLIC_API_URL": "https://staging-api.hydra.psgelectrical.co.za" }
+    },
+    "production": {
+      "extends": "base",
+      "autoIncrement": true,
+      "android": { "buildType": "app-bundle" },
+      "env": { "EXPO_PUBLIC_APP_ENV": "production", "EXPO_PUBLIC_API_URL": "https://api.hydra.psgelectrical.co.za" }
+    }
+  },
+  "submit": {
+    "production": {
+      "android": { "track": "internal", "releaseStatus": "draft" },
+      "ios": {}
+    }
+  }
+}
