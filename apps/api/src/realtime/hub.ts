@@ -11,7 +11,8 @@ export type RealtimeEvent =
   | 'payment.confirmed'
   | 'notification.new'
   | 'schedule.updated'
-  | 'inventory.low_stock';
+  | 'inventory.low_stock'
+  | 'ai.updated';
 
 export interface RealtimeHub {
   emit(room: string, event: RealtimeEvent, payload: Record<string, unknown>): void;
