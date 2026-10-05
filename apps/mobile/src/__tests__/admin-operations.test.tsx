@@ -205,18 +205,29 @@ describe('invoice flow', () => {
 describe('admin More menu', () => {
   it('hides owner-only modules from office staff', async () => {
     signInAs('ADMIN_OFFICE');
-    mockApi({ 'GET /dashboard/admin': () => ({ kpis: { lowStockCount: 2, missedCallsToReview: 0, invoicesOutstanding: 1 } }) });
+    mockApi({
+      'GET /dashboard/admin': () => ({ kpis: { lowStockCount: 2, missedCallsToReview: 0, invoicesOutstanding: 1 } }),
+      'GET /ai/admin/summary': () => ({ needsReview: 3, urgent: 0, critical: 0, waitingCustomer: 0, accepted: 0 }),
+    });
     await renderScreen(<More />);
     expect(await screen.findByRole('button', { name: 'Invoices & payments, 1' })).toBeOnTheScreen();
+    expect(await screen.findByRole('button', { name: 'AI Review, 3' })).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Audit log' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Data exports' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'AI Assistant settings' })).toBeNull();
   });
 
   it('shows owner modules to the owner and navigates to them', async () => {
     signInAs('ADMIN_OWNER');
-    mockApi({ 'GET /dashboard/admin': () => ({ kpis: {} }) });
+    mockApi({
+      'GET /dashboard/admin': () => ({ kpis: {} }),
+      'GET /ai/admin/summary': () => ({ needsReview: 0, urgent: 1, critical: 1, waitingCustomer: 0, accepted: 0 }),
+    });
     await renderScreen(<More />);
+    expect(await screen.findByRole('button', { name: 'AI Review, 1 CRITICAL' })).toBeOnTheScreen();
     await fireEvent.press(await screen.findByRole('button', { name: 'Audit log' }));
     expect(router.push).toHaveBeenCalledWith('/admin/audit');
+    await fireEvent.press(screen.getByRole('button', { name: 'AI Assistant settings' }));
+    expect(router.push).toHaveBeenCalledWith('/admin/ai-settings');
   });
 });

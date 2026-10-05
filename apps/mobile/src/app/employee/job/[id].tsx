@@ -6,6 +6,7 @@ import type { JobDetailDto } from '@hydra/shared';
 import { api, errorMessage } from '../../../api/client';
 import { useJob, useJobAction } from '../../../api/queries';
 import { JobStatusBadge, NotesSection, PersonRow, SegmentLink, Timeline } from '../../../components/jobs';
+import { JobAiSection } from '../../../features/ai/JobAiSection';
 import { BrandHeader, Screen } from '../../../components/layout';
 import { Badge, Button, Card, KeyValue, Label, Segmented, Text, TextField, colors, confirm, radius, spacing, toast } from '../../../design-system';
 import { PhotoPicker } from '../../../features/photos';
@@ -131,6 +132,7 @@ export default function EmployeeJob() {
               <Label>Job description</Label>
               <Text variant="bodySmall" color="textSecondary" style={{ marginTop: 4 }}>{j.description}</Text>
             </View>
+            <JobAiSection jobId={j.id} source={j.source} />
             <NotesSection job={j} canPost={!['PAID', 'CANCELLED'].includes(j.status)} staff />
           </>
         )}

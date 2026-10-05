@@ -44,6 +44,18 @@ export default function CustomerDashboard() {
               <Text variant="h1">Hello, {d.firstName}</Text>
             </View>
 
+            <Card accent="primary" style={{ gap: spacing.sm }} onPress={() => router.push('/customer/ai')} accessibilityLabel="HYDRA Smart Quote — AI quote assistant" testID="dashboard-smart-quote">
+              <View style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'center' }}>
+                <IconTile icon="cpu" tone="primary" />
+                <View style={{ flex: 1 }}>
+                  <Label color="primaryBright">New · HYDRA Smart Quote</Label>
+                  <Text variant="h3">Get an instant preliminary quote</Text>
+                </View>
+                <Icon name="chevron-right" color="textMuted" />
+              </View>
+              <Text variant="bodySmall" color="textMuted">Describe the problem and add photos — see how serious it looks, a price range and our target response time.</Text>
+            </Card>
+
             <Card accent="secondary" style={{ gap: spacing.md, backgroundColor: '#18152A' }} onPress={() => router.navigate('/customer/rewards')} accessibilityLabel="Rewards balance">
               <View style={styles.between}>
                 <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="gift" size={18} color="secondaryBright" /><Text variant="title" weight="bold">Rewards balance</Text></View>
@@ -147,6 +159,7 @@ export default function CustomerDashboard() {
             <QuickLinks links={[
               { icon: 'briefcase', label: 'My jobs', route: '/customer/jobs' },
               { icon: 'plus-circle', label: 'Request service', route: '/customer/request' },
+              { icon: 'cpu', label: 'Smart Quote (AI assessments)', route: '/customer/ai' },
               { icon: 'file-text', label: 'Quotes', route: '/customer/jobs?filter=QUOTES', badge: d.quotesAwaiting.length ? String(d.quotesAwaiting.length) : undefined },
               { icon: 'activity', label: 'Live job timeline', route: active ? `/customer/job/${active.id}` : '/customer/jobs' },
               { icon: 'credit-card', label: 'Invoices & payments', route: '/customer/billing', badge: d.invoicesDue.length ? String(d.invoicesDue.length) : undefined },

@@ -6,6 +6,7 @@ import { PostgresBillingRepository } from '../repositories/billingRepository';
 import { PostgresFileRepository } from '../repositories/fileRepository';
 import { PostgresQuoteRepository } from '../repositories/quoteRepository';
 import { PostgresSessionRepository } from '../repositories/sessionRepository';
+import { refreshEstimateOutcomes, reviewAgeingTask } from '../services/aiAdminService';
 import { audit, SYSTEM_ACTOR } from '../services/auditService';
 import { transactional } from '../services/events';
 
@@ -57,6 +58,16 @@ export const TASKS = {
       await files.delete(f.id);
     }
     return orphans.length;
+  },
+
+  /** Smart Quote: remind admins about review cases older than the configured threshold (once per case). */
+  async aiReviewAgeing(): Promise<number> {
+    return reviewAgeingTask();
+  },
+
+  /** Smart Quote: snapshot AI estimate vs final quote vs invoice for converted jobs (analytics only). */
+  async aiEstimateOutcomes(): Promise<number> {
+    return refreshEstimateOutcomes();
   },
 };
 

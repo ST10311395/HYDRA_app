@@ -3,6 +3,7 @@ import request from 'supertest';
 import type { Role } from '@hydra/shared';
 import { createApp } from '../src/app';
 import { db } from '../src/db/pool';
+import { overrideAiProvider } from '../src/ai/providers';
 import { overrideIntegrations } from '../src/integrations';
 import type { GoogleIdentity, GoogleIdentityVerifier } from '../src/integrations/google';
 import { PostgresUserRepository } from '../src/repositories/userRepository';
@@ -34,6 +35,8 @@ export class FakeGoogleVerifier implements GoogleIdentityVerifier {
 export const googleToken = (sub: string, email: string) => `google-test-token|${sub}|${email}|padding-to-satisfy-min-length`;
 
 const TABLES = [
+  'ai_estimate_outcomes', 'ai_provider_calls', 'ai_knowledge_revisions', 'ai_knowledge_entries', 'ai_feedback', 'ai_admin_reviews',
+  'ai_proposals', 'ai_attachments', 'ai_messages', 'ai_assessments', 'ai_conversations', 'ai_policies',
   'audit_logs', 'data_export_logs', 'idempotency_keys', 'notifications', 'push_tokens', 'ai_message_logs', 'missed_call_logs', 'contacts',
   'payroll_items', 'payrolls', 'timesheets', 'employee_schedules', 'leave_requests', 'customer_discounts', 'discounts', 'rewards_transactions',
   'rewards_accounts', 'payment_webhook_events', 'payments', 'invoice_items', 'invoices', 'inspection_attachments', 'inspection_reports',
@@ -59,6 +62,7 @@ export async function resetDatabase(): Promise<Fixture> {
   await db().query(`UPDATE app_settings SET value = 'false' WHERE key = 'missedCallAutomationEnabled'`);
   await db().query(`UPDATE app_settings SET value = 'true' WHERE key = 'payrollRequirePaidInvoice'`);
   overrideIntegrations({ google: new FakeGoogleVerifier() });
+  overrideAiProvider(null);
 
   const hash = await hashPassword(PASSWORD);
   const users = new PostgresUserRepository(db());

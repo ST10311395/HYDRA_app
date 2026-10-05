@@ -16,6 +16,7 @@
     "db:start": "npm run db:start -w @hydra/api",
     "db:migrate": "npm run db:migrate -w @hydra/api",
     "db:seed": "npm run db:seed -w @hydra/api",
+    "db:seed:ai": "npm run db:seed:ai -w @hydra/api",
     "db:reset": "npm run db:reset -w @hydra/api",
     "api": "npm run dev -w @hydra/api",
     "mobile": "npm run start -w @hydra/mobile",

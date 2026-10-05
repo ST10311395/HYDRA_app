@@ -7,4 +7,5 @@ export * from './schemas/jobs.js';
 export * from './schemas/finance.js';
 export * from './schemas/workforce.js';
 export * from './schemas/comms.js';
+export * from './schemas/ai.js';
 export * from './types.js';

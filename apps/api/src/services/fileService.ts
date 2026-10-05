@@ -32,6 +32,8 @@ const RULES: Record<FilePurpose, { mimes: string[]; maxBytes: number }> = {
   INSPECTION_EVIDENCE: { mimes: ['image/jpeg', 'image/png', 'image/webp', 'image/heic'], maxBytes: 8 * 1024 * 1024 },
   PROFILE_IMAGE: { mimes: ['image/jpeg', 'image/png', 'image/webp'], maxBytes: 4 * 1024 * 1024 },
   COMPLIANCE_DOCUMENT: { mimes: ['application/pdf', 'image/jpeg', 'image/png'], maxBytes: 15 * 1024 * 1024 },
+  /** HYDRA Smart Quote photos: private, owner/admin only until linked to an assigned job. */
+  AI_ASSESSMENT_PHOTO: { mimes: ['image/jpeg', 'image/png', 'image/webp', 'image/heic'], maxBytes: 8 * 1024 * 1024 },
 };
 
 const EXT_OK = /\.(jpe?g|png|webp|heic|heif|pdf)$/i;
@@ -45,8 +47,11 @@ export async function uploadFile(
   actor: Actor,
 ): Promise<FileRefDto> {
   const rule = RULES[purpose];
-  if (auth.role === 'CUSTOMER' && purpose !== 'JOB_PHOTO' && purpose !== 'PROFILE_IMAGE') {
+  if (auth.role === 'CUSTOMER' && purpose !== 'JOB_PHOTO' && purpose !== 'PROFILE_IMAGE' && purpose !== 'AI_ASSESSMENT_PHOTO') {
     throw new AppError(403, 'FORBIDDEN', 'Customers may only upload job photos');
+  }
+  if (auth.role !== 'CUSTOMER' && purpose === 'AI_ASSESSMENT_PHOTO') {
+    throw new AppError(403, 'FORBIDDEN', 'Smart Quote photos are uploaded by customers');
   }
   if (file.size <= 0) throw badRequest('The file is empty');
   if (file.size > rule.maxBytes) throw new AppError(413, 'FILE_TOO_LARGE', `File exceeds the ${Math.round(rule.maxBytes / 1048576)}MB limit`);

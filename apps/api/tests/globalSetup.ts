@@ -7,13 +7,14 @@ import path from 'node:path';
 import EmbeddedPostgres from 'embedded-postgres';
 import { runMigrations } from '../src/db/migrate';
 
-const PORT = 5434;
+// TEST_PG_PORT / TEST_PG_DIR let a run avoid a cluster left behind by an interrupted run.
+const PORT = Number(process.env.TEST_PG_PORT ?? 5434);
 let pg: EmbeddedPostgres | null = null;
 
 export async function setup(): Promise<void> {
   let url = process.env.TEST_DATABASE_URL;
   if (!url) {
-    const dir = path.resolve(__dirname, '../.pgdata-test');
+    const dir = path.resolve(__dirname, '..', process.env.TEST_PG_DIR ?? '.pgdata-test');
     rmSync(dir, { recursive: true, force: true });
     pg = new EmbeddedPostgres({
       databaseDir: dir,

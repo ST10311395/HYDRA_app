@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { useAiSummary } from '../../../api/ai';
 import { useAdminDashboard } from '../../../api/queries';
 import { JobCard } from '../../../components/jobs';
 import { BrandHeader, Screen } from '../../../components/layout';
@@ -25,7 +26,26 @@ const OWNER_TOOLS: { label: string; icon: IconName; route: string }[] = [
   { label: 'Staff accounts', icon: 'user-check', route: '/admin/staff' },
   { label: 'POPIA requests', icon: 'shield', route: '/admin/data-requests' },
   { label: 'Payroll approval', icon: 'dollar-sign', route: '/admin/payroll' },
+  { label: 'AI Assistant settings', icon: 'cpu', route: '/admin/ai-settings' },
 ];
+
+/** HYDRA Smart Quote review queue at a glance; severity 5 cases are shown in red at the top. */
+function SmartQuoteCard() {
+  const q = useAiSummary();
+  const s = q.data;
+  if (!s) return null;
+  const critical = s.critical > 0;
+  return (
+    <Card accent={critical ? 'danger' : s.needsReview ? 'secondary' : 'none'} onPress={() => router.push(critical ? '/admin/ai-review?tab=URGENT' : '/admin/ai-review')} accessibilityLabel={`AI review: ${s.needsReview} need review, ${s.critical} critical`}
+      style={{ gap: 6, backgroundColor: critical ? colors.dangerMuted : undefined }} testID="admin-ai-card">
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Icon name={critical ? 'alert-octagon' : 'cpu'} color={critical ? 'dangerBright' : 'secondaryBright'} />
+        <Text variant="title" weight="bold" color={critical ? 'dangerBright' : 'text'}>{critical ? `${s.critical} CRITICAL Smart Quote case${s.critical === 1 ? '' : 's'}` : 'Smart Quote AI review'}</Text>
+      </View>
+      <Text variant="caption" color="textMuted">{s.needsReview} need review · {s.urgent} urgent · {s.waitingCustomer} waiting on customer · {s.accepted} accepted to convert</Text>
+    </Card>
+  );
+}
 
 const ACTION_LABEL = (a: string) => a.toLowerCase().replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
 
@@ -59,6 +79,7 @@ export default function AdminDashboard() {
               <Label color="primaryBright">{role === 'ADMIN_OWNER' ? 'Owner / Manager' : 'Office admin'}</Label>
               <Text variant="h1">Operations Center</Text>
             </View>
+            <SmartQuoteCard />
             <View style={styles.grid}>
               {kpis.map((x) => (
                 <Card key={x.label} style={styles.kpi} onPress={() => router.push(x.route as never)} accessibilityLabel={`${x.label}: ${x.value}`} accent={x.alert ? 'primary' : 'none'}>

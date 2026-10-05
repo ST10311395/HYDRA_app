@@ -5,6 +5,8 @@ import { businessRule, notFound } from '../utils/errors';
 import { paginated } from '../utils/pagination';
 import { audit, type Actor } from './auditService';
 import { withTransaction } from '../db/pool';
+import { integrations } from '../integrations';
+import { anonymiseCustomerAi, exportCustomerAiData } from './aiAdminService';
 
 /** POPIA §6.4.8 data-subject participation: a structured copy of the caller's own personal data. */
 export async function exportMyData(auth: AuthContext, actor: Actor) {
@@ -25,6 +27,7 @@ export async function exportMyData(auth: AuthContext, actor: Actor) {
       : Promise.resolve({ rows: [] }),
     q.query(`SELECT type, title, created_at AS "createdAt" FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT 500`, [auth.userId]),
   ]);
+  const aiAssessments = auth.customerId ? await exportCustomerAiData(q, auth.customerId) : [];
   await audit(q, actor, 'PERSONAL_DATA_EXPORTED', 'user', auth.userId);
   return {
     generatedAt: new Date().toISOString(),
@@ -34,6 +37,7 @@ export async function exportMyData(auth: AuthContext, actor: Actor) {
     invoices: invoices.rows,
     rewardsTransactions: rewards.rows,
     notifications: notifications.rows,
+    aiAssessments,
   };
 }
 
@@ -55,7 +59,8 @@ export async function listDataRequests(page: number, pageSize: number) {
  * permitted — financial and compliance records are retained (statutory retention), personal fields are removed.
  */
 export async function resolveDataRequest(auth: AuthContext, id: string, status: 'COMPLETED' | 'REJECTED', resolution: string, actor: Actor) {
-  return withTransaction(async (tx) => {
+  const removedObjects: string[] = [];
+  const result = await withTransaction(async (tx) => {
     const { rows } = await tx.query<{ userId: string; type: string; status: string }>(
       `SELECT user_id AS "userId", request_type AS type, status FROM data_subject_requests WHERE id = $1 FOR UPDATE`,
       [id],
@@ -73,9 +78,13 @@ export async function resolveDataRequest(auth: AuthContext, id: string, status: 
       );
       if ((open[0]?.n ?? 0) > 0) throw businessRule('The customer has open jobs or unpaid invoices; resolve them before anonymising');
       await new PostgresUserRepository(tx).anonymise(r.userId);
+      removedObjects.push(...(await anonymiseCustomerAi(tx, r.userId)));
     }
     await tx.query(`UPDATE data_subject_requests SET status = $2, resolution = $3, handled_by = $4, handled_at = now() WHERE id = $1`, [id, status, resolution, auth.userId]);
     await audit(tx, actor, `DATA_REQUEST_${status}`, 'data_subject_request', id, { type: r.type });
     return { id, status };
   });
+  // Smart Quote photos are deleted from storage only after the database change has committed.
+  for (const key of removedObjects) await integrations().storage.delete(key).catch(() => undefined);
+  return result;
 }

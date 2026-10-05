@@ -15,6 +15,7 @@
     "db:start": "tsx --env-file-if-exists=.env scripts/embedded-db.ts",
     "db:migrate": "tsx --env-file-if-exists=.env src/db/migrate.ts",
     "db:seed": "tsx --env-file-if-exists=.env seeds/seed.ts",
+    "db:seed:ai": "tsx --env-file-if-exists=.env seeds/ai-seed.ts",
     "db:reset": "tsx --env-file-if-exists=.env src/db/migrate.ts --reset && tsx --env-file-if-exists=.env seeds/seed.ts",
     "jobs": "tsx --env-file-if-exists=.env src/jobs/worker.ts",
     "openapi": "tsx scripts/export-openapi.ts",
@@ -42,6 +43,7 @@
     "vitest": "^5.0.2"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
     "@asteasolutions/zod-to-openapi": "^9.1.0",
     "@azure/storage-blob": "^12.34.0",
     "@hydra/shared": "^1.0.0",
