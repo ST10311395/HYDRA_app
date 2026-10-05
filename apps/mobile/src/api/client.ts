@@ -124,6 +124,7 @@ export const api = {
   get: <T>(path: string, query?: RequestOptions['query']) => apiRequest<T>('GET', path, { query }),
   post: <T>(path: string, body?: unknown, extra?: Omit<RequestOptions, 'body'>) => apiRequest<T>('POST', path, { ...extra, body: body ?? {} }),
   patch: <T>(path: string, body?: unknown) => apiRequest<T>('PATCH', path, { body: body ?? {} }),
+  put: <T>(path: string, body?: unknown) => apiRequest<T>('PUT', path, { body: body ?? {} }),
   delete: <T>(path: string, body?: unknown) => apiRequest<T>('DELETE', path, { body }),
   upload: <T>(path: string, form: FormData) => apiRequest<T>('POST', path, { formData: form, timeoutMs: 60_000 }),
   /** Binary-safe download (CSV/PDF exports) with the server-provided filename and row count. */

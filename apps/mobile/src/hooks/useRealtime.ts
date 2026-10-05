@@ -26,6 +26,7 @@ export function useRealtime(): void {
     socket.on('schedule.updated', () => invalidate(['schedules'], ['dashboard'], ['jobs']));
     socket.on('inventory.low_stock', () => invalidate(['materials'], ['dashboard']));
     socket.on('notification.new', () => invalidate(['notifications'], ['dashboard']));
+    socket.on('ai.updated', () => invalidate(['ai']));
     return () => {
       socket?.disconnect();
       socket = null;
