@@ -1,0 +1,32 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+
+# API runtime data
+apps/api/.pgdata/
+apps/api/.pgdata-test/
+apps/api/uploads/
+apps/api/exports/
+
+# Expo / React Native
+apps/mobile/.expo/
+apps/mobile/dist/
+apps/mobile/web-build/
+apps/mobile/android/
+apps/mobile/ios/
+apps/mobile/expo-env.d.ts
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.keystore
+!debug.keystore
+google-services.json
+GoogleService-Info.plist
+apps/api/.test-uploads/
