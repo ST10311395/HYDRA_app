@@ -49,11 +49,13 @@ export interface NewJob {
   siteLongitude?: number | null;
   description: string;
   urgency: JobUrgency;
-  source: 'APP' | 'CONTACT_QUERY' | 'ADMIN' | 'MISSED_CALL';
+  source: 'APP' | 'CONTACT_QUERY' | 'ADMIN' | 'MISSED_CALL' | 'AI_ASSESSMENT';
   contactPhone?: string | null;
   preferredDate?: string | null;
   preferredTimeWindow?: string;
   contactQueryId?: string | null;
+  /** Smart Quote case the job came from (traceability). */
+  aiConversationId?: string | null;
 }
 
 export interface JobListFilter {
@@ -133,11 +135,12 @@ export class PostgresJobRepository implements IJobRepository {
   async insert(job: NewJob): Promise<string> {
     const { rows } = await this.db.query<{ id: string }>(
       `INSERT INTO jobs (customer_id, service_type_id, site_address, site_latitude, site_longitude, description, urgency, source,
-                         contact_phone, preferred_date, preferred_time_window, contact_query_id)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id`,
+                         contact_phone, preferred_date, preferred_time_window, contact_query_id, ai_conversation_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id`,
       [
         job.customerId, job.serviceTypeId, job.siteAddress, job.siteLatitude ?? null, job.siteLongitude ?? null, job.description,
         job.urgency, job.source, job.contactPhone ?? null, job.preferredDate ?? null, job.preferredTimeWindow ?? 'ANY', job.contactQueryId ?? null,
+        job.aiConversationId ?? null,
       ],
     );
     return rows[0]!.id;

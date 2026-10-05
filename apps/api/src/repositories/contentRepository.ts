@@ -25,6 +25,7 @@ const SERVICE_COLS = `id, slug, name, category, description, base_price AS "base
 export interface IContentRepository {
   listServiceTypes(opts: { activeOnly: boolean; category?: string; search?: string }): Promise<ServiceTypeDto[]>;
   getServiceType(id: string): Promise<ServiceTypeDto | null>;
+  getServiceTypeBySlug(slug: string): Promise<ServiceTypeDto | null>;
   createServiceType(input: ServiceTypeInput & { slug: string }): Promise<ServiceTypeDto>;
   updateServiceType(id: string, input: Partial<ServiceTypeInput>): Promise<ServiceTypeDto | null>;
   listPortfolio(opts: { category?: string; search?: string; featuredOnly?: boolean }): Promise<PortfolioItemDto[]>;
@@ -60,6 +61,11 @@ export class PostgresContentRepository implements IContentRepository {
 
   async getServiceType(id: string) {
     const { rows } = await this.db.query<ServiceTypeDto>(`SELECT ${SERVICE_COLS} FROM service_types WHERE id = $1`, [id]);
+    return rows[0] ?? null;
+  }
+
+  async getServiceTypeBySlug(slug: string) {
+    const { rows } = await this.db.query<ServiceTypeDto>(`SELECT ${SERVICE_COLS} FROM service_types WHERE slug = $1`, [slug]);
     return rows[0] ?? null;
   }
 
