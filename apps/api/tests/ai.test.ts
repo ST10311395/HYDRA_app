@@ -6,6 +6,7 @@ import request from 'supertest';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { DEFAULT_AI_SETTINGS } from '../src/ai/policies';
 import { overrideAiProvider } from '../src/ai/providers';
+import { GeminiProvider } from '../src/ai/providers/gemini';
 import { AiProviderError, type AiProvider } from '../src/ai/providers/types';
 import { closePool, db } from '../src/db/pool';
 import { PostgresUserRepository } from '../src/repositories/userRepository';
@@ -546,6 +547,126 @@ describe('feature flag and analytics', () => {
     expect(res.body.feedback.severity.TOO_HIGH).toBe(1);
     await api(t.electrician1).get('/ai/analytics').expect(403);
   });
+});
+
+describe('Gemini provider through the Smart Quote orchestrator', () => {
+  type Reply = Response | ((signal?: AbortSignal | null) => Promise<Response>);
+  const sent: { contents: { parts: { text?: string; inlineData?: { mimeType: string; data: string } }[] }[] }[] = [];
+  const geminiJson = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
+  const geminiAnswer = (analysis: object, finishReason = 'STOP') =>
+    geminiJson(200, { candidates: [{ content: { role: 'model', parts: [{ text: JSON.stringify(analysis) }] }, finishReason }] });
+  const analysis = (over: object = {}) => ({
+    summary: 'Nuisance tripping when the geyser switches on', serviceCategory: 'GEYSER_ELECTRICAL', severity: 2, severityReason: 'No sign of heat damage.',
+    observations: [], clarifyingQuestions: [], needsMoreInformation: false, estimatedLabourHours: { min: 1, max: 2 }, suggestedPricingFactors: [],
+    confidence: 92, requiresAdminReview: false, adminReviewReason: null, safetyFlags: [], imageFindings: { status: 'NOT_PROVIDED', notes: [] }, conflictingInformation: false,
+    ...over,
+  });
+  /** The real Gemini adapter + SDK, answering from a script instead of the network. */
+  function useGemini(...replies: Reply[]) {
+    sent.length = 0;
+    const fetchImpl = (async (_url: string | URL | Request, init?: RequestInit) => {
+      sent.push(JSON.parse(String(init?.body ?? '{}')) as (typeof sent)[number]);
+      const next = replies[Math.min(sent.length - 1, replies.length - 1)]!;
+      return typeof next === 'function' ? next(init?.signal) : next.clone();
+    }) as typeof fetch;
+    overrideAiProvider(new GeminiProvider('test-gemini-key', 'gemini-test-model', undefined, fetchImpl));
+  }
+
+  it('text + photo: sends the image inline, redacts personal details and returns a server-priced proposal', async () => {
+    useGemini(geminiAnswer(analysis({ imageFindings: { status: 'ANALYSED', notes: ['Geyser breaker visible in the board'] } })));
+    const photoId = await uploadAiPhoto(t.customerA);
+    const c = await start(t.customerA, 'My DB trips whenever the geyser switches on. Call me on 082 555 1234.', { attachmentIds: [photoId], propertyType: 'RESIDENTIAL' });
+    expect(sent).toHaveLength(1);
+    const parts = sent[0]!.contents[0]!.parts;
+    expect(parts[0]).toEqual({ inlineData: { mimeType: 'image/png', data: PNG.toString('base64') } });
+    expect(parts.at(-1)?.text).toMatch(/DB trips whenever the geyser switches on/);
+    expect(JSON.stringify(sent[0])).not.toMatch(/082 555 1234/);
+    expect(c.isSimulation).toBe(false);
+    expect(c.status).toBe('AI_ANSWERED');
+    expect(c.messages[0].attachments[0].analysisStatus).toBe('ANALYSED');
+    expect(c.proposal.priceMin).toBeGreaterThan(0);
+    expect(c.proposal.priceMax).toBeGreaterThanOrEqual(c.proposal.priceMin);
+    const detail = await api(t.owner).get(`/ai/admin/cases/${c.id}`).expect(200);
+    expect(detail.body.assessment).toMatchObject({ provider: 'gemini', model: 'gemini-test-model', source: 'AI', severity: 2 });
+    expect(detail.body.assessment.imageAnalysis.status).toBe('ANALYSED');
+    expect(detail.body.providerCalls.map((p: { status: string }) => p.status)).toEqual(['OK']);
+  });
+
+  it('severity 5: rules override a low Gemini severity — safety warning, no quotation, critical alert', async () => {
+    useGemini(geminiAnswer(analysis({ serviceCategory: 'LIGHTING', severity: 1, confidence: 98 })));
+    const c = await start(t.customerB, 'There is smoke coming out of my distribution board.');
+    expect(c.severity).toBe(5);
+    expect(c.assessment.outcome).toBe('SAFETY_ESCALATION');
+    expect(c.messages.at(-1).kind).toBe('SAFETY_WARNING');
+    expect(c.proposal).toBeNull();
+    const alerts = await notifications(f.users.owner.id, 'AI_CASE_CRITICAL');
+    expect(alerts.at(-1)?.data.aiCaseId).toBe(c.id);
+  });
+
+  it('severity 4 forces admin review even when Gemini is confident', async () => {
+    useGemini(geminiAnswer(analysis({ serviceCategory: 'SOCKETS_SWITCHES', severity: 2, confidence: 97 })));
+    const c = await start(t.customerB, 'My wall plug was sparking when I plugged in the kettle');
+    expect(c.severity).toBe(4);
+    expect(c.status).toBe('NEEDS_ADMIN_REVIEW');
+    expect(c.proposal).toBeNull();
+  });
+
+  it('low Gemini confidence goes to a person, not a proposal', async () => {
+    useGemini(geminiAnswer(analysis({ confidence: 35 })));
+    const c = await start(t.customerA, 'My geyser trips the DB sometimes');
+    expect(c.status).toBe('NEEDS_ADMIN_REVIEW');
+    expect(c.proposal).toBeNull();
+    const detail = await api(t.owner).get(`/ai/admin/cases/${c.id}`).expect(200);
+    expect(detail.body.escalationReasons).toContain('LOW_CONFIDENCE');
+  });
+
+  it('strips DIY instructions from Gemini output and escalates', async () => {
+    useGemini(geminiAnswer(analysis({ summary: 'Geyser element faulty. You can replace the element yourself after switching off the breaker.' })));
+    const c = await start(t.customerA, 'Geyser is not heating and trips the DB');
+    const detail = await api(t.owner).get(`/ai/admin/cases/${c.id}`).expect(200);
+    expect(detail.body.assessment.summary).toBe('Geyser element faulty.');
+    expect(detail.body.escalationReasons).toContain('UNSAFE_AI_OUTPUT');
+    expect(c.status).toBe('NEEDS_ADMIN_REVIEW');
+  });
+
+  it('malformed Gemini output is rejected and routed to a person', async () => {
+    useGemini(geminiJson(200, { candidates: [{ content: { parts: [{ text: '{"summary": "Probably fine", "severity": "low"' }] }, finishReason: 'STOP' }] }));
+    const c = await start(t.customerA, 'Lights flicker in the lounge');
+    expect(c.status).toBe('NEEDS_ADMIN_REVIEW');
+    expect(c.proposal).toBeNull();
+    const detail = await api(t.owner).get(`/ai/admin/cases/${c.id}`).expect(200);
+    expect(detail.body.escalationReasons).toContain('MALFORMED_AI_RESPONSE');
+    expect(detail.body.providerCalls.map((p: { status: string }) => p.status)).toEqual(['MALFORMED']);
+  });
+
+  it('a Gemini safety block is not retried and goes to a person', async () => {
+    useGemini(geminiAnswer({}, 'SAFETY'));
+    const c = await start(t.customerA, 'Outside light on the wall is not working');
+    expect(sent).toHaveLength(1);
+    expect(c.status).toBe('NEEDS_ADMIN_REVIEW');
+    const detail = await api(t.owner).get(`/ai/admin/cases/${c.id}`).expect(200);
+    expect(detail.body.escalationReasons).toContain('PROVIDER_UNAVAILABLE');
+    expect(detail.body.assessment.source).toBe('FALLBACK');
+  });
+
+  it('server errors are retried once (AI_MAX_RETRIES) and then fall back to human review', async () => {
+    useGemini(geminiJson(503, { error: { code: 503, message: 'The model is overloaded', status: 'UNAVAILABLE' } }));
+    const c = await start(t.customerB, 'Our office lost power on half the circuits');
+    expect(sent).toHaveLength(2);
+    expect(c.status).toBe('NEEDS_ADMIN_REVIEW');
+    expect(c.messages.at(-1).body).toBe('Your request has been saved and sent to our team for review.');
+    const detail = await api(t.owner).get(`/ai/admin/cases/${c.id}`).expect(200);
+    expect(detail.body.providerCalls.map((p: { status: string }) => p.status)).toEqual(['ERROR', 'ERROR']);
+    expect(JSON.stringify(detail.body)).not.toContain('test-gemini-key');
+  });
+
+  it('the hard timeout aborts a hanging Gemini request', async () => {
+    useGemini((s) => new Promise<Response>((_resolve, reject) => s?.addEventListener('abort', () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' })))));
+    const c = await start(t.customerB, 'Inverter beeps and shows a fault light');
+    expect(c.status).toBe('NEEDS_ADMIN_REVIEW');
+    const detail = await api(t.owner).get(`/ai/admin/cases/${c.id}`).expect(200);
+    expect(detail.body.providerCalls.map((p: { status: string }) => p.status)).toEqual(['TIMEOUT', 'TIMEOUT']);
+  }, 20_000);
 });
 
 describe('development seed', () => {

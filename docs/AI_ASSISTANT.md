@@ -27,7 +27,7 @@ CUSTOMER QUESTION
 | Shared contract | `packages/shared/src/schemas/ai.ts` — enums, provider-output schema (`aiAnalysisSchema`), request schemas, versioned policy schemas, DTOs, customer wording constants |
 | Database | `apps/api/migrations/006_ai_assistant.sql` |
 | Deterministic rules | `apps/api/src/ai/engine.ts` (safety, classification, severity, pricing, confidence, decision, response window, history), `ai/text.ts` (phrase matching with negation, redaction, DIY filter), `ai/policies.ts` (defaults, core safety rules, `PROMPT_VERSION`) |
-| Provider abstraction | `apps/api/src/ai/providers/` — `types.ts` (`AiProvider`), `mock.ts`, `anthropic.ts`, `openai.ts`, `index.ts` (factory + `NoAiProvider`); `ai/prompt.ts`; `ai/parse.ts` |
+| Provider abstraction | `apps/api/src/ai/providers/` — `types.ts` (`AiProvider`), `mock.ts`, `anthropic.ts`, `openai.ts`, `gemini.ts`, `index.ts` (factory + `NoAiProvider`); `ai/prompt.ts`; `ai/parse.ts` |
 | Retrieval | `apps/api/src/repositories/aiKnowledgeRepository.ts` (`KnowledgeRetriever` + PostgreSQL implementation) |
 | Data access | `apps/api/src/repositories/aiRepository.ts` |
 | Orchestration | `apps/api/src/services/ai/orchestrator.ts` (`runAssessment`, `applySafetyRulesOnly`), `services/ai/config.ts`, `services/ai/dto.ts` |
@@ -140,6 +140,7 @@ escalation live in HYDRA code, so swapping providers never changes business beha
 | `mock` | `MockAiProvider` | Deterministic **development simulation**. Labelled "Development AI simulation" everywhere; never claims image analysis ("AI image analysis is unavailable in this development environment."). Refused in production. Test directives: `[mock:timeout]`, `[mock:error]`, `[mock:ratelimit]`, `[mock:malformed]`, `[mock:confident]`, `[mock:unclear-image]`, `[mock:conflict]`, `[mock:review]`. |
 | `anthropic` | `AnthropicProvider` (official `@anthropic-ai/sdk`) | Structured output (`output_config.format` JSON schema), base64 images (JPEG/PNG/GIF/WebP), default model `claude-opus-5-5`, server-side refusal fallbacks (`fallbacks: "default"`); SDK retries disabled because HYDRA owns retry policy. |
 | `openai` | `OpenAiCompatibleProvider` (`fetch`) | Chat Completions with `json_schema` response format; `AI_BASE_URL` for Azure OpenAI / compatible gateways; `AI_MODEL` required. |
+| `gemini` | `GeminiProvider` (official `@google/genai`, Gemini Developer API) | `generateContent` with `responseMimeType: application/json` + `responseJsonSchema`; inline images (JPEG/PNG/WebP/HEIF); `AI_MODEL` required (no default); Gemini's default safety settings kept; a blocked prompt or safety/recitation stop escalates to a person (not retried), `MAX_TOKENS` is retried; SDK retries disabled because HYDRA owns retry policy; the key is sent only in the `x-goog-api-key` header. |
 | `none` | `NoAiProvider` | Human-only: every case goes to review (also the owner's *Human review only* mode). Production default when unset. |
 
 Orchestrator: hard timeout per call (`AI_TIMEOUT_MS`), retries for timeouts / rate limits / 5xx
@@ -243,10 +244,10 @@ category, unclear images, conflicting information, low confidence) until the rou
 | Variable | Purpose |
 | --- | --- |
 | `AI_ASSISTANT_ENABLED` | Server kill switch (default `true`) |
-| `AI_PROVIDER` | `mock` \| `anthropic` \| `openai` \| `none` (unset → `mock` in dev/test, `none` in production) |
-| `AI_MODEL` | Model name (Anthropic default `claude-opus-5-5`; required for `openai`) |
+| `AI_PROVIDER` | `mock` \| `anthropic` \| `openai` \| `gemini` \| `none` (unset → `mock` in dev/test, `none` in production) |
+| `AI_MODEL` | Model name (Anthropic default `claude-opus-5-5`; required for `openai` and `gemini` — HYDRA production uses `gemini-3.6-flash`) |
 | `AI_API_KEY` | Provider key — environment / Key Vault only, never in source or the app |
-| `AI_BASE_URL` | Optional custom endpoint (Azure OpenAI, gateway) |
+| `AI_BASE_URL` | Optional custom endpoint (Azure OpenAI, Anthropic/Gemini gateway) |
 | `AI_TIMEOUT_MS` | Per-call hard timeout (default 25 000) |
 | `AI_MAX_RETRIES` | Retries for transient failures (default 1) |
 
@@ -386,9 +387,10 @@ the "saved and sent to our team" fallback.
 ## 18. Known limitations
 
 - Development uses the **simulation**: it classifies by keywords and approved knowledge and never analyses
-  images. Real image understanding requires `AI_PROVIDER=anthropic` (or `openai`) with a key.
-- The real provider adapters are implemented and unit-tested at the parsing/validation layer, but have not been
-  exercised against a live endpoint in this environment (no credentials).
+  images. Real image understanding requires `AI_PROVIDER=anthropic` (or `openai` / `gemini`) with a key.
+- The real provider adapters are implemented and unit-tested at the parsing/validation layer. The Gemini adapter
+  has passed live text and image smoke tests against `gemini-3.6-flash`; the Anthropic and OpenAI-compatible
+  adapters have not been exercised against a live endpoint in this environment (no credentials).
 - Default rates, call-out fees and category ranges are development figures — PSG Electrical must confirm them
   in *AI Assistant settings* before customers rely on estimates.
 - Retrieval is lexical (full-text + keywords); semantic/vector retrieval is a documented upgrade path.

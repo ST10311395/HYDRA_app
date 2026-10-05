@@ -1,5 +1,6 @@
 import { config } from '../../config/env';
 import { AnthropicProvider } from './anthropic';
+import { GeminiProvider } from './gemini';
 import { MockAiProvider } from './mock';
 import { OpenAiCompatibleProvider } from './openai';
 import { AiProviderError, type AiProvider } from './types';
@@ -29,6 +30,9 @@ export function createAiProvider(modelOverride?: string): AiProvider {
       return new AnthropicProvider(cfg.AI_API_KEY, model ?? DEFAULT_ANTHROPIC_MODEL, cfg.AI_BASE_URL);
     case 'openai':
       return model ? new OpenAiCompatibleProvider(cfg.AI_API_KEY, model, cfg.AI_BASE_URL) : new NoAiProvider();
+    case 'gemini':
+      // No default model: Gemini model names change often, so an unset AI_MODEL means human review.
+      return model ? new GeminiProvider(cfg.AI_API_KEY, model, cfg.AI_BASE_URL) : new NoAiProvider();
     default:
       return new NoAiProvider();
   }

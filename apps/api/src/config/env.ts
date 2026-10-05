@@ -83,10 +83,10 @@ const envSchema = z.object({
     .optional()
     .transform((v) => v === undefined || v === '' || v === 'true' || v === '1'),
   /** Unset → `mock` in development/test, `none` (human-only review) in production. */
-  AI_PROVIDER: z.enum(['mock', 'anthropic', 'openai', 'none']).optional(),
+  AI_PROVIDER: z.enum(['mock', 'anthropic', 'openai', 'gemini', 'none']).optional(),
   AI_MODEL: optional,
   AI_API_KEY: optional,
-  /** OpenAI-compatible base URL (e.g. an Azure OpenAI deployment); defaults to the provider's public API. */
+  /** Custom endpoint (e.g. an Azure OpenAI deployment or a gateway); defaults to the provider's public API. */
   AI_BASE_URL: optional,
   AI_TIMEOUT_MS: z.coerce.number().int().min(1000).max(120_000).default(25_000),
   AI_MAX_RETRIES: z.coerce.number().int().min(0).max(3).default(1),
@@ -112,7 +112,7 @@ export interface AppConfig extends Env {
   fileSigningSecret: string;
   webhookSecret: string;
   googleClientIds: string[];
-  aiProvider: 'mock' | 'anthropic' | 'openai' | 'none';
+  aiProvider: 'mock' | 'anthropic' | 'openai' | 'gemini' | 'none';
 }
 
 export function assertProductionSafety(env: Env): void {
@@ -131,7 +131,7 @@ export function assertProductionSafety(env: Env): void {
   if (!env.PUBLIC_API_BASE_URL.startsWith('https://')) problems.push('PUBLIC_API_BASE_URL must use https');
   if (!env.DATABASE_SSL) problems.push('DATABASE_SSL must be true in production');
   if (env.AI_PROVIDER === 'mock') problems.push('AI_PROVIDER=mock (development simulation) is not allowed in production — use a real provider or none');
-  if ((env.AI_PROVIDER === 'anthropic' || env.AI_PROVIDER === 'openai') && !env.AI_API_KEY) problems.push('AI_API_KEY');
+  if ((env.AI_PROVIDER === 'anthropic' || env.AI_PROVIDER === 'openai' || env.AI_PROVIDER === 'gemini') && !env.AI_API_KEY) problems.push('AI_API_KEY');
   if (problems.length > 0) {
     throw new Error(`Unsafe production configuration: ${problems.join('; ')}`);
   }
