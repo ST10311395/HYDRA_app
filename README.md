@@ -467,6 +467,10 @@ Store the supplied annexure alongside this README if submitting it with the repo
 relates to the interactions it contains; supplement it with later development evidence instead of treating it as
 a complete coding-use record.
 
+<img width="1919" height="1024" alt="Screenshot 2026-10-05 130004" src="https://github.com/user-attachments/assets/b82c38ad-c3a4-4313-ba65-13d593461a02" />
+<img width="1919" height="1079" alt="Screenshot 2026-10-05 125930" src="https://github.com/user-attachments/assets/7da1c734-2cf5-4a7c-b393-448b8b102ae1" />
+
+
 ## Code attribution and references
 
 Hand-written source files carry a short `Code Attribution` comment listing only the references relevant to that
