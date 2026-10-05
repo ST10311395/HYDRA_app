@@ -84,6 +84,7 @@ export const config = {
   apiUrlSource: resolved.source,
   googleWebClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ?? '',
   googleIosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID ?? '',
-  easProjectId: process.env.EXPO_PUBLIC_EAS_PROJECT_ID ?? '',
+  // Falls back to the project ID baked into app.config.ts so push works without the env var.
+  easProjectId: process.env.EXPO_PUBLIC_EAS_PROJECT_ID || ((Constants.expoConfig?.extra?.eas as { projectId?: string } | undefined)?.projectId ?? ''),
   isProduction: APP_ENV === 'production',
 };

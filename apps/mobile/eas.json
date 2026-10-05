@@ -16,19 +16,19 @@
       "extends": "base",
       "distribution": "internal",
       "android": { "buildType": "apk" },
-      "env": { "HYDRA_ENABLE_MISSED_CALL_MONITOR": "true", "EXPO_PUBLIC_APP_ENV": "production", "EXPO_PUBLIC_API_URL": "https://api.hydra.psgelectrical.co.za" }
+      "env": { "HYDRA_ENABLE_MISSED_CALL_MONITOR": "true", "EXPO_PUBLIC_APP_ENV": "production", "EXPO_PUBLIC_API_URL": "https://hydra-psg-api-dqezcvhufjacdhfr.southafricanorth-01.azurewebsites.net" }
     },
     "preview": {
       "extends": "base",
       "distribution": "internal",
       "android": { "buildType": "apk" },
-      "env": { "EXPO_PUBLIC_APP_ENV": "staging", "EXPO_PUBLIC_API_URL": "https://staging-api.hydra.psgelectrical.co.za" }
+      "env": { "EXPO_PUBLIC_APP_ENV": "staging", "EXPO_PUBLIC_API_URL": "https://hydra-psg-api-dqezcvhufjacdhfr.southafricanorth-01.azurewebsites.net" }
     },
     "production": {
       "extends": "base",
       "autoIncrement": true,
       "android": { "buildType": "app-bundle" },
-      "env": { "EXPO_PUBLIC_APP_ENV": "production", "EXPO_PUBLIC_API_URL": "https://api.hydra.psgelectrical.co.za" }
+      "env": { "EXPO_PUBLIC_APP_ENV": "production", "EXPO_PUBLIC_API_URL": "https://hydra-psg-api-dqezcvhufjacdhfr.southafricanorth-01.azurewebsites.net" }
     }
   },
   "submit": {
