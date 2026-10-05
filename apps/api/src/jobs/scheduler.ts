@@ -7,6 +7,8 @@ const SCHEDULE: Record<TaskName, string> = {
   quoteExpiry: '5 0 * * *', // 00:05 daily
   sessionCleanup: '30 2 * * *', // 02:30 daily
   orphanUploads: '0 3 * * *', // 03:00 daily
+  aiReviewAgeing: '*/30 * * * *', // every 30 minutes
+  aiEstimateOutcomes: '45 3 * * *', // 03:45 daily
 };
 
 /** In-process scheduler for single-instance deployments. Scale-out deployments run `npm run jobs` as a WebJob instead. */
