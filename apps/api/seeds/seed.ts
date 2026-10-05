@@ -24,6 +24,7 @@ import { createQuote, respondToQuote } from '../src/services/quoteService';
 import { decideLeave, requestLeave } from '../src/services/workforceService';
 import type { AuthContext } from '../src/types/express';
 import { addDays, businessDayStart, todayIso } from '../src/utils/dates';
+import { seedSmartQuote } from './ai';
 import { DEPARTMENTS, FAQS, MATERIALS, OFFICES, PARTNERS, PORTFOLIO, PUBLIC_CONTENT, SERVICE_TYPES, TEAM } from './content';
 
 interface SeedUser {
@@ -277,6 +278,9 @@ async function main(): Promise<void> {
   await submitEnquiry({ name: 'Megan Pillay', email: 'megan.pillay@example.com', phone: '+27 71 333 9087', urgency: 'STANDARD', message: 'Requesting a quotation for a 30kW rooftop solar system for our offices.', source: 'QUOTE_TOOL', consent: true, details: { sector: 'Solar & Energy Storage', voltageLevel: 'Low Voltage (400V / 230V Three-Phase)', scope: '30kW grid-tied with 20kWh storage', siteAddress: 'Westville, Durban' } }, undefined, guest);
   await submitEnquiry({ name: 'Johan Steyn', email: 'johan.steyn@example.com', phone: '+27 84 222 7719', urgency: 'EMERGENCY', message: 'Complete power failure at our cold-storage facility. Generator not starting.', source: 'CONTACT_FORM', consent: true }, undefined, guest);
   await logMissedCall(office, { phoneNumber: '+27 72 111 2233', callAt: new Date(Date.now() - 45 * 60_000).toISOString(), durationSeconds: 0, source: 'MANUAL' }, actorOf(office));
+
+  // HYDRA Smart Quote: policies, approved knowledge, sample cases (development simulation only)
+  await seedSmartQuote();
 
   await closePool();
   console.log('\nHYDRA demo data seeded.\n');
