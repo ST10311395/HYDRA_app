@@ -431,11 +431,7 @@ Freedom Conservancy, 2026; GitHub, 2026b).
 
 ### Scope and tools disclosed
 
-Generative AI assistance is disclosed for HYDRA planning, requirements interpretation, documentation, diagram
-review, implementation assistance, troubleshooting and verification support. Claude/Claude Code (Anthropic) was
-used during the project, including development assistance (Anthropic, 2026a; 2026b). ChatGPT (OpenAI) was used
-for guidance, documentation and preparation of this README (OpenAI, 2026). Claude Code also assisted in
-combining the team's two README versions into this document on 5 October 2026.
+The submitting team remains responsible for the final code, accuracy of claims, source attribution, test results and compliance with the assessment’s AI-use requirements. This README includes an AI-assisted disclosure and does not create signatures or certify that every team member has reviewed it. Each member should confirm that the final disclosure accurately reflects their actual use of AI tools and that all relevant supporting evidence has been included.
 
 This declaration covers assistance in producing the assessment and project. The runtime Smart Quote feature
 described above is a separate application capability; a configured provider does not imply that it was used to
