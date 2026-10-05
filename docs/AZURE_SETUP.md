@@ -116,12 +116,20 @@ Functions timer, and set `DISABLE_SCHEDULER=true` on the API so scaled-out insta
 Azure Front Door Standard in front of App Service adds WAF rules and a global edge. Restrict App Service
 access to the Front Door service tag and keep `TRUST_PROXY=true`. WebSockets (Socket.IO) are supported.
 
-## 8. GitHub OIDC for deployments
+## 8. GitHub deployment credentials (publish profile)
 
-Create an Entra ID app registration with a federated credential for `repo:<org>/<repo>:environment:production`
-(and `:staging`), grant it **Website Contributor** on the web app, then set repository/environment secrets
-`AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `DATABASE_URL`, and variables
-`AZURE_WEBAPP_NAME`, `AZURE_WEBAPP_SLOT`, `API_BASE_URL`. See [DEPLOYMENT.md](DEPLOYMENT.md).
+The deploy workflow authenticates with the App Service **publish profile**. The production web app is
+`hydra-psg-api` (`https://hydra-psg-api-dqezcvhufjacdhfr.southafricanorth-01.azurewebsites.net`).
+
+1. Enable basic-auth publishing credentials on the web app (portal → *Configuration → General settings →
+   SCM Basic Auth Publishing Credentials: On*), otherwise the publish profile is rejected.
+2. Download the profile (portal → App Service → *Download publish profile*, or
+   `az webapp deployment list-publishing-profiles -g <resource-group> -n hydra-psg-api --xml`) and store the
+   whole XML as the `production` environment secret `AZURE_WEBAPP_PUBLISH_PROFILE`. Do not save it in the repo.
+3. Add the environment secret `DATABASE_URL` and variables `AZURE_WEBAPP_NAME=hydra-psg-api`,
+   `AZURE_WEBAPP_SLOT=production`, `API_BASE_URL=https://hydra-psg-api-dqezcvhufjacdhfr.southafricanorth-01.azurewebsites.net`.
+
+Rotate the credential with *Reset publish profile* and update the secret. See [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Code attribution
 

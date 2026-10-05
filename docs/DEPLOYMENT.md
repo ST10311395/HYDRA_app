@@ -9,16 +9,30 @@ Infrastructure is created once with [AZURE_SETUP.md](AZURE_SETUP.md). Mobile bin
 | --- | --- | --- | --- | --- |
 | Local | `npm run api` (http://localhost:4000) | embedded PostgreSQL :5433 | `development` (dev client) | — |
 | Staging | `app-hydra-api-stg` (`https://staging-api.hydra.psgelectrical.co.za`) | `psql-hydra-stg` | `preview` | Manual workflow run, no reviewer |
-| Production | `app-hydra-api-prod` (`https://api.hydra.psgelectrical.co.za`) | `psql-hydra-prod` | `production`, `admin-device` | Manual workflow run **with required reviewers** |
+| Production | `hydra-psg-api` (`https://hydra-psg-api-dqezcvhufjacdhfr.southafricanorth-01.azurewebsites.net`) | `psql-hydra-prod` | `production`, `admin-device` | Manual workflow run **with required reviewers** |
 
 ## GitHub configuration
 
 1. **Settings → Environments**: create `staging` and `production`. On `production` enable *Required
    reviewers* (owner/lead engineer) and restrict deployments to `main`.
-2. Environment **secrets**: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` (OIDC — no
-   passwords), `DATABASE_URL` (used only by the migration step).
+2. Environment **secrets**:
+   - `AZURE_WEBAPP_PUBLISH_PROFILE` — the App Service publish profile (Azure portal → App Service →
+     *Download publish profile*; paste the whole XML file as the secret value). `azure/webapps-deploy`
+     authenticates with it directly, so no `azure/login` step, Entra ID app registration or `id-token`
+     permission is needed. Basic-auth publishing credentials (SCM) must be enabled on the web app for the
+     profile to work. Treat the profile as a password: never commit it, and *Reset publish profile* in the
+     portal (then update the secret) if it may have leaked.
+   - `DATABASE_URL` — used only by the migration step (run with `DATABASE_SSL=true`).
 3. Environment **variables**: `AZURE_WEBAPP_NAME`, `AZURE_WEBAPP_SLOT` (`production` or `staging` slot),
-   `API_BASE_URL` (for the health smoke test).
+   `API_BASE_URL` (for the health smoke test). Current production values:
+
+   | Variable | Value |
+   | --- | --- |
+   | `AZURE_WEBAPP_NAME` | `hydra-psg-api` |
+   | `AZURE_WEBAPP_SLOT` | `production` |
+   | `API_BASE_URL` | `https://hydra-psg-api-dqezcvhufjacdhfr.southafricanorth-01.azurewebsites.net` |
+
+   A staging environment needs its own publish profile (one per web app/slot) and its own variables.
 4. Repository secret `EXPO_TOKEN` and variables `EXPO_PUBLIC_*` for [EAS builds](EAS_BUILD.md).
 5. Branch protection on `main`: require the **CI** workflow (`quality`, `api`, `mobile` jobs) to pass and at
    least one review.
@@ -29,14 +43,14 @@ Infrastructure is created once with [AZURE_SETUP.md](AZURE_SETUP.md). Mobile bin
 2. **Actions → Deploy API → Run workflow → staging**. The workflow:
    - installs, builds `@hydra/shared` and the API,
    - assembles a self-contained package (`dist/`, `migrations/`, production `node_modules`),
-   - logs in to Azure with OIDC,
    - applies pending migrations with `npm run db:migrate:prod` (checksum-guarded, transactional; reset is refused in production),
-   - deploys with `azure/webapps-deploy`,
-   - polls `/health` until `status: ok`.
+   - deploys with `azure/webapps-deploy@v3` using the `AZURE_WEBAPP_PUBLISH_PROFILE` secret,
+   - polls `${API_BASE_URL}/health` until `status: ok`.
 3. Smoke test staging with a `preview` mobile build: sign in as each role, request → quote → accept → assign
    → QR check-in → materials → inspection → invoice → sandbox (Paystack test key) payment.
 4. Run the same workflow for **production**; a reviewer approves the environment gate.
-5. If a deployment slot is used, deploy to `staging` slot then swap: `az webapp deployment slot swap -g rg-hydra-prod -n app-hydra-api-prod --slot staging`.
+5. If a deployment slot is used, deploy to `staging` slot then swap: `az webapp deployment slot swap -g <resource-group> -n hydra-psg-api --slot staging`
+   (download the publish profile of the `staging` slot for that environment's secret).
 
 ### Rollback
 
