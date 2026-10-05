@@ -1,0 +1,90 @@
+name: Deploy API (Azure App Service)
+
+# Manual, reviewed deployments only (spec §30): never deploys automatically on push. The
+# "production" GitHub Environment must be configured with required reviewers (see docs/DEPLOYMENT.md).
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [staging, production]
+        default: staging
+      run_migrations:
+        description: Apply pending database migrations before swapping in the new build
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  id-token: write # OIDC federation to Azure — no long-lived publish profile or client secret
+
+concurrency:
+  group: deploy-api-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build, migrate, deploy → ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Build shared + API
+        run: npm run build -w @hydra/shared && npm run build -w @hydra/api
+
+      - name: Assemble a self-contained deployment package
+        run: |
+          set -euo pipefail
+          mkdir -p deploy
+          cp -r apps/api/dist apps/api/migrations deploy/
+          npm pack -w @hydra/shared --pack-destination deploy
+          node -e "
+            const fs=require('fs');
+            const p=require('./apps/api/package.json');
+            const tgz=fs.readdirSync('deploy').find(f=>f.startsWith('hydra-shared-')&&f.endsWith('.tgz'));
+            p.dependencies['@hydra/shared']='file:./'+tgz;
+            delete p.devDependencies;
+            p.scripts={start:'node dist/server.js','db:migrate:prod':'node dist/db/migrate.js','owner:create':'node dist/db/createOwner.js'};
+            fs.writeFileSync('deploy/package.json',JSON.stringify(p,null,2));
+          "
+          cd deploy && npm install --omit=dev --no-audit --no-fund
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Apply database migrations
+        if: ${{ inputs.run_migrations }}
+        working-directory: deploy
+        # DATABASE_URL is an environment secret (Key Vault-backed). The runner must be allowed through
+        # the PostgreSQL Flexible Server firewall, or run this step from a self-hosted runner in the VNet.
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_SSL: 'true'
+        run: npm run db:migrate:prod
+
+      - name: Deploy to App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          slot-name: ${{ vars.AZURE_WEBAPP_SLOT || 'production' }}
+          package: deploy
+
+      - name: Smoke test /health
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS "${{ vars.API_BASE_URL }}/health" | grep -q '"status":"ok"'; then echo "healthy"; exit 0; fi
+            sleep 10
+          done
+          echo "API did not become healthy"; exit 1

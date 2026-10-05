@@ -1,0 +1,119 @@
+name: CI
+
+# Quality gates for every push and pull request (spec §27 / §30): lint, typecheck, unit + integration
+# tests against a real PostgreSQL service, API build, and Expo/mobile validation. Nothing deploys here.
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '24'
+  # Keep Expo CLI non-interactive and telemetry-free in CI.
+  CI: 'true'
+  EXPO_NO_TELEMETRY: '1'
+
+jobs:
+  quality:
+    name: Lint · typecheck · shared tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Install (also builds @hydra/shared via postinstall)
+        run: npm ci
+      - name: Lint (shared, api, mobile)
+        run: npm run lint
+      - name: Typecheck (shared, api, mobile incl. tests)
+        run: npm run typecheck
+      - name: Shared domain tests
+        run: npm test -w @hydra/shared
+
+  api:
+    name: API tests (PostgreSQL) · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: hydra_test
+          POSTGRES_PASSWORD: hydra_test_only
+          POSTGRES_DB: hydra_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U hydra_test -d hydra_test"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      # The test harness uses this server instead of starting an embedded cluster.
+      TEST_DATABASE_URL: postgres://hydra_test:hydra_test_only@localhost:5432/hydra_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Unit, security and end-to-end workflow tests
+        run: npm test -w @hydra/api
+      - name: Build API
+        run: npm run build -w @hydra/api
+      - name: Export OpenAPI document
+        run: npm run openapi -w @hydra/api
+      - uses: actions/upload-artifact@v4
+        with:
+          name: api-dist
+          path: |
+            apps/api/dist
+            apps/api/migrations
+          retention-days: 7
+
+  mobile:
+    name: Mobile tests · Expo validation · bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+        working-directory: .
+      - name: Jest (components, auth, flows, guards, permissions)
+        run: npm test
+      - name: Navigation audit (no dead links)
+        run: npm run check:routes
+      - name: Resolve Expo config (store build)
+        run: npx expo config --type public > /dev/null
+      - name: Resolve Expo config (admin work-device build with missed-call module)
+        run: npx expo config --type introspect | grep -q READ_CALL_LOG
+        env:
+          HYDRA_ENABLE_MISSED_CALL_MONITOR: 'true'
+      - name: Store build must NOT request call-log access
+        run: |
+          if npx expo config --type introspect | grep -q READ_CALL_LOG; then
+            echo "READ_CALL_LOG leaked into the store build"; exit 1
+          fi
+      - name: expo-doctor
+        run: npx expo-doctor
+      - name: Export Android + iOS bundles (Hermes)
+        run: npm run build
+        env:
+          EXPO_PUBLIC_APP_ENV: production
+          EXPO_PUBLIC_API_URL: https://api.example.invalid

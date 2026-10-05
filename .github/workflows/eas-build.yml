@@ -1,0 +1,54 @@
+name: EAS Build (Android / iOS)
+
+# Native binaries are built in Expo's cloud (EAS Build); no Android SDK or Xcode is needed here.
+# Manual trigger only. Requires the EXPO_TOKEN repository secret (see docs/EAS_BUILD.md).
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        type: choice
+        options: [android, ios, all]
+        default: android
+      profile:
+        description: eas.json build profile
+        type: choice
+        options: [preview, production, admin-device, development]
+        default: preview
+      submit:
+        description: Submit a production build to the stores after it finishes
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+        working-directory: .
+      - name: Pre-flight (tests + Expo checks)
+        run: npm test && npx expo-doctor
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Build
+        env:
+          EXPO_PUBLIC_EAS_PROJECT_ID: ${{ vars.EXPO_PUBLIC_EAS_PROJECT_ID }}
+          EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${{ vars.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID }}
+          EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: ${{ vars.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID }}
+          EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME: ${{ vars.EXPO_PUBLIC_GOOGLE_IOS_URL_SCHEME }}
+        run: >
+          eas build --platform ${{ inputs.platform }} --profile ${{ inputs.profile }} --non-interactive
+          ${{ inputs.submit && inputs.profile == 'production' && '--auto-submit' || '' }}
