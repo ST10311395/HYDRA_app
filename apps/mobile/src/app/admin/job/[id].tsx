@@ -6,6 +6,7 @@ import type { JobDetailDto, QuoteDto } from '@hydra/shared';
 import { api, errorMessage } from '../../../api/client';
 import { useJob, useJobAction, useSimpleMutation } from '../../../api/queries';
 import { JobStatusBadge, NotesSection, PersonRow, QuoteBreakdown, SegmentLink, Timeline } from '../../../components/jobs';
+import { JobAiSection } from '../../../features/ai/JobAiSection';
 import { BrandHeader, Screen } from '../../../components/layout';
 import { Badge, Button, Card, Divider, KeyValue, Label, Text, TextField, colors, confirm, radius, spacing, toast } from '../../../design-system';
 import { useJobSubscription } from '../../../hooks/useRealtime';
@@ -197,6 +198,7 @@ export default function AdminJobDetail() {
               <Text variant="bodySmall" color="textSecondary" style={{ marginTop: 4 }}>{j.description}</Text>
             </View>
 
+            <JobAiSection jobId={j.id} source={j.source} adminLink />
             <NotesSection job={j} canPost={j.status !== 'CANCELLED'} staff />
           </>
         )}

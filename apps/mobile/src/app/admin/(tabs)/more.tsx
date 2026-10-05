@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { View } from 'react-native';
+import { useAiSummary } from '../../../api/ai';
 import { useAdminDashboard } from '../../../api/queries';
 import { useIsOwner } from '../../../components/admin';
 import { SegmentLink } from '../../../components/jobs';
@@ -20,8 +21,18 @@ export default function More() {
   const owner = useIsOwner();
   const user = useAuth((s) => s.user);
   const dash = useAdminDashboard();
+  const ai = useAiSummary();
   const k = dash.data?.kpis;
   const groups: { title: string; items: Item[] }[] = [
+    {
+      title: 'Smart Quote (AI)',
+      items: [
+        { icon: 'cpu', label: 'AI Review', route: '/admin/ai-review', badge: ai.data?.critical ? `${ai.data.critical} CRITICAL` : ai.data?.needsReview ? String(ai.data.needsReview) : undefined },
+        { icon: 'book-open', label: 'AI Knowledge', route: '/admin/ai-knowledge' },
+        { icon: 'bar-chart-2', label: 'AI analytics', route: '/admin/ai-analytics' },
+        { icon: 'sliders', label: 'AI Assistant settings', route: '/admin/ai-settings', owner: true },
+      ],
+    },
     {
       title: 'Operations',
       items: [

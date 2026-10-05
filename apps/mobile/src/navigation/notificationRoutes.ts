@@ -2,8 +2,10 @@
 export function routeForNotification(role: string | undefined, data: Record<string, unknown> | null | undefined): string | null {
   const jobId = typeof data?.jobId === 'string' ? data.jobId : null;
   const invoiceId = typeof data?.invoiceId === 'string' ? data.invoiceId : null;
+  const aiCaseId = typeof data?.aiCaseId === 'string' ? data.aiCaseId : null;
   if (role === 'CUSTOMER') {
     if (invoiceId) return `/customer/invoice/${invoiceId}`;
+    if (aiCaseId && !jobId) return `/customer/ai/${aiCaseId}`;
     if (jobId) return `/customer/job/${jobId}`;
     if (data?.route === '/rewards') return '/customer/rewards';
   } else if (role === 'EMPLOYEE') {
@@ -12,6 +14,7 @@ export function routeForNotification(role: string | undefined, data: Record<stri
     return '/employee/calendar';
   } else if (role === 'ADMIN_OFFICE' || role === 'ADMIN_OWNER') {
     if (jobId) return `/admin/job/${jobId}`;
+    if (aiCaseId) return `/admin/ai-case/${aiCaseId}`;
     if (invoiceId) return `/admin/invoice/${invoiceId}`;
     if (typeof data?.enquiryId === 'string') return `/admin/enquiry/${data.enquiryId}`;
     if (typeof data?.missedCallId === 'string') return `/admin/missed-call/${data.missedCallId}`;
