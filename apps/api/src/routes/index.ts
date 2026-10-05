@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { registerAdminRoutes } from '../controllers/adminController';
+import { registerAiRoutes } from '../controllers/aiController';
 import { registerAuthRoutes } from '../controllers/authController';
 import { registerContentRoutes } from '../controllers/contentController';
 import { registerFileRoutes } from '../controllers/fileController';
@@ -16,6 +17,7 @@ export function apiRouter(): Router {
   registerFinanceRoutes(r);
   registerOperationsRoutes(r);
   registerAdminRoutes(r);
+  registerAiRoutes(r);
   registerFileRoutes(r);
   return r;
 }

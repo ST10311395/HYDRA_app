@@ -27,3 +27,5 @@ export const registerLimiter = limiter({ windowMs: 60 * 60_000, limit: 10 });
 /** Public contact form — the most exposed surface (PDF §2.1.1 Visitor). */
 export const contactLimiter = limiter({ windowMs: 60 * 60_000, limit: 8 });
 export const uploadLimiter = limiter({ windowMs: 60_000, limit: 20 });
+/** Smart Quote messages call an external AI provider: cap per client to protect cost and the provider quota. */
+export const aiLimiter = limiter({ windowMs: 60_000, limit: 12 });
