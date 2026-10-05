@@ -20,7 +20,7 @@ export function registerFileRoutes(r: Router): void {
     pre: [uploadLimiter, upload.single('file')], status: 201 },
     (req) => {
       const purpose = z.enum(FILE_PURPOSES).safeParse(req.body?.purpose);
-      if (!purpose.success) throw badRequest('purpose must be one of JOB_PHOTO, INSPECTION_EVIDENCE, COMPLIANCE_DOCUMENT, PROFILE_IMAGE');
+      if (!purpose.success) throw badRequest(`purpose must be one of ${FILE_PURPOSES.join(', ')}`);
       if (!req.file) throw badRequest('Attach a file in the "file" field');
       return uploadFile(auth(req), purpose.data, req.file, actorFrom(req));
     });

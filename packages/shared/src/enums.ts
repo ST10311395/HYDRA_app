@@ -30,7 +30,7 @@ export type JobStatus = (typeof JOB_STATUSES)[number];
 export const JOB_URGENCIES = ['STANDARD', 'HIGH', 'EMERGENCY'] as const;
 export type JobUrgency = (typeof JOB_URGENCIES)[number];
 
-export const JOB_SOURCES = ['APP', 'CONTACT_QUERY', 'ADMIN', 'MISSED_CALL'] as const;
+export const JOB_SOURCES = ['APP', 'CONTACT_QUERY', 'ADMIN', 'MISSED_CALL', 'AI_ASSESSMENT'] as const;
 export type JobSource = (typeof JOB_SOURCES)[number];
 
 export const MILESTONE_STATUSES = ['PENDING', 'COMPLETED', 'SKIPPED'] as const;
@@ -111,6 +111,7 @@ export const FILE_PURPOSES = [
   'INSPECTION_EVIDENCE',
   'COMPLIANCE_DOCUMENT',
   'PROFILE_IMAGE',
+  'AI_ASSESSMENT_PHOTO',
 ] as const;
 export type FilePurpose = (typeof FILE_PURPOSES)[number];
 
@@ -180,6 +181,10 @@ export const NOTIFICATION_TYPES = [
   'MISSED_CALL_REVIEW',
   'MESSAGE_FAILED',
   'ADMIN_NOTE',
+  'AI_CASE_REVIEW',
+  'AI_CASE_CRITICAL',
+  'AI_CASE_UPDATE',
+  'AI_PROPOSAL_READY',
   'SYSTEM',
 ] as const;
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];

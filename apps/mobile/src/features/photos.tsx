@@ -23,6 +23,7 @@ const RULES: Partial<Record<FilePurpose, { mimes: string[]; maxBytes: number }>>
   JOB_PHOTO: { mimes: ['image/jpeg', 'image/png', 'image/webp', 'image/heic'], maxBytes: 8 * 1024 * 1024 },
   INSPECTION_EVIDENCE: { mimes: ['image/jpeg', 'image/png', 'image/webp', 'image/heic'], maxBytes: 8 * 1024 * 1024 },
   PROFILE_IMAGE: { mimes: ['image/jpeg', 'image/png', 'image/webp'], maxBytes: 4 * 1024 * 1024 },
+  AI_ASSESSMENT_PHOTO: { mimes: ['image/jpeg', 'image/png', 'image/webp', 'image/heic'], maxBytes: 8 * 1024 * 1024 },
 };
 
 /** Client-side pre-check: null when acceptable, otherwise the message to show. The server re-validates (magic bytes). */
