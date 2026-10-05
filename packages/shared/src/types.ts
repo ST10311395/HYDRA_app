@@ -1,3 +1,7 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 /**
  * API response DTOs. The API maps database rows to these shapes; the mobile app consumes them.
  * Monetary values are numbers with 2-decimal precision; timestamps are ISO-8601 strings.

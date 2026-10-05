@@ -1,3 +1,8 @@
+/*
+ * Code Attribution
+ * Meta Platforms, Inc. 2026. React Native documentation. Available at: https://reactnative.dev/docs/getting-started [Accessed 21 August 2026].
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 import { Platform } from 'react-native';
 import { config } from '../config';
 

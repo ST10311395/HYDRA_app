@@ -1,3 +1,8 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ * OWASP Foundation. 2023. OWASP API Security Top 10. Available at: https://owasp.org/API-Security/ [Accessed 2 September 2026].
+ */
 import { z } from 'zod';
 import { LEAVE_TYPES, SCHEDULE_EVENT_TYPES } from '../enums.js';
 import { isoDate, isoDateTime, optionalText, paginationQuery, trimmed, uuid } from './common.js';

@@ -1,3 +1,9 @@
+/*
+ * Code Attribution
+ * Anthropic. 2026. Claude Code documentation. Available at: https://docs.anthropic.com/en/docs/claude-code [Accessed 5 October 2026].
+ * Expo. 2026. Expo documentation. Available at: https://docs.expo.dev/ [Accessed 5 September 2026].
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 import type { ConfigContext, ExpoConfig } from "expo/config";
 
 /**

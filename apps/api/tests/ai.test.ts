@@ -1,3 +1,10 @@
+/*
+ * Code Attribution
+ * Anthropic. 2026. Claude Code documentation. Available at: https://docs.anthropic.com/en/docs/claude-code [Accessed 5 October 2026].
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ * OpenJS Foundation. 2026. Node.js documentation. Available at: https://nodejs.org/docs/latest/api/ [Accessed 12 September 2026].
+ * PostgreSQL Global Development Group. 2026. PostgreSQL documentation. Available at: https://www.postgresql.org/docs/ [Accessed 26 August 2026].
+ */
 /**
  * HYDRA Smart Quote — API, workflow, security, failure-handling and learning tests (docs/AI_ASSISTANT.md).
  * Runs against the real PostgreSQL test database with the deterministic development provider.

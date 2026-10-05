@@ -1,3 +1,8 @@
+/*
+ * Code Attribution
+ * Meta Open Source. 2026. Jest documentation. Available at: https://jestjs.io/docs/getting-started [Accessed 9 September 2026].
+ * Meta Platforms, Inc. 2026. React Native documentation. Available at: https://reactnative.dev/docs/getting-started [Accessed 21 August 2026].
+ */
 /**
  * Jest environment for the HYDRA mobile app (jest-expo preset). Native modules that have no JS
  * implementation under Node are replaced with small, deterministic in-memory fakes.

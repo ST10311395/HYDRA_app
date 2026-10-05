@@ -122,3 +122,12 @@ Create an Entra ID app registration with a federated credential for `repo:<org>/
 (and `:staging`), grant it **Website Contributor** on the web app, then set repository/environment secrets
 `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `DATABASE_URL`, and variables
 `AZURE_WEBAPP_NAME`, `AZURE_WEBAPP_SLOT`, `API_BASE_URL`. See [DEPLOYMENT.md](DEPLOYMENT.md).
+
+## Code attribution
+
+- Microsoft. 2026. *Azure App Service documentation*. Available at: https://learn.microsoft.com/en-us/azure/app-service/ [Accessed 5 October 2026].
+- Microsoft. 2026. *Azure Database for PostgreSQL documentation*. Available at: https://learn.microsoft.com/en-us/azure/postgresql/ [Accessed 1 October 2026].
+- Microsoft. 2026. *Azure Blob Storage documentation*. Available at: https://learn.microsoft.com/en-us/azure/storage/blobs/ [Accessed 20 August 2026].
+- Microsoft. 2026. *Azure Key Vault documentation*. Available at: https://learn.microsoft.com/en-us/azure/key-vault/ [Accessed 5 October 2026].
+
+Full reference list: [README.md](../README.md#code-attribution-and-references).

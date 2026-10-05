@@ -1,3 +1,7 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 import { describe, expect, it } from 'vitest';
 import { allowedJobEvents, canTransitionInvoice, nextJobStatus, TERMINAL_JOB_STATUSES } from './lifecycle.js';
 import { JOB_STATUSES } from './enums.js';

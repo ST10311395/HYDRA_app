@@ -1,3 +1,8 @@
+/*
+ * Code Attribution
+ * Meta Open Source. 2026. Jest documentation. Available at: https://jestjs.io/docs/getting-started [Accessed 9 September 2026].
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 import { resolveApiUrl } from '../config';
 
 const dev = { appEnv: 'development', isDevice: true } as const;

@@ -1,3 +1,11 @@
+/*
+ * Code Attribution
+ * Expo. 2026. Expo documentation. Available at: https://docs.expo.dev/ [Accessed 5 September 2026].
+ * Meta Open Source. 2026. Jest documentation. Available at: https://jestjs.io/docs/getting-started [Accessed 9 September 2026].
+ * Meta Platforms, Inc. 2026. React documentation. Available at: https://react.dev/ [Accessed 16 September 2026].
+ * Meta Platforms, Inc. 2026. React Native documentation. Available at: https://reactnative.dev/docs/getting-started [Accessed 21 August 2026].
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 /** A crash in one screen shows the branded recovery screen for that area, not a dead app (§35). */
 import { Stack } from 'expo-router';
 import { cleanup, fireEvent, renderRouter, screen } from 'expo-router/testing-library';

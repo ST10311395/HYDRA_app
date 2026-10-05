@@ -1,3 +1,7 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 /**
  * Web build of push registration. Expo push tokens exist only on iOS/Android devices, so the
  * browser never imports expo-notifications (its token listeners are unsupported on web) and

@@ -1,3 +1,7 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 export * from './enums.js';
 export * from './lifecycle.js';
 export * from './money.js';

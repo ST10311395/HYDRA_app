@@ -1,3 +1,7 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 /**
  * Canonical HYDRA enumerations. These values are mirrored by CHECK constraints in the
  * PostgreSQL migrations — change both together.

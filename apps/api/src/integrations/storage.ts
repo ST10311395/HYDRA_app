@@ -1,3 +1,9 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ * Microsoft. 2026. Azure Blob Storage documentation. Available at: https://learn.microsoft.com/en-us/azure/storage/blobs/ [Accessed 20 August 2026].
+ * OpenJS Foundation. 2026. Node.js documentation. Available at: https://nodejs.org/docs/latest/api/ [Accessed 12 September 2026].
+ */
 import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import {

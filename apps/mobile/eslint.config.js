@@ -1,3 +1,7 @@
+/*
+ * Code Attribution
+ * ESLint. 2026. ESLint documentation. Available at: https://eslint.org/docs/latest/ [Accessed 5 September 2026].
+ */
 // https://docs.expo.dev/guides/using-eslint/
 const { defineConfig } = require('eslint/config');
 const expoConfig = require('eslint-config-expo/flat');

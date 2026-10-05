@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+/*
+ * Code Attribution
+ * OpenJS Foundation. 2026. Node.js documentation. Available at: https://nodejs.org/docs/latest/api/ [Accessed 12 September 2026].
+ */
 /**
  * Points local development at this machine's LAN IP so a physical phone on the same Wi-Fi can reach
  * the API. Updates only these keys and keeps everything else (including secrets) untouched:

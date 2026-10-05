@@ -1,3 +1,7 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 /** Maps notification payloads to in-app screens for the signed-in role. */
 export function routeForNotification(role: string | undefined, data: Record<string, unknown> | null | undefined): string | null {
   const jobId = typeof data?.jobId === 'string' ? data.jobId : null;

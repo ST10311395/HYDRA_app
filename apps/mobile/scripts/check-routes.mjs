@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+/*
+ * Code Attribution
+ * Expo. 2026. Expo documentation. Available at: https://docs.expo.dev/ [Accessed 5 September 2026].
+ * OpenJS Foundation. 2026. Node.js documentation. Available at: https://nodejs.org/docs/latest/api/ [Accessed 12 September 2026].
+ */
 /**
  * Static navigation audit: every route literal used in the app (router.push/replace/navigate,
  * <Link href>, `route:` tables, notification deep links) must resolve to an Expo Router file.

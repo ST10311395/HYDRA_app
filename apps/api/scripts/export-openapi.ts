@@ -1,3 +1,8 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ * OpenJS Foundation. 2026. Node.js documentation. Available at: https://nodejs.org/docs/latest/api/ [Accessed 12 September 2026].
+ */
 /**
  * Writes the generated OpenAPI 3 document to docs/openapi.json (used by docs/API.md and CI).
  * Routes register their OpenAPI entries when the router is built, so no database is needed.

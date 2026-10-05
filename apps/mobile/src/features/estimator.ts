@@ -1,3 +1,7 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 /**
  * Indicative project scope estimator (Our Services wireframe). It gives a planning guide only —
  * the binding figure is always the engineer-reviewed quotation.

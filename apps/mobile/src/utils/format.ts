@@ -1,3 +1,7 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 import { JOB_STATUS_LABELS, formatZar, type InvoiceStatus, type JobStatus, type MissedCallStatus } from '@hydra/shared';
 import type { IconName } from '../design-system/Icon';
 

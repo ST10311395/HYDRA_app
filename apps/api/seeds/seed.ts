@@ -1,3 +1,9 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ * OpenJS Foundation. 2026. Node.js documentation. Available at: https://nodejs.org/docs/latest/api/ [Accessed 12 September 2026].
+ * PostgreSQL Global Development Group. 2026. PostgreSQL documentation. Available at: https://www.postgresql.org/docs/ [Accessed 26 August 2026].
+ */
 /**
  * Development seed (spec §25). Refuses to run in production. Demo lifecycle data is produced by
  * calling the real service layer (quotes, assignment, QR check-in, materials, inspection, invoicing,

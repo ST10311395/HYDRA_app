@@ -1,3 +1,10 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ * Microsoft. 2026. Azure App Service documentation. Available at: https://learn.microsoft.com/en-us/azure/app-service/ [Accessed 5 October 2026].
+ * OpenJS Foundation. 2026. Node.js documentation. Available at: https://nodejs.org/docs/latest/api/ [Accessed 12 September 2026].
+ * PostgreSQL Global Development Group. 2026. PostgreSQL documentation. Available at: https://www.postgresql.org/docs/ [Accessed 26 August 2026].
+ */
 import { createServer } from 'node:http';
 import { networkInterfaces } from 'node:os';
 import { createApp } from './app';

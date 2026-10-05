@@ -1,3 +1,9 @@
+/*
+ * Code Attribution
+ * Anthropic. 2026. Claude Code documentation. Available at: https://docs.anthropic.com/en/docs/claude-code [Accessed 5 October 2026].
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ * OWASP Foundation. 2023. OWASP API Security Top 10. Available at: https://owasp.org/API-Security/ [Accessed 2 September 2026].
+ */
 import { z } from 'zod';
 import { JOB_URGENCIES, type JobUrgency } from '../enums.js';
 import { isoDate, money, optionalText, paginationQuery, trimmed, uuid } from './common.js';

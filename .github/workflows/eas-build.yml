@@ -1,3 +1,8 @@
+# Code Attribution
+# Expo. 2026. Expo documentation. Available at: https://docs.expo.dev/ [Accessed 5 September 2026].
+# GitHub. 2026. GitHub Actions documentation. Available at: https://docs.github.com/en/actions [Accessed 2 September 2026].
+# npm, Inc. 2026. npm documentation. Available at: https://docs.npmjs.com/ [Accessed 5 September 2026].
+
 name: EAS Build (Android / iOS)
 
 # Native binaries are built in Expo's cloud (EAS Build); no Android SDK or Xcode is needed here.

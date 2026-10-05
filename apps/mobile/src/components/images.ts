@@ -1,3 +1,7 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 /**
  * Bundled imagery extracted from the approved high-fidelity wireframes. Database records reference
  * these by `imageKey` / `photoKey`; unknown keys fall back to a neutral technical image.

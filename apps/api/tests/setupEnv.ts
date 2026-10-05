@@ -1,3 +1,8 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ * OpenJS Foundation. 2026. Node.js documentation. Available at: https://nodejs.org/docs/latest/api/ [Accessed 12 September 2026].
+ */
 // Environment for every test worker — set before any module reads config().
 process.env.NODE_ENV = 'test';
 process.env.DATABASE_URL = process.env.TEST_DATABASE_URL ?? `postgres://hydra_test:hydra_test_only@localhost:${process.env.TEST_PG_PORT ?? 5434}/hydra_test`;

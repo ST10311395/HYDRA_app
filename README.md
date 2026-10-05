@@ -219,3 +219,37 @@ Current results are recorded in [FINAL_COMPLETION_REPORT.md](FINAL_COMPLETION_RE
 | Google button says “not configured” | Set the `EXPO_PUBLIC_GOOGLE_*` client IDs and use a development build — see docs/GOOGLE_AUTH.md. |
 | Payments stay pending locally | Complete the sandbox checkout page that opens in the in-app browser; it posts a signed webhook to the API. |
 | API refuses to start in production | Read the “Unsafe production configuration” message — a required secret or TLS setting is missing. |
+
+## Code attribution and references
+
+Hand-written source files carry a short `Code Attribution` comment listing only the references relevant to
+that file. SQL migrations are excluded on purpose: the migration runner checksums each applied file, so editing
+one would be refused as schema drift. JSON, lock files, generated output and secrets carry no comments. The
+Claude Code documentation is cited where Claude Code assisted development (the Smart Quote AI module and the
+Gemini/EAS integration); Claude is not a runtime dependency of HYDRA. Visual Studio Code and GitHub
+documentation informed the development workflow rather than specific files.
+
+Reference list (IIE Harvard Anglia):
+
+- Anthropic. 2026. *Claude Code documentation*. Available at: https://docs.anthropic.com/en/docs/claude-code [Accessed 5 October 2026].
+- ESLint. 2026. *ESLint documentation*. Available at: https://eslint.org/docs/latest/ [Accessed 5 September 2026].
+- Expo. 2026. *Expo documentation*. Available at: https://docs.expo.dev/ [Accessed 5 September 2026].
+- Fowler, M. 2018. *Refactoring: Improving the design of existing code*. 2nd ed. Boston: Addison-Wesley.
+- GitHub. 2026. *GitHub Actions documentation*. Available at: https://docs.github.com/en/actions [Accessed 2 September 2026].
+- GitHub. 2026. *GitHub documentation*. Available at: https://docs.github.com/ [Accessed 15 September 2026].
+- Martin, R.C. 2017. *Clean Architecture: A craftsman’s guide to software structure and design*. Boston: Prentice Hall.
+- Meta Open Source. 2026. *Jest documentation*. Available at: https://jestjs.io/docs/getting-started [Accessed 9 September 2026].
+- Meta Platforms, Inc. 2026. *React documentation*. Available at: https://react.dev/ [Accessed 16 September 2026].
+- Meta Platforms, Inc. 2026. *React Native documentation*. Available at: https://reactnative.dev/docs/getting-started [Accessed 21 August 2026].
+- Microsoft. 2026. *Azure App Service documentation*. Available at: https://learn.microsoft.com/en-us/azure/app-service/ [Accessed 5 October 2026].
+- Microsoft. 2026. *Azure Blob Storage documentation*. Available at: https://learn.microsoft.com/en-us/azure/storage/blobs/ [Accessed 20 August 2026].
+- Microsoft. 2026. *Azure Database for PostgreSQL documentation*. Available at: https://learn.microsoft.com/en-us/azure/postgresql/ [Accessed 1 October 2026].
+- Microsoft. 2026. *Azure Key Vault documentation*. Available at: https://learn.microsoft.com/en-us/azure/key-vault/ [Accessed 5 October 2026].
+- Microsoft. 2026. *TypeScript documentation*. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+- Microsoft. 2026. *Visual Studio Code documentation*. Available at: https://code.visualstudio.com/docs [Accessed 23 August 2026].
+- npm, Inc. 2026. *npm documentation*. Available at: https://docs.npmjs.com/ [Accessed 5 September 2026].
+- OpenJS Foundation. 2026. *Node.js documentation*. Available at: https://nodejs.org/docs/latest/api/ [Accessed 12 September 2026].
+- OWASP Foundation. 2021. *OWASP Top Ten Web Application Security Risks*. Available at: https://owasp.org/www-project-top-ten/ [Accessed 5 September 2026].
+- OWASP Foundation. 2023. *OWASP API Security Top 10*. Available at: https://owasp.org/API-Security/ [Accessed 2 September 2026].
+- PostgreSQL Global Development Group. 2026. *PostgreSQL documentation*. Available at: https://www.postgresql.org/docs/ [Accessed 26 August 2026].
+- Software Freedom Conservancy. 2026. *Git documentation*. Available at: https://git-scm.com/doc [Accessed 28 September 2026].

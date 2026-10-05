@@ -1,3 +1,9 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ * OpenJS Foundation. 2026. Node.js documentation. Available at: https://nodejs.org/docs/latest/api/ [Accessed 12 September 2026].
+ * PostgreSQL Global Development Group. 2026. PostgreSQL documentation. Available at: https://www.postgresql.org/docs/ [Accessed 26 August 2026].
+ */
 /**
  * One-time bootstrap of the first ADMIN_OWNER account in a fresh (unseeded) environment.
  * Refuses to run if any owner already exists — all later staff are created in-app by the owner.

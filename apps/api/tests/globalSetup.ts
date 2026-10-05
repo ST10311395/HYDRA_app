@@ -1,3 +1,8 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ * OpenJS Foundation. 2026. Node.js documentation. Available at: https://nodejs.org/docs/latest/api/ [Accessed 12 September 2026].
+ */
 /**
  * Starts a throwaway PostgreSQL cluster for the test run (real PostgreSQL, not a mock) unless
  * TEST_DATABASE_URL points at an existing server (e.g. the CI service container).

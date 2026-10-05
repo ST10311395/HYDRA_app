@@ -1,3 +1,8 @@
+/*
+ * Code Attribution
+ * Anthropic. 2026. Claude Code documentation. Available at: https://docs.anthropic.com/en/docs/claude-code [Accessed 5 October 2026].
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
   AiAnalyticsDto,

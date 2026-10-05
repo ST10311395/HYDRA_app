@@ -1,3 +1,10 @@
+# Code Attribution
+# GitHub. 2026. GitHub Actions documentation. Available at: https://docs.github.com/en/actions [Accessed 2 September 2026].
+# Microsoft. 2026. Azure App Service documentation. Available at: https://learn.microsoft.com/en-us/azure/app-service/ [Accessed 5 October 2026].
+# Microsoft. 2026. Azure Database for PostgreSQL documentation. Available at: https://learn.microsoft.com/en-us/azure/postgresql/ [Accessed 1 October 2026].
+# npm, Inc. 2026. npm documentation. Available at: https://docs.npmjs.com/ [Accessed 5 September 2026].
+# OpenJS Foundation. 2026. Node.js documentation. Available at: https://nodejs.org/docs/latest/api/ [Accessed 12 September 2026].
+
 name: Deploy API (Azure App Service)
 
 # Manual, reviewed deployments only (spec §30): never deploys automatically on push. The

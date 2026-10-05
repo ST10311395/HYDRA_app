@@ -1,3 +1,8 @@
+/*
+ * Code Attribution
+ * Meta Platforms, Inc. 2026. React documentation. Available at: https://react.dev/ [Accessed 16 September 2026].
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 import { useState } from 'react';
 
 const UNSET = Symbol('unset');

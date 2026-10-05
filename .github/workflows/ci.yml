@@ -1,3 +1,9 @@
+# Code Attribution
+# Expo. 2026. Expo documentation. Available at: https://docs.expo.dev/ [Accessed 5 September 2026].
+# GitHub. 2026. GitHub Actions documentation. Available at: https://docs.github.com/en/actions [Accessed 2 September 2026].
+# npm, Inc. 2026. npm documentation. Available at: https://docs.npmjs.com/ [Accessed 5 September 2026].
+# PostgreSQL Global Development Group. 2026. PostgreSQL documentation. Available at: https://www.postgresql.org/docs/ [Accessed 26 August 2026].
+
 name: CI
 
 # Quality gates for every push and pull request (spec §27 / §30): lint, typecheck, unit + integration

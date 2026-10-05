@@ -1,3 +1,7 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 import type { ApiErrorBody, AuthSession } from '@hydra/shared';
 import { config } from '../config';
 

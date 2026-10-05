@@ -1,3 +1,7 @@
+/*
+ * Code Attribution
+ * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
+ */
 /**
  * Money helpers. All arithmetic is done in integer cents to avoid floating-point drift;
  * values cross the API boundary as numbers rounded to 2 decimals (NUMERIC(12,2) in PostgreSQL).
