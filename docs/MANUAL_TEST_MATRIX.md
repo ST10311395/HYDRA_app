@@ -4,7 +4,7 @@ Use with README → *Testing on a physical phone*. Accounts: README → *Manual 
 “Auto” names the automated test that covers the same path; manual runs on a real device are still
 needed for camera, GPS, wake lock over http, native share sheets and OEM browser behaviour.
 
-**Retest first on the next walkthrough** (fixed in the 2026-10-02 runtime review, FINAL_COMPLETION_REPORT.md §12):
+**Retest first on the next walkthrough** (fixed in the 2026-10-02 runtime review):
 
 1. Customer → Show QR → back → Show QR → back (repeat quickly): no error overlay; the QR countdown runs.
 2. Profile edit for each role: change name/phone (customer: address + marketing), Save → header initials

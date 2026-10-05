@@ -8,7 +8,7 @@ platforms.
 | Profile | Output | API | Purpose |
 | --- | --- | --- | --- |
 | `development` | Android APK with dev client | `http://10.0.2.2:4000` | Local development with native modules (Google Sign-In, camera) |
-| `preview` | Android APK (internal) / iOS ad-hoc | staging | QA and client acceptance |
+| `preview` | Android APK (internal) / iOS ad-hoc | live Azure API (`https://hydra-psg-api-dqezcvhufjacdhfr.southafricanorth-01.azurewebsites.net`) | QA and client acceptance |
 | `production` | Android **AAB**, iOS App Store IPA; build number auto-incremented | production | Store release |
 | `admin-device` | Android APK (internal) with `READ_CALL_LOG` | production | Office work phone(s) only — missed-call monitoring. Never uploaded to Google Play. |
 
@@ -37,6 +37,9 @@ and store it as the `EXPO_TOKEN` repository secret.
 eas build --platform android --profile preview      # installable APK for testers
 eas build --platform android --profile production   # Play Store AAB
 ```
+
+The `preview` APK talks to the live Azure API, https://hydra-psg-api-dqezcvhufjacdhfr.southafricanorth-01.azurewebsites.net (`EXPO_PUBLIC_API_URL` in
+`apps/mobile/eas.json`), so testers see real production data — use test accounts only.
 
 1. On the first build, let EAS **generate and store the upload keystore** (or upload the company's). Back it
    up: `eas credentials -p android` → download keystore.

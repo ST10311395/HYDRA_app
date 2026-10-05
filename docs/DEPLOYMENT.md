@@ -8,8 +8,8 @@ Infrastructure is created once with [AZURE_SETUP.md](AZURE_SETUP.md). Mobile bin
 | Environment | API | Database | Mobile build profile | Deploys |
 | --- | --- | --- | --- | --- |
 | Local | `npm run api` (http://localhost:4000) | embedded PostgreSQL :5433 | `development` (dev client) | — |
-| Staging | `app-hydra-api-stg` (`https://staging-api.hydra.psgelectrical.co.za`) | `psql-hydra-stg` | `preview` | Manual workflow run, no reviewer |
-| Production | `hydra-psg-api` (`https://hydra-psg-api-dqezcvhufjacdhfr.southafricanorth-01.azurewebsites.net`) | `psql-hydra-prod` | `production`, `admin-device` | Manual workflow run **with required reviewers** |
+| Staging | Not provisioned (add a separate App Service or a `staging` slot of `hydra-psg-api`) | separate database | — | Manual workflow run, no reviewer |
+| Production | `hydra-psg-api` (`https://hydra-psg-api-dqezcvhufjacdhfr.southafricanorth-01.azurewebsites.net`) | `psql-hydra-prod` | `preview`, `production`, `admin-device` | Manual workflow run **with required reviewers** |
 
 ## GitHub configuration
 
@@ -39,6 +39,8 @@ Infrastructure is created once with [AZURE_SETUP.md](AZURE_SETUP.md). Mobile bin
 
 ## Release procedure
 
+Staging is not provisioned yet: until it is, skip steps 2–3 and run the workflow for **production** (step 4).
+
 1. Merge to `main` with CI green (lint, typecheck, shared/API/mobile tests, API build, Expo export).
 2. **Actions → Deploy API → Run workflow → staging**. The workflow:
    - installs, builds `@hydra/shared` and the API,
@@ -46,7 +48,8 @@ Infrastructure is created once with [AZURE_SETUP.md](AZURE_SETUP.md). Mobile bin
    - applies pending migrations with `npm run db:migrate:prod` (checksum-guarded, transactional; reset is refused in production),
    - deploys with `azure/webapps-deploy@v3` using the `AZURE_WEBAPP_PUBLISH_PROFILE` secret,
    - polls `${API_BASE_URL}/health` until `status: ok`.
-3. Smoke test staging with a `preview` mobile build: sign in as each role, request → quote → accept → assign
+3. Smoke test staging with a mobile build whose `EXPO_PUBLIC_API_URL` is the staging API (the `preview` profile
+   currently points at production): sign in as each role, request → quote → accept → assign
    → QR check-in → materials → inspection → invoice → sandbox (Paystack test key) payment.
 4. Run the same workflow for **production**; a reviewer approves the environment gate.
 5. If a deployment slot is used, deploy to `staging` slot then swap: `az webapp deployment slot swap -g <resource-group> -n hydra-psg-api --slot staging`

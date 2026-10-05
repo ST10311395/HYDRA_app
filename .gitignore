@@ -33,3 +33,6 @@ apps/mobile/expo-env.d.ts
 google-services.json
 GoogleService-Info.plist
 apps/api/.test-uploads/
+
+# Claude Code / AI-tool settings (local only, never committed)
+.claude/

@@ -4,6 +4,11 @@ This creates the production (and, repeated with `-stg` names, the staging) infra
 [ARCHITECTURE.md](ARCHITECTURE.md). Use **South Africa North** to keep personal information in-country
 (POPIA). Commands use the Azure CLI (`az`); the portal works equally well.
 
+The production API runs on the App Service **`hydra-psg-api`**
+(https://hydra-psg-api-dqezcvhufjacdhfr.southafricanorth-01.azurewebsites.net).
+Other resource names below (`rg-hydra-prod`, `psql-hydra-prod`, `kv-hydra-prod`, `asp-hydra-prod`) are
+examples — substitute the names used in your subscription.
+
 ```bash
 LOC=southafricanorth
 RG=rg-hydra-prod
@@ -58,15 +63,15 @@ Generate JWT/file-signing secrets with
 
 ```bash
 az appservice plan create -g $RG -n asp-hydra-prod -l $LOC --is-linux --sku P1v3
-az webapp create -g $RG -p asp-hydra-prod -n app-hydra-api-prod --runtime "NODE:24-lts"
-az webapp identity assign -g $RG -n app-hydra-api-prod            # system-assigned managed identity
+az webapp create -g $RG -p asp-hydra-prod -n hydra-psg-api --runtime "NODE:24-lts"
+az webapp identity assign -g $RG -n hydra-psg-api            # system-assigned managed identity
 # allow the identity to read secrets:
 az role assignment create --role "Key Vault Secrets User" --assignee <principalId> \
   --scope $(az keyvault show -n kv-hydra-prod --query id -o tsv)
-az webapp config set -g $RG -n app-hydra-api-prod --startup-file "node dist/server.js" --always-on true \
+az webapp config set -g $RG -n hydra-psg-api --startup-file "node dist/server.js" --always-on true \
   --http20-enabled true --min-tls-version 1.2 --ftps-state Disabled
-az webapp update -g $RG -n app-hydra-api-prod --https-only true
-az webapp deployment slot create -g $RG -n app-hydra-api-prod --slot staging   # optional blue/green
+az webapp update -g $RG -n hydra-psg-api --https-only true
+az webapp deployment slot create -g $RG -n hydra-psg-api --slot staging   # optional blue/green
 ```
 
 App settings (Key Vault references use `@Microsoft.KeyVault(SecretUri=…)`):
@@ -74,7 +79,7 @@ App settings (Key Vault references use `@Microsoft.KeyVault(SecretUri=…)`):
 | Setting | Value |
 | --- | --- |
 | `NODE_ENV` / `APP_ENV` | `production` / `production` |
-| `PUBLIC_API_BASE_URL` | `https://api.hydra.psgelectrical.co.za` |
+| `PUBLIC_API_BASE_URL` | `https://hydra-psg-api-dqezcvhufjacdhfr.southafricanorth-01.azurewebsites.net` |
 | `TRUST_PROXY` | `true` |
 | `CORS_ORIGINS` | web origins only if a web client is added (the native app sends no Origin) |
 | `DATABASE_URL`, `DATABASE_SSL` | KV reference, `true` |
@@ -93,8 +98,9 @@ App settings (Key Vault references use `@Microsoft.KeyVault(SecretUri=…)`):
 The API refuses to start in production if a required secret is missing, TLS is off, or a development
 fallback (simulated payments, console email) is configured.
 
-Custom domain + managed certificate: `az webapp config hostname add …` then
-`az webapp config ssl create --hostname api.hydra.psgelectrical.co.za …` and bind it (SNI).
+Optional custom domain + managed certificate: `az webapp config hostname add …` then
+`az webapp config ssl create --hostname <custom-domain> …` and bind it (SNI). If you add one, update
+`PUBLIC_API_BASE_URL`, the `API_BASE_URL` GitHub variable and `EXPO_PUBLIC_API_URL` in `eas.json` to match.
 
 ## 5. Monitoring
 
