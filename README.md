@@ -1,5 +1,6 @@
-HYDRA
-Digital service management for PSG Electrical & Cables and TRITE Solar
+**HYDRA
+Digital service management for PSG Electrical & Cables and TRITE SOLAR**
+
 HYDRA is a React Native and Expo application backed by a Node.js, Express and PostgreSQL REST API. It brings customer enquiries, electrical and solar service requests, quotations, field work, invoicing and business administration into one system.
 Repository: ST10311395/HYDRA_app
 This README describes the repository inspected on 5 October 2026. Local demonstration features and deployment configuration are included; configured cloud URLs and integration adapters do not establish that those services are live.
@@ -14,8 +15,9 @@ Contents
 - Team workflow
 - Generative AI declaration
 - References
-Features and user roles
-Role	Main functions
+- 
+**Features and user roles
+Role	Main functions**
 Customer	Register and sign in; request electrical or solar services; track jobs; accept or decline quotations; view invoices and payments; manage notification preferences; use Smart Quote.
 Employee	View assigned work; use QR and GPS attendance/check-in features; clock in and out; update work progress; complete jobs and view relevant job information.
 Office administrator	Manage customers, service requests, quotations, assignments, invoices, payments, inventory, missed-call follow-up and AI review cases.
@@ -36,7 +38,8 @@ Development editor	Visual Studio Code is a suitable editor for the monorepo (Mic
 
 
 The mobile client communicates with the REST API, which validates requests, authorises actions and accesses PostgreSQL and configured service providers. REST architecture is described by Fielding (2000). Separation of interface, service and persistence responsibilities can be evaluated against Martin (2017), while incremental code improvement is discussed by Fowler (2018). These references provide technical context; they do not establish that project code was copied from the sources.
-Project structure
+
+**Project structure**
 HYDRA_app/
 ├── apps/
 │   ├── api/                 # API source, migrations, seeds, scripts and tests
@@ -52,7 +55,9 @@ HYDRA_app/
 ├── .env.example             # Configuration template; contains no real secrets
 ├── package.json             # Workspace commands
 └── README.md
-Local setup
+
+
+**Local setup**
 1. Prerequisites
 Install Git, Node.js and npm. The repository declares Node.js >=20.19; its CI/build configuration uses Node.js 24. Use the version compatible with the checked-in dependencies and lockfile. Use an Android device/emulator or a suitable iOS development environment for native testing.
 2. Clone and install
@@ -159,14 +164,15 @@ Existing evidence	HYDRA_AI_Usage_Disclosure_Annexure.pdf contains 32 interaction
 Additional evidence required for complete disclosure	Retain relevant Claude Code implementation/debugging records and this ChatGPT interaction with the submission. The annexure's documentation/planning evidence alone does not document every subsequent coding interaction.
 
 
-Declaration statement
+**Declaration statement**
 We disclose the use of generative AI as described in this README and the accompanying evidence. AI assistance included implementation support as well as planning and documentation. AI-produced suggestions, explanations and code must be reviewed against the project requirements and checked before they are relied upon or submitted.
 The submitting team remains responsible for the final code, accuracy of claims, source attribution, test results and compliance with the assessment's AI-use requirements. This README is an AI-assisted disclosure draft; it does not create signatures or certify that every member has reviewed it. Each member should confirm that the final disclosure reflects their actual use and that relevant evidence is included.
 Store the supplied annexure alongside this README if submitting it with the repository. Its original disclosure relates to the interactions it contains; supplement it with later development evidence instead of treating it as a complete coding-use record.
 Referencing and code attribution
 The references below follow alphabetical author ordering and distinguish same-author, same-year works with letters, as directed by the supplied IIE Harvard Anglia guide. All 23 requested sources are retained, including Fielding (2000). Website years and access dates are the details supplied by the team; they are not independently established publication dates in this README.
 Documentation references acknowledge technical resources. A general reference list does not identify which files contain adapted code. Where code is directly copied or adapted, add a precise acknowledgement with the source, affected file/function and nature of the adaptation. AI records should identify the corresponding implementation assistance. Anthropic's product reference is added because Claude is explicitly disclosed.
-References
+
+**References**
 Anthropic 2026. Claude. [Online]. Available at: https://claude.ai/ [Accessed 5 October 2026].
 ESLint 2026. ESLint documentation. [Online]. Available at: https://eslint.org/docs/latest/ [Accessed 5 October 2026].
 Expo 2026. Expo documentation. [Online]. Available at: https://docs.expo.dev/ [Accessed 5 October 2026].
