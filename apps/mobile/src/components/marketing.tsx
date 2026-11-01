@@ -12,7 +12,7 @@ import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import type { PartnerDto, PortfolioItemDto, ServiceTypeDto, TeamMemberDto } from '@hydra/shared';
 import { usePublicContent } from '../api/queries';
-import { Badge, Button, Card, Icon, Label, Text, colors, radius, spacing, type IconName } from '../design-system';
+import { Badge, Button, Card, HIT, Icon, Label, Text, colors, radius, spacing, type IconName } from '../design-system';
 import { SERVICE_CATEGORY_LABEL as CATEGORY_LABEL, SERVICE_ICON, initials, monthYear } from '../utils/format';
 import { imageFor } from './images';
 import { PSG_CONTACT } from '../content/company';
@@ -314,7 +314,7 @@ export function MarketingFooter() {
     <View style={{ alignItems: 'center', gap: 6, paddingVertical: spacing.lg, borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.border }} testID="marketing-footer">
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: spacing.lg, rowGap: spacing.xs, marginBottom: spacing.sm }} accessibilityRole="menu">
         {ABOUT_LINKS.map((l) => (
-          <Pressable key={l.route} accessibilityRole="link" onPress={() => router.push(l.route)} hitSlop={8} style={{ minHeight: 32, justifyContent: 'center' }}>
+          <Pressable key={l.route} accessibilityRole="link" onPress={() => router.push(l.route)} style={{ minHeight: HIT, justifyContent: 'center' }}>
             <Text variant="bodySmall" color="primaryBright" weight="semibold">{l.label}</Text>
           </Pressable>
         ))}

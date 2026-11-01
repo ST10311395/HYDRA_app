@@ -60,7 +60,10 @@ export default function WorkScreen() {
         {projects.isLoading ? (
           <LoadingCards count={2} />
         ) : projects.isError ? (
-          <ErrorState onRetry={() => void projects.refetch()} />
+          <>
+            <ErrorState onRetry={() => void projects.refetch()} />
+            <SectorList />
+          </>
         ) : !list.length ? (
           filtering ? (
             <EmptyState icon="briefcase" title="No projects found" message="Try another filter or search term." />

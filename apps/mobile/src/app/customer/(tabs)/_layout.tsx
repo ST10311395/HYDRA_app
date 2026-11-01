@@ -16,7 +16,7 @@ import { colors } from '../../../design-system';
 const CustomerTabBar = makeTabBar([
   { name: 'index', label: 'Home', icon: 'home' },
   { name: 'jobs', label: 'My jobs', icon: 'briefcase' },
-  { name: 'request', label: 'Request', icon: 'plus', href: '/customer/request' },
+  { name: 'request', label: 'Request', icon: 'plus', href: '/customer/request', hint: 'Opens the service request form' },
   { name: 'billing', label: 'Billing', icon: 'credit-card' },
   { name: 'profile', label: 'Account', icon: 'user' },
 ]);

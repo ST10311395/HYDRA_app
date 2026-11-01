@@ -11,7 +11,7 @@ import { StyleSheet, View } from 'react-native';
 import type { ServiceCategory } from '@hydra/shared';
 import { useServices } from '../../../api/queries';
 import { BrandHeader, Screen } from '../../../components/layout';
-import { FaultCta, QualityCard, ServiceCard } from '../../../components/marketing';
+import { FaultCta, QualityCard, ServiceCard, ServiceOverview } from '../../../components/marketing';
 import { Accordion, Button, Card, EmptyState, ErrorState, FilterChips, Label, LoadingCards, SearchField, Segmented, Text, colors, radius, spacing, type IconName } from '../../../design-system';
 import { Slider } from '../../../design-system/Slider';
 import { estimateScope, type Sector } from '../../../features/estimator';
@@ -56,7 +56,10 @@ export default function ServicesScreen() {
         {services.isLoading ? (
           <LoadingCards count={2} />
         ) : services.isError ? (
-          <ErrorState onRetry={() => void services.refetch()} />
+          <>
+            <ErrorState onRetry={() => void services.refetch()} />
+            <ServiceOverview />
+          </>
         ) : visible.length === 0 ? (
           <EmptyState icon="search" title="No matching services" message="Try a different keyword or filter." />
         ) : (

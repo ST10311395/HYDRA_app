@@ -21,6 +21,8 @@ export interface TabSpec {
    * customer's prominent “Request” button). The underlying screen keeps its own route.
    */
   href?: string;
+  /** Screen-reader hint for an action tab, e.g. what it opens. */
+  hint?: string;
 }
 
 /** Persistent five-item bottom navigation matching the wireframes (Home · Services · Work · Quote · Contact). */
@@ -38,6 +40,7 @@ export function makeTabBar(tabs: TabSpec[]) {
                 key={tab.name}
                 accessibilityRole="button"
                 accessibilityLabel={tab.label}
+                accessibilityHint={tab.hint}
                 onPress={() => {
                   void Haptics.selectionAsync();
                   router.push(href as never);

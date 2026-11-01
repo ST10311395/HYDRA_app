@@ -53,7 +53,7 @@ describe('customer tab bar', () => {
   it('puts the everyday journey first: Home, My jobs, Request, Billing, Account', () => {
     const layout = readFileSync(join(__dirname, '../app/customer/(tabs)/_layout.tsx'), 'utf8');
     expect([...layout.matchAll(/label: '([^']+)'/g)].map((m) => m[1])).toEqual(['Home', 'My jobs', 'Request', 'Billing', 'Account']);
-    expect(layout).toMatch(/name: 'request', label: 'Request', icon: 'plus', href: '\/customer\/request'/);
+    expect(layout).toMatch(/name: 'request', label: 'Request', icon: 'plus', href: '\/customer\/request', hint: 'Opens the service request form'/);
     // Rewards keeps its own screen (reached from Home, Billing and Account).
     expect(layout).toMatch(/<Tabs\.Screen name="rewards" \/>/);
   });
@@ -61,11 +61,12 @@ describe('customer tab bar', () => {
   it('an action tab opens its screen on top instead of switching tab', async () => {
     const Bar = makeTabBar([
       { name: 'index', label: 'Home', icon: 'home' },
-      { name: 'request', label: 'Request', icon: 'plus', href: '/customer/request' },
+      { name: 'request', label: 'Request', icon: 'plus', href: '/customer/request', hint: 'Opens the service request form' },
     ]);
     const navigate = jest.fn();
     const props = { state: { index: 0, routes: [{ name: 'index', key: 'index-1', params: undefined }] }, navigation: { emit: () => ({ defaultPrevented: false }), navigate } } as unknown as BottomTabBarProps;
     await renderScreen(<Bar {...props} />);
+    expect(screen.getByTestId('tab-action-request').props.accessibilityHint).toBe('Opens the service request form');
     await fireEvent.press(screen.getByTestId('tab-action-request'));
     expect(router.push).toHaveBeenCalledWith('/customer/request');
     expect(navigate).not.toHaveBeenCalled();

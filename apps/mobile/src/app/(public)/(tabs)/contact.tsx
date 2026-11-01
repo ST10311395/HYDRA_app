@@ -14,7 +14,7 @@ import { useDepartments, useFaqs, useOffices, usePublicContent, useSubmitEnquiry
 import { BrandHeader, Screen } from '../../../components/layout';
 import { PSG_CONTACT } from '../../../content/company';
 import { SAFETY_NOTE } from '../../../content/marketing';
-import { Accordion, Button, Card, Checkbox, FilterChips, Icon, Label, SelectField, Segmented, Text, TextField, colors, radius, spacing, toast, type IconName } from '../../../design-system';
+import { Accordion, Button, Card, Checkbox, FilterChips, Icon, Label, SelectField, Segmented, Text, TextField, HIT, colors, radius, spacing, toast, type IconName } from '../../../design-system';
 import { useAuth } from '../../../store/auth';
 import { URGENCY_OPTIONS } from '../../../utils/format';
 import { callNumber, openDirections, openWhatsApp, sendEmail } from '../../../utils/links';
@@ -193,7 +193,7 @@ function Row({ icon, text, bold, mono, onPress, label }: { icon: IconName; text:
       <Text variant={mono ? 'mono' : 'bodySmall'} weight={bold ? 'bold' : undefined} color={bold || mono ? 'text' : 'textSecondary'} style={{ flexShrink: 1 }}>{text}</Text>
     </View>
   );
-  return onPress ? <Pressable accessibilityRole="link" accessibilityLabel={label} onPress={onPress} style={{ flexShrink: 1, minHeight: 32, justifyContent: 'center' }}>{body}</Pressable> : body;
+  return onPress ? <Pressable accessibilityRole="link" accessibilityLabel={label} onPress={onPress} style={{ flexShrink: 1, minHeight: HIT, justifyContent: 'center' }}>{body}</Pressable> : body;
 }
 
 const styles = StyleSheet.create({
