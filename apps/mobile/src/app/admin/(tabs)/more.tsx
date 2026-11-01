@@ -6,14 +6,18 @@
  * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
  */
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { View } from 'react-native';
 import { useAiSummary } from '../../../api/ai';
 import { useAdminDashboard } from '../../../api/queries';
 import { useIsOwner } from '../../../components/admin';
 import { SegmentLink } from '../../../components/jobs';
 import { BrandHeader, Screen } from '../../../components/layout';
-import { Badge, Button, Label, Text, colors, confirm, spacing, type IconName } from '../../../design-system';
+import { Badge, Button, EmptyState, Label, SearchField, Text, colors, confirm, spacing, type IconName } from '../../../design-system';
 import { useAuth } from '../../../store/auth';
+
+/** Case-insensitive match on the item label or its group name. */
+const matches = (i: { label: string }, group: string, q: string) => !q.trim() || `${i.label} ${group}`.toLowerCase().includes(q.trim().toLowerCase());
 
 interface Item {
   icon: IconName;
@@ -23,9 +27,13 @@ interface Item {
   badge?: string;
 }
 
-/** “More” drawer for the smaller-device tab pattern (spec §10): finance, inventory, comms, reports and settings. */
+/**
+ * “Manage” (formerly More): every office and owner module in labelled groups, with a search box so
+ * nothing needs menu hunting (Part 3). Owner-only modules are listed for owners only.
+ */
 export default function More() {
   const owner = useIsOwner();
+  const [search, setSearch] = useState('');
   const user = useAuth((s) => s.user);
   const dash = useAdminDashboard();
   const ai = useAiSummary();
@@ -88,7 +96,7 @@ export default function More() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <BrandHeader section="More" />
+      <BrandHeader section="Manage" />
       <Screen onRefresh={() => void dash.refetch()} refreshing={dash.isRefetching}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.sm, flexWrap: 'wrap' }}>
           <View style={{ flexShrink: 1 }}>
@@ -97,8 +105,12 @@ export default function More() {
           </View>
           {owner ? <Badge label="Owner privileges" icon="key" tone="secondary" mono={false} /> : null}
         </View>
+        <SearchField value={search} onChangeText={setSearch} placeholder="Search, e.g. invoices, payroll, stock" />
+        {search.trim() && !groups.some((g) => g.items.some((i) => (!i.owner || owner) && matches(i, g.title, search))) ? (
+          <EmptyState icon="search" title="Nothing matches" message="Try another word, such as “quote”, “staff” or “CoC”." />
+        ) : null}
         {groups.map((g) => {
-          const items = g.items.filter((i) => !i.owner || owner);
+          const items = g.items.filter((i) => (!i.owner || owner) && matches(i, g.title, search));
           if (!items.length) return null;
           return (
             <View key={g.title} style={{ gap: spacing.sm }}>

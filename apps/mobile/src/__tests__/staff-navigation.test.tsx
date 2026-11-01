@@ -15,6 +15,8 @@ import type { QueryClient } from '@tanstack/react-query';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import type { EmployeeTodayDto } from '@hydra/shared';
+import AdminDashboard from '../app/admin/(tabs)/index';
+import AdminManage from '../app/admin/(tabs)/more';
 import EmployeeToday from '../app/employee/(tabs)/index';
 import EmployeeMore from '../app/employee/(tabs)/profile';
 import { makeJob, mockApi, renderScreen, renderedText, signInAs } from '../test-utils';
@@ -71,5 +73,64 @@ describe('electrician navigation', () => {
     await settle(client);
     await fireEvent.press(screen.getByRole('button', { name: label }));
     expect(router.push).toHaveBeenCalledWith(route);
+  });
+});
+
+const ADMIN_DASH = {
+  kpis: { activeJobs: 4, requestedJobs: 2, quotesAwaiting: 1, invoicesOutstanding: 3, outstandingAmount: 5400, lowStockCount: 0, staffClockedIn: 2, pendingLeave: 0, newEnquiries: 5, missedCallsToReview: 1, revenueThisMonth: 42000 },
+  urgentJobs: [], activeJobs: [], recentActivity: [], unreadNotifications: 0,
+};
+
+describe('office admin and owner navigation', () => {
+  beforeEach(() => {
+    mockApi({
+      'GET /dashboard/admin': () => ADMIN_DASH,
+      'GET /ai/admin/summary': () => ({ needsReview: 0, urgent: 0, critical: 0, waitingCustomer: 0, accepted: 0 }),
+      'GET /notifications': () => ({ items: [], unread: 0 }),
+    });
+  });
+
+  it('keeps four work tabs and one organised Manage area', () => {
+    expect(tabLabels('admin')).toEqual(['Dashboard', 'Enquiries', 'Jobs', 'Workforce', 'Manage']);
+  });
+
+  it('the dashboard separates work that needs attention from status figures', async () => {
+    signInAs('ADMIN_OFFICE');
+    const { client } = await renderScreen(<AdminDashboard />);
+    await screen.findByTestId('admin-ai-card'); // the AI summary loads separately from the KPIs
+    await settle(client);
+    const attention = renderedText(screen.getByTestId('kpis-attention'));
+    const glance = renderedText(screen.getByTestId('kpis-glance'));
+    for (const k of ['New requests', 'New enquiries', 'Quotes awaiting', 'Missed calls to review']) expect(attention).toContain(k);
+    for (const k of ['Active jobs', 'Staff clocked in', 'Invoices outstanding']) expect(glance).toContain(k);
+    expect(screen.getByText('Urgent faults')).toBeOnTheScreen();
+    expect(screen.queryByText(/emergency/i)).toBeNull();
+  });
+
+  it('Manage search narrows the modules', async () => {
+    signInAs('ADMIN_OFFICE');
+    const { client } = await renderScreen(<AdminManage />);
+    await settle(client);
+    await fireEvent.changeText(screen.getByLabelText(/^Search, e\.g\./), 'payroll');
+    expect(screen.getByRole('button', { name: 'Payroll' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Customers' })).toBeNull();
+  });
+
+  it('search never reveals owner-only modules to an office admin', async () => {
+    signInAs('ADMIN_OFFICE');
+    const { client } = await renderScreen(<AdminManage />);
+    await settle(client);
+    await fireEvent.changeText(screen.getByLabelText(/^Search, e\.g\./), 'audit');
+    expect(screen.queryByRole('button', { name: 'Audit log' })).toBeNull();
+    expect(screen.getByText('Nothing matches')).toBeOnTheScreen();
+  });
+
+  it('the owner finds owner modules through search', async () => {
+    signInAs('ADMIN_OWNER');
+    const { client } = await renderScreen(<AdminManage />);
+    await settle(client);
+    await fireEvent.changeText(screen.getByLabelText(/^Search, e\.g\./), 'audit');
+    await fireEvent.press(screen.getByRole('button', { name: 'Audit log' }));
+    expect(router.push).toHaveBeenCalledWith('/admin/audit');
   });
 });
