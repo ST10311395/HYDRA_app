@@ -69,7 +69,7 @@ describe('responsive brand header', () => {
     // Emergency collapses to its icon but stays a labelled, tappable action.
     expect(screen.getByLabelText('Emergency: call the 24/7 line')).toBeOnTheScreen();
     expect(screen.queryByText('Emergency')).toBeNull();
-    expect(screen.getByLabelText('Call PSG Electrical')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Call PSG Electrical on 082 603 9283')).toBeOnTheScreen();
     expect(screen.getByTestId('header-account')).toBeOnTheScreen();
   });
 
@@ -97,7 +97,7 @@ describe('header at every common phone width', () => {
     await renderScreen(<BrandHeader section="My Dashboard" />);
     expect(screen.getByText('PSG Electrical')).toBeOnTheScreen();
     expect(screen.getByLabelText('Emergency: call the 24/7 line')).toBeOnTheScreen();
-    expect(screen.getByLabelText('Call PSG Electrical')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Call PSG Electrical on 082 603 9283')).toBeOnTheScreen();
     expect(await screen.findByLabelText(/^Account menu for Lerato/)).toBeOnTheScreen();
     expect(screen.getByText('LK')).toBeOnTheScreen();
   });

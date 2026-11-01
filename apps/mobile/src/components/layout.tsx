@@ -16,6 +16,7 @@ import { usePublicContent } from '../api/queries';
 import { Button, Icon, IconButton, Text, colors, confirm, radius, spacing, type IconName } from '../design-system';
 import { homeForRole, useAuth } from '../store/auth';
 import { useNetwork } from '../hooks/useNetwork';
+import { PSG_CONTACT } from '../content/company';
 import { callNumber } from '../utils/links';
 import { BrandLogo } from './BrandLogo';
 
@@ -150,7 +151,7 @@ export function BrandHeader({ section, back }: { section: string; back?: boolean
           <Icon name="shield" size={compact ? 17 : 15} color="white" />
           {!compact ? <Text variant="caption" weight="bold" color="white" style={{ fontSize: 13 }}>Emergency</Text> : null}
         </Pressable>
-        <IconButton icon="phone-call" label="Call PSG Electrical" size={compact ? 38 : 40} onPress={() => hotline && void callNumber(hotline)} />
+        <IconButton icon="phone-call" label={`Call PSG Electrical on ${PSG_CONTACT.primaryPhone}`} size={compact ? 38 : 40} onPress={() => void callNumber(PSG_CONTACT.primaryPhone)} />
         <AccountButton size={compact ? 38 : 40} unread={unread} onPress={() => setMenuOpen(true)} />
       </View>
       <View style={[styles.crumbRow, compact ? { paddingHorizontal: spacing.md } : null]}>
