@@ -74,6 +74,14 @@ are **not** removed: existing jobs, quotes and AI cases reference them. Only cus
 | `IMG-20261021-WA0011.jpg` | Neutral urgency labels; hide kVA from standard path; keep date | `(public)/(tabs)/quote.tsx` | 22 |
 | Portfolio slides | Genuine branding, services, sectors, quality statement | public screens, `api/seeds/content.ts` | 05, 11 |
 
+**Quote form after Part 3:** step 1 asks *What do you need?* (New installation · Fault or repair · DB board ·
+Compliance (CoC) · Solar & backup · Maintenance) plus an optional site type (Residential / Commercial /
+Industrial — commercial kept, without HVAC). Step 2 keeps service, scope brief, urgency (Standard / Priority /
+Urgent fault → STANDARD / HIGH / EMERGENCY), preferred date and photos; supply type and kVA moved into
+*Advanced details (optional)*, which opens automatically when the load estimator passes a kVA value. Legacy
+sector keys (INDUSTRIAL, COMMERCIAL, FIBRE, AUDIT, EMERGENCY) from deep links and saved drafts are mapped, and
+enquiries stored with old sector/voltage text still display unchanged.
+
 **Ambiguity noted:** "the last screenshot we don't need within the quotation section at all" is read as the
 technical scope fields on WA0011 (kVA, HV voltage options) and the circled Fibre sector — not the whole quote
 tool. Required inputs (service, scope brief, location, contact, consent) and the preferred date stay.
@@ -148,6 +156,9 @@ menu derives its owner-only items from it, and each owner screen still renders `
 | 18 | style: streamline employee daily work navigation | pending | |
 | 19 | style: simplify admin dashboard and management menus | pending | |
 | 20 | fix: preserve owner-only navigation and access guards | pending | |
+| 21 | content: correct quotation sector descriptions and options | pending | |
+| 22 | refactor: simplify quotation scope and urgency labels | pending | |
+| 23 | test: protect quotation and role workflow regressions | pending | |
 
 **Logo source:** `apps/mobile/assets/images/brand/psg-logo.svg` is a vector redraw of the portfolio house
 mark (blue → violet → pink), traced from `Screenshot 2026-11-01 203150.png` because no original artwork was
