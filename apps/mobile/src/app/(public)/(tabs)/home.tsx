@@ -10,7 +10,7 @@ import { useWindowDimensions, View } from 'react-native';
 import { usePortfolio, usePublicContent, useServices } from '../../../api/queries';
 import { BrandBackdrop } from '../../../components/BrandBackdrop';
 import { BrandHeader, Screen } from '../../../components/layout';
-import { MarketingFooter, ProjectMiniCard, QualityCard, QuoteCta, ServiceMiniCard, TestimonialCard, published } from '../../../components/marketing';
+import { MarketingFooter, ProjectMiniCard, QualityCard, ServiceMiniCard, TestimonialCard, published } from '../../../components/marketing';
 import { PSG_CONTACT } from '../../../content/company';
 import { HERO, SAFETY_NOTE } from '../../../content/marketing';
 import { Button, Card, HorizontalScroller, Icon, IconTile, Label, LoadingCards, SectionHeader, Text, colors, spacing } from '../../../design-system';
@@ -82,23 +82,7 @@ export default function HomeScreen() {
         ) : null}
         <TestimonialCard />
 
-        {/* 6 · Final CTA + footer */}
-        <QuoteCta />
-        <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-          <Button label="Why Choose PSG" variant="outline" size="sm" style={{ flex: 1 }} onPress={() => router.push('/why-psg')} />
-          <Button label="Partners" variant="outline" size="sm" style={{ flex: 1 }} onPress={() => router.push('/partners')} />
-          <Button label="Our Team" variant="outline" size="sm" style={{ flex: 1 }} onPress={() => router.push('/team')} />
-        </View>
-        {!user ? (
-          <Card elevated style={{ gap: spacing.md }}>
-            <Text variant="title" weight="bold">Track your jobs, quotes & rewards</Text>
-            <Text variant="bodySmall" color="textMuted">Create a free account to request services, follow your electrician live and pay invoices securely.</Text>
-            <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-              <Button label="Sign in" variant="secondary" style={{ flex: 1 }} onPress={() => router.push('/login')} />
-              <Button label="Create account" style={{ flex: 1 }} onPress={() => router.push('/register')} />
-            </View>
-          </Card>
-        ) : null}
+        {/* Footer: About links (Why PSG, team, partners, FAQ) moved here from the removed promo tiles */}
         <MarketingFooter />
       </Screen>
     </View>

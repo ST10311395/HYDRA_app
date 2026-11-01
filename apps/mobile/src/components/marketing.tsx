@@ -196,18 +196,6 @@ export function TestimonialCard() {
 }
 
 /** Closing quotation CTA block used across marketing pages. */
-export function QuoteCta({ eyebrow = 'Start a project', title = 'Request a quotation', body = 'Tell us what you need. We review every request and contact you to confirm the scope before quoting.', primary = 'Request a quote', secondary = 'Contact PSG' }: { eyebrow?: string; title?: string; body?: string; primary?: string; secondary?: string }) {
-  return (
-    <Card accent="primary" style={{ gap: spacing.md, backgroundColor: '#121A2B' }}>
-      <Label color="primaryBright">{eyebrow}</Label>
-      <Text variant="h2" style={{ fontSize: 19 }}>{title}</Text>
-      <Text variant="bodySmall" color="textMuted">{body}</Text>
-      <Button label={primary} icon="file-text" iconRight="arrow-right" onPress={() => router.navigate('/quote')} />
-      <Button label={secondary} icon="phone-call" variant="secondary" onPress={() => router.navigate('/contact')} />
-    </Card>
-  );
-}
-
 /**
  * Fault reporting call-to-action (replaces the former 24/7 emergency panel, Part 3 brief §6): routes to
  * the existing fault request flow or the verified business line, with neutral safety guidance and no
@@ -251,9 +239,24 @@ export function QualityCard() {
   );
 }
 
+const ABOUT_LINKS = [
+  { label: 'Why PSG', href: '/why-psg' },
+  { label: 'Our team', href: '/team' },
+  { label: 'Partners', href: '/partners' },
+  { label: 'FAQ', href: '/faq' },
+] as const;
+
+/** Site footer: hours, main line, About links and the privacy notice. */
 export function MarketingFooter() {
   return (
-    <View style={{ alignItems: 'center', gap: 6, paddingVertical: spacing.lg, borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.border }}>
+    <View style={{ alignItems: 'center', gap: 6, paddingVertical: spacing.lg, borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.border }} testID="marketing-footer">
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: spacing.lg, rowGap: spacing.xs, marginBottom: spacing.sm }} accessibilityRole="menu">
+        {ABOUT_LINKS.map((l) => (
+          <Pressable key={l.href} accessibilityRole="link" onPress={() => router.push(l.href)} hitSlop={8} style={{ minHeight: 32, justifyContent: 'center' }}>
+            <Text variant="bodySmall" color="primaryBright" weight="semibold">{l.label}</Text>
+          </Pressable>
+        ))}
+      </View>
       <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
         <Icon name="clock" size={14} color="primaryBright" />
         <Text variant="bodySmall" color="textSecondary">Hours {PSG_CONTACT.hours}</Text>
