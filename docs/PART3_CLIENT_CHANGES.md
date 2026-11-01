@@ -43,6 +43,7 @@ portfolio (`part3-reference/Screenshot 2026-11-01 2031*.png`).
 | Q9 | Office address(es) and department desks to publish. | None shown; the contact screen lists the verified phones, emails and hours. |
 | Q10 | Service “starting from” prices (seeded: e.g. DB boards R45 000, fault finding R1 450). | Unchanged (business data); owner to review in Admin → Service types. |
 | Q11 | AI triage response windows for levels 1–2 (“3–5 business days”, “1–3 business days”) and working days (Mon–Fri assumed). | Unchanged defaults, editable by the owner in AI settings; only 24-hour/24-7/“immediately” wording removed. |
+| Q12 | Default quote terms say “Workmanship guaranteed for 12 months” (Admin → quote builder). | Unchanged: editable business terms, not app marketing; owner to confirm the warranty period. |
 
 ## 2. Claims to remove or reword
 
@@ -92,8 +93,18 @@ any is removed. Additions are allowed.
 
 **Owner protection today:** the mobile `OwnerGate` and the More-menu filter hide owner modules from office
 admins. The API enforces `ADMIN_OWNER` on the matching endpoints (covered in `apps/api/tests/security.test.ts`).
-Gap noted for commit 20: `OWNER_ONLY_PATHS` in `navigation/guards.ts` does not list `/admin/ai-settings`,
-although the screen itself is wrapped in `OwnerGate`.
+Commit 20 closed the gap where `OWNER_ONLY_PATHS` omitted `/admin/ai-settings`. The list is now the single
+source of truth: the admin stack (`Stack.Protected`) refuses those routes for office admins, the Manage
+menu derives its owner-only items from it, and each owner screen still renders `OwnerGate`.
+
+### Navigation after Part 3
+
+| Role | Tab bar | Secondary area |
+| --- | --- | --- |
+| Guest | Home · Services · Work · Quote · Contact | Footer: Why PSG, Our team, Partners, FAQ, Privacy; header account menu |
+| Customer | Home · My jobs · **Request** (action) · Billing · Account | Account: Rewards, Notifications, Compliance certificates, Smart Quote assessments, About PSG |
+| Employee | Today · Calendar · Scan · Timesheet · More | More → My work: All assigned jobs, Log materials, Inspection / CoC, Leave, Notifications |
+| Admin / owner | Dashboard · Enquiries · Jobs · Workforce · Manage | Manage: grouped modules with search; owner-only modules only for the owner |
 
 ## 5. Acceptance checklist
 
@@ -132,6 +143,11 @@ although the screen itself is wrapped in `OwnerGate`.
 | 13 | content: update hero with hazardous area testing focus | pending | |
 | 14 | refactor: remove redundant guest home promotions | pending | |
 | 15 | style: simplify guest navigation and service discovery | pending | |
+| 16 | style: streamline customer dashboard navigation | pending | |
+| 17 | style: clarify customer job quote and billing pathways | pending | |
+| 18 | style: streamline employee daily work navigation | pending | |
+| 19 | style: simplify admin dashboard and management menus | pending | |
+| 20 | fix: preserve owner-only navigation and access guards | pending | |
 
 **Logo source:** `apps/mobile/assets/images/brand/psg-logo.svg` is a vector redraw of the portfolio house
 mark (blue → violet → pink), traced from `Screenshot 2026-11-01 203150.png` because no original artwork was
