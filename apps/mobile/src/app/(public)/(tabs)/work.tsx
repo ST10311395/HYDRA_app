@@ -11,8 +11,18 @@ import { View } from 'react-native';
 import type { PortfolioCategory } from '@hydra/shared';
 import { usePortfolio } from '../../../api/queries';
 import { BrandHeader, Screen } from '../../../components/layout';
-import { ProjectCard, TestimonialCard, published } from '../../../components/marketing';
-import { Button, Card, EmptyState, ErrorState, FilterChips, IconTile, LoadingCards, SearchField, Text, colors, spacing } from '../../../design-system';
+import { ProjectCard, SectorList, TestimonialCard, published } from '../../../components/marketing';
+import { Button, Card, EmptyState, ErrorState, FilterChips, Icon, IconTile, LoadingCards, SearchField, Text, colors, spacing } from '../../../design-system';
+
+/** Core capability areas, from the PSG company portfolio. */
+const CAPABILITIES = [
+  'Industrial electrical installations and upgrades',
+  'Cable management systems and infrastructure',
+  'Distribution board (DB) installations and reconfiguration',
+  'Fault finding and system diagnostics',
+  'Electrical maintenance in operational environments',
+  'Support for solar electrical integration',
+];
 
 type Filter = 'ALL' | PortfolioCategory;
 
@@ -55,7 +65,19 @@ export default function WorkScreen() {
           filtering ? (
             <EmptyState icon="briefcase" title="No projects found" message="Try another filter or search term." />
           ) : (
-            <EmptyState icon="briefcase" title="Case studies coming soon" message="Project case studies will be published here once approved by PSG Electrical & Cables." />
+            <>
+              <EmptyState icon="briefcase" title="Case studies coming soon" message="Project case studies will be published here once approved by PSG Electrical & Cables." />
+              <SectorList />
+              <Card style={{ gap: spacing.md }} testID="capabilities">
+                <Text variant="h3">Core capability areas</Text>
+                {CAPABILITIES.map((c) => (
+                  <View key={c} style={{ flexDirection: 'row', gap: 10 }}>
+                    <Icon name="check-circle" size={16} color="primaryBright" />
+                    <Text variant="bodySmall" style={{ flex: 1 }}>{c}</Text>
+                  </View>
+                ))}
+              </Card>
+            </>
           )
         ) : (
           list.map((p) => <ProjectCard key={p.id} project={p} />)

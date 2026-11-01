@@ -12,7 +12,7 @@ import type { ServiceCategory } from '@hydra/shared';
 import { useServices } from '../../../api/queries';
 import { BrandHeader, Screen } from '../../../components/layout';
 import { FaultCta, QualityCard, ServiceCard } from '../../../components/marketing';
-import { Button, Card, EmptyState, ErrorState, FilterChips, IconTile, Label, LoadingCards, SearchField, Segmented, Text, colors, radius, spacing, type IconName } from '../../../design-system';
+import { Accordion, Button, Card, EmptyState, ErrorState, FilterChips, Label, LoadingCards, SearchField, Segmented, Text, colors, radius, spacing, type IconName } from '../../../design-system';
 import { Slider } from '../../../design-system/Slider';
 import { estimateScope, type Sector } from '../../../features/estimator';
 import { TAGLINE } from '../../../content/marketing';
@@ -63,48 +63,44 @@ export default function ServicesScreen() {
           visible.map((s) => <ServiceCard key={s.id} service={s} onQuote={() => quoteFor(s.id)} />)
         )}
 
-        {/* Project scope estimator */}
-        <Card style={{ gap: spacing.md }}>
-          <View style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'center' }}>
-            <IconTile icon="sliders" />
-            <View style={{ flex: 1 }}>
-              <Text variant="h3">Project Scope Estimator</Text>
-              <Text variant="caption" color="textMuted">Calculate required power rating & team deployment</Text>
+        {/* Technical load estimator: kept for experienced customers, hidden by default (Part 3) */}
+        <Accordion title="Advanced: estimate your power load">
+          <View style={{ gap: spacing.md }}>
+            <Text variant="caption" color="textMuted">Optional. Most customers can skip this — describe the work in the quote form instead.</Text>
+            <Label>Select sector</Label>
+            <Segmented
+              value={sector}
+              onChange={setSector}
+              options={[
+                { value: 'industrial', label: 'industrial' },
+                { value: 'commercial', label: 'commercial' },
+                { value: 'residential', label: 'residential' },
+              ]}
+            />
+            <View style={styles.between}>
+              <Text variant="bodySmall" color="textSecondary">Project Power Load (kVA)</Text>
+              <Text variant="mono" color="primaryBright" style={{ fontSize: 16 }}>{kva} kVA</Text>
             </View>
+            <Slider value={kva} min={20} max={500} step={10} onChange={setKva} label="Project power load in kVA" />
+            <View style={styles.between}>
+              {['20 kVA', '250 kVA', '500 kVA+'].map((l) => <Text key={l} variant="mono" color="textMuted" style={{ fontSize: 11 }}>{l}</Text>)}
+            </View>
+            <View style={styles.estimate}>
+              {[
+                ['Deployment Tier:', estimate.tier],
+                ['Required Crew:', estimate.crew],
+                ['Recommended Cabling:', estimate.cabling],
+              ].map(([k, v]) => (
+                <View key={k} style={styles.between}>
+                  <Text variant="bodySmall" color="textMuted">{k}</Text>
+                  <Text variant="bodySmall" weight="bold" style={{ flexShrink: 1, textAlign: 'right' }}>{v}</Text>
+                </View>
+              ))}
+              <Text variant="caption" color="textMuted">Indicative only. Your quotation confirms the scope after assessment.</Text>
+            </View>
+            <Button label="Use in a quote request" iconRight="chevron-right" onPress={() => router.navigate({ pathname: '/quote', params: { sector: estimate.quoteSector, kva: String(kva) } })} />
           </View>
-          <Label>Select Sector</Label>
-          <Segmented
-            value={sector}
-            onChange={setSector}
-            options={[
-              { value: 'industrial', label: 'industrial' },
-              { value: 'commercial', label: 'commercial' },
-              { value: 'residential', label: 'residential' },
-            ]}
-          />
-          <View style={styles.between}>
-            <Text variant="bodySmall" color="textSecondary">Project Power Load (kVA)</Text>
-            <Text variant="mono" color="primaryBright" style={{ fontSize: 16 }}>{kva} kVA</Text>
-          </View>
-          <Slider value={kva} min={20} max={500} step={10} onChange={setKva} label="Project power load in kVA" />
-          <View style={styles.between}>
-            {['20 kVA', '250 kVA', '500 kVA+'].map((l) => <Text key={l} variant="mono" color="textMuted" style={{ fontSize: 11 }}>{l}</Text>)}
-          </View>
-          <View style={styles.estimate}>
-            {[
-              ['Deployment Tier:', estimate.tier],
-              ['Required Crew:', estimate.crew],
-              ['Recommended Cabling:', estimate.cabling],
-            ].map(([k, v]) => (
-              <View key={k} style={styles.between}>
-                <Text variant="bodySmall" color="textMuted">{k}</Text>
-                <Text variant="bodySmall" weight="bold" style={{ flexShrink: 1, textAlign: 'right' }}>{v}</Text>
-              </View>
-            ))}
-            <Text variant="caption" color="textMuted">Indicative only. Your quotation confirms the scope after assessment.</Text>
-          </View>
-          <Button label="Apply Scope to Quote Request" iconRight="chevron-right" onPress={() => router.navigate({ pathname: '/quote', params: { sector: estimate.quoteSector, kva: String(kva) } })} />
-        </Card>
+        </Accordion>
 
         <QualityCard />
 

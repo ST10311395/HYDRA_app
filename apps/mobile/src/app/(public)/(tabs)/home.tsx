@@ -10,7 +10,7 @@ import { useWindowDimensions, View } from 'react-native';
 import { usePortfolio, usePublicContent, useServices } from '../../../api/queries';
 import { BrandBackdrop } from '../../../components/BrandBackdrop';
 import { BrandHeader, Screen } from '../../../components/layout';
-import { MarketingFooter, ProjectMiniCard, QualityCard, ServiceMiniCard, TestimonialCard, published } from '../../../components/marketing';
+import { MarketingFooter, ProcessSteps, ProjectMiniCard, QualityCard, SectorList, ServiceMiniCard, ServiceOverview, TestimonialCard, published } from '../../../components/marketing';
 import { PSG_CONTACT } from '../../../content/company';
 import { HERO, SAFETY_NOTE } from '../../../content/marketing';
 import { Button, Card, HorizontalScroller, Icon, IconTile, Label, LoadingCards, SectionHeader, Text, colors, spacing } from '../../../design-system';
@@ -64,13 +64,17 @@ export default function HomeScreen() {
         <SectionHeader title="Our services" actionLabel="View all" onAction={() => router.navigate('/services')} />
         {services.isLoading ? (
           <LoadingCards count={1} />
-        ) : (
+        ) : services.data?.length ? (
           <HorizontalScroller contentContainerStyle={{ gap: spacing.md, paddingRight: spacing.lg }} snapInterval={cardWidth + spacing.md}>
-            {(services.data ?? []).map((item) => <ServiceMiniCard key={item.id} service={item} width={cardWidth} />)}
+            {services.data.map((item) => <ServiceMiniCard key={item.id} service={item} width={cardWidth} />)}
           </HorizontalScroller>
+        ) : (
+          <ServiceOverview />
         )}
 
-        {/* 4 · Quality & compliance (portfolio statement, no certification claims) */}
+        {/* 4 · How it works, industries and quality (website + portfolio) */}
+        <ProcessSteps />
+        <SectorList />
         <QualityCard />
 
         {/* 5 · Recent projects + testimonial */}

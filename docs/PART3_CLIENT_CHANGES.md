@@ -39,6 +39,10 @@ portfolio (`part3-reference/Screenshot 2026-11-01 2031*.png`).
 | Q5 | Permission to show portfolio client names/logos (African Logistics Services, Swift Chemicals, Fashion Fusion, Hi-Tap Bolt & Tool, UKZN). | Not shown as named projects until permission is confirmed. |
 | Q6 | Original logo artwork (SVG or high-resolution transparent PNG). | Needed for commit 05; a screenshot crop is not production quality. |
 | Q7 | Website address: portfolio says `www.psgelectrical.co.za`, live site is the workers.dev URL. | Use the domain only where the brief allows; flag. |
+| Q8 | WhatsApp number for the business. | WhatsApp action hidden until a number is configured in public content. |
+| Q9 | Office address(es) and department desks to publish. | None shown; the contact screen lists the verified phones, emails and hours. |
+| Q10 | Service “starting from” prices (seeded: e.g. DB boards R45 000, fault finding R1 450). | Unchanged (business data); owner to review in Admin → Service types. |
+| Q11 | AI triage response windows for levels 1–2 (“3–5 business days”, “1–3 business days”) and working days (Mon–Fri assumed). | Unchanged defaults, editable by the owner in AI settings; only 24-hour/24-7/“immediately” wording removed. |
 
 ## 2. Claims to remove or reword
 
@@ -123,6 +127,11 @@ although the screen itself is wrapped in `OwnerGate`.
 | 08 | fix: improve compact mobile header responsiveness | pending | |
 | 09 | style: redesign sign in and welcome experience | pending | |
 | 10 | test: cover auth and guest landing routes | pending | |
+| 11 | content: align PSG service copy with official website | pending | |
+| 12 | content: replace unsupported emergency availability claims | pending | |
+| 13 | content: update hero with hazardous area testing focus | pending | |
+| 14 | refactor: remove redundant guest home promotions | pending | |
+| 15 | style: simplify guest navigation and service discovery | pending | |
 
 **Logo source:** `apps/mobile/assets/images/brand/psg-logo.svg` is a vector redraw of the portfolio house
 mark (blue → violet → pink), traced from `Screenshot 2026-11-01 203150.png` because no original artwork was
@@ -130,6 +139,14 @@ supplied. The app icon, Android adaptive icon layers, splash and favicon are ren
 owner's original file when received (Q6); `components/BrandLogo.tsx` mirrors the same paths.
 
 **For commit 25:** add the react-native-svg reference (used by `BrandLogo.tsx`) to the README reference list.
+
+**Existing databases (commit 12):** the seed only fills an empty database, so a database created before
+Part 3 still holds the old marketing rows. `npm run db:content:refresh -w @hydra/api` shows a dry run of
+what would change (service wording by slug, company content, offices, department desks, FAQs);
+`-- --apply` applies it in one transaction. Jobs, quotes, invoices, users and service ids/prices are not
+touched. Production additionally needs `--allow-production` and should only be run with the owner's
+approval. Independently of the database, the app no longer shows records flagged `is_demo` (portfolio,
+team, partners) or demo company content (metrics, accreditations, testimonials) as real.
 
 The README's Generative AI declaration will be updated in commit 25 to record Claude Code assistance for
 Part 3; it is not removed or shortened.

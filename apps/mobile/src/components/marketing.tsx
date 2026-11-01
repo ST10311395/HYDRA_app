@@ -16,7 +16,7 @@ import { Badge, Button, Card, Icon, Label, Text, colors, radius, spacing, type I
 import { SERVICE_CATEGORY_LABEL as CATEGORY_LABEL, SERVICE_ICON, initials, monthYear } from '../utils/format';
 import { imageFor } from './images';
 import { PSG_CONTACT } from '../content/company';
-import { QUALITY, SAFETY_NOTE } from '../content/marketing';
+import { PROCESS, QUALITY, SAFETY_NOTE, SECTORS, SERVICES } from '../content/marketing';
 import { callNumber } from '../utils/links';
 
 /**
@@ -219,6 +219,68 @@ export function FaultCta({ title = 'Electrical fault?', body = 'Report it with a
   );
 }
 
+/**
+ * The six services published on the PSG website. Shown when the live service catalogue is empty or
+ * cannot be loaded, so guests always see what PSG does; each row opens the Services tab.
+ */
+export function ServiceOverview() {
+  return (
+    <Card style={{ gap: spacing.md }} testID="service-overview">
+      {SERVICES.map((s) => (
+        <Pressable key={s.title} accessibilityRole="link" accessibilityLabel={s.title} onPress={() => router.navigate('/services')} style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' }}>
+          <View style={styles.sectorIcon}><Icon name={s.icon} size={16} color="primaryBright" /></View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="title" weight="bold">{s.title}</Text>
+            <Text variant="bodySmall" color="textMuted">{s.body}</Text>
+          </View>
+        </Pressable>
+      ))}
+    </Card>
+  );
+}
+
+/** Industries served, from the PSG company portfolio. */
+export function SectorList() {
+  return (
+    <Card style={{ gap: spacing.md }} testID="sector-list">
+      <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+        <Icon name="briefcase" size={18} color="primaryBright" />
+        <Text variant="h3">Industries we serve</Text>
+      </View>
+      {SECTORS.map((s) => (
+        <View key={s.title} style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' }}>
+          <View style={styles.sectorIcon}><Icon name={s.icon} size={16} color="primaryBright" /></View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="title" weight="bold">{s.title}</Text>
+            <Text variant="bodySmall" color="textMuted">{s.body}</Text>
+          </View>
+        </View>
+      ))}
+    </Card>
+  );
+}
+
+/** How a job runs, in four plain steps (PSG website). */
+export function ProcessSteps() {
+  return (
+    <Card style={{ gap: spacing.md }} testID="process-steps">
+      <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+        <Icon name="list" size={18} color="primaryBright" />
+        <Text variant="h3">How it works</Text>
+      </View>
+      {PROCESS.map((p, i) => (
+        <View key={p.title} style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' }}>
+          <View style={styles.step}><Text variant="caption" weight="bold" color="white">{i + 1}</Text></View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="title" weight="bold">{p.title}</Text>
+            <Text variant="bodySmall" color="textMuted">{p.body}</Text>
+          </View>
+        </View>
+      ))}
+    </Card>
+  );
+}
+
 /** Quality & compliance statement from the PSG company portfolio. No certification claims. */
 export function QualityCard() {
   return (
@@ -240,10 +302,10 @@ export function QualityCard() {
 }
 
 const ABOUT_LINKS = [
-  { label: 'Why PSG', href: '/why-psg' },
-  { label: 'Our team', href: '/team' },
-  { label: 'Partners', href: '/partners' },
-  { label: 'FAQ', href: '/faq' },
+  { label: 'Why PSG', route: '/why-psg' },
+  { label: 'Our team', route: '/team' },
+  { label: 'Partners', route: '/partners' },
+  { label: 'FAQ', route: '/faq' },
 ] as const;
 
 /** Site footer: hours, main line, About links and the privacy notice. */
@@ -252,7 +314,7 @@ export function MarketingFooter() {
     <View style={{ alignItems: 'center', gap: 6, paddingVertical: spacing.lg, borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.border }} testID="marketing-footer">
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: spacing.lg, rowGap: spacing.xs, marginBottom: spacing.sm }} accessibilityRole="menu">
         {ABOUT_LINKS.map((l) => (
-          <Pressable key={l.href} accessibilityRole="link" onPress={() => router.push(l.href)} hitSlop={8} style={{ minHeight: 32, justifyContent: 'center' }}>
+          <Pressable key={l.route} accessibilityRole="link" onPress={() => router.push(l.route)} hitSlop={8} style={{ minHeight: 32, justifyContent: 'center' }}>
             <Text variant="bodySmall" color="primaryBright" weight="semibold">{l.label}</Text>
           </Pressable>
         ))}
@@ -350,6 +412,8 @@ export function TeamCard({ member, onCall, onCredentials }: { member: TeamMember
 }
 
 const styles = StyleSheet.create({
+  sectorIcon: { width: 32, height: 32, borderRadius: radius.sm, backgroundColor: colors.primaryMuted, alignItems: 'center', justifyContent: 'center' },
+  step: { width: 26, height: 26, borderRadius: 13, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.sm },
   specGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   spec: { width: '48.5%', backgroundColor: colors.surfaceElevated, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.border, padding: 10, gap: 4 },
