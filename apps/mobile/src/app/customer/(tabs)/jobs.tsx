@@ -23,6 +23,15 @@ const FILTERS = {
   CANCELLED: 'CANCELLED',
 } as const;
 
+/** What each filter holds and what happens next, so an empty list still tells the customer where things are. */
+const EMPTY: Record<keyof typeof FILTERS, { title: string; message: string }> = {
+  ACTIVE: { title: 'No current jobs', message: 'Request a service and follow it here: request → quote → scheduled → completed → invoice.' },
+  QUOTES: { title: 'No quotes to review', message: 'When we send you a quotation it appears here for you to accept or decline.' },
+  CERTIFICATES: { title: 'No certificates yet', message: 'Certificates of Compliance appear here once a job has passed inspection.' },
+  DONE: { title: 'No paid jobs yet', message: 'Jobs move here once their invoice is fully paid.' },
+  CANCELLED: { title: 'No cancelled jobs', message: 'Cancelled requests are kept here for your records.' },
+};
+
 export default function CustomerJobs() {
   const params = useLocalSearchParams<{ filter?: string }>();
   const [filter, setFilter] = useState<keyof typeof FILTERS>(params.filter && params.filter in FILTERS ? (params.filter as keyof typeof FILTERS) : 'ACTIVE');
@@ -43,7 +52,7 @@ export default function CustomerJobs() {
         }
         renderItem={({ item }) => <JobCard job={item} onPress={() => router.push(`/customer/job/${item.id}`)} />}
         ListFooterComponent={filter === 'CERTIFICATES' && items.length ? <Text variant="caption" color="textMuted" align="center">Open a job to view or share its Certificate of Compliance.</Text> : null}
-        ListEmptyComponent={notReady(q) ? <QueryFallback query={q} /> : <EmptyState icon="briefcase" title="No jobs here yet" message="Requests you make will appear here with live progress." />}
+        ListEmptyComponent={notReady(q) ? <QueryFallback query={q} /> : <EmptyState icon={filter === 'QUOTES' ? 'file-text' : filter === 'CERTIFICATES' ? 'award' : 'briefcase'} title={EMPTY[filter].title} message={EMPTY[filter].message} />}
         onEndReached={() => q.hasNextPage && void q.fetchNextPage()}
         onEndReachedThreshold={0.4}
         refreshControl={<RefreshControl refreshing={q.isRefetching} onRefresh={() => void q.refetch()} tintColor={colors.primaryBright} />}

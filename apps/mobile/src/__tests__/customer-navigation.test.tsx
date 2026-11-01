@@ -15,7 +15,9 @@ import type { QueryClient } from '@tanstack/react-query';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
+import BillingScreen from '../app/customer/(tabs)/billing';
 import CustomerDashboard from '../app/customer/(tabs)/index';
+import CustomerJobs from '../app/customer/(tabs)/jobs';
 import CustomerProfile from '../app/customer/(tabs)/profile';
 import { makeTabBar } from '../components/TabBar';
 import { mockApi, renderScreen, signInAs } from '../test-utils';
@@ -108,5 +110,28 @@ describe('customer account hub', () => {
     await settle(client);
     await fireEvent.press(screen.getByRole('button', { name: label }));
     expect(router.push).toHaveBeenCalledWith(route);
+  });
+});
+
+describe('customer jobs, quotes and billing pathways', () => {
+  it.each([
+    ['QUOTES', 'No quotes to review', /accept or decline/],
+    ['CERTIFICATES', 'No certificates yet', /passed inspection/],
+    ['ACTIVE', 'No current jobs', /request .* quote .* invoice/],
+  ])('the %s filter explains what belongs there when empty', async (filter, title, message) => {
+    (jest.requireMock('expo-router') as { __setParams: (p: object) => void }).__setParams({ filter });
+    mockApi({ 'GET /jobs': () => ({ items: [], page: 1, pageSize: 20, total: 0 }), 'GET /notifications': () => ({ items: [], unread: 0 }) });
+    const { client } = await renderScreen(<CustomerJobs />);
+    await settle(client);
+    expect(screen.getByText(title)).toBeOnTheScreen();
+    expect(screen.getByText(message)).toBeOnTheScreen();
+  });
+
+  it('billing links to rewards, which can be used on eligible invoices', async () => {
+    mockApi({ 'GET /invoices': () => ({ items: [], page: 1, pageSize: 20, total: 0 }), 'GET /payments': () => ({ items: [], page: 1, pageSize: 20, total: 0 }), 'GET /notifications': () => ({ items: [], unread: 0 }) });
+    const { client } = await renderScreen(<BillingScreen />);
+    await settle(client);
+    await fireEvent.press(screen.getByTestId('billing-rewards'));
+    expect(router.navigate).toHaveBeenCalledWith('/customer/rewards');
   });
 });
