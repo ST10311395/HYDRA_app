@@ -25,6 +25,11 @@ export const colors = {
   secondaryBright: '#C77DFF',
   secondaryMuted: 'rgba(177,60,255,0.14)',
   secondaryBorder: 'rgba(177,60,255,0.45)',
+  /** PSG logo gradient (blue → violet → pink); for the brand mark and subtle accents only. */
+  brandBlue: '#58AEEC',
+  brandViolet: '#8C6DBB',
+  brandPink: '#DB3A78',
+  brandPinkMuted: 'rgba(219,58,120,0.14)',
   danger: '#E31837',
   dangerBright: '#FF4D63',
   dangerMuted: 'rgba(227,24,55,0.14)',
@@ -46,6 +51,16 @@ export const spacing = { xxs: 2, xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 24, 
 
 export const radius = { sm: 6, md: 10, lg: 14, xl: 18, pill: 999 } as const;
 
+/** Layout breakpoints and widths shared by headers, forms and screen columns. */
+export const layout = {
+  /** Side gutter on phone screens. */
+  gutter: spacing.lg,
+  /** Below this window width headers and toolbars condense (small Android phones). */
+  compactWidth: 380,
+  /** Readable column width for forms and long text on tablets and the web. */
+  maxContentWidth: 640,
+} as const;
+
 export const fonts = {
   regular: 'PlusJakartaSans_400Regular',
   medium: 'PlusJakartaSans_500Medium',
@@ -64,8 +79,8 @@ export const type = {
   title: { fontFamily: fonts.semibold, fontSize: 15, lineHeight: 21 },
   body: { fontFamily: fonts.regular, fontSize: 15, lineHeight: 22 },
   bodySmall: { fontFamily: fonts.regular, fontSize: 13, lineHeight: 19 },
-  caption: { fontFamily: fonts.medium, fontSize: 12, lineHeight: 16 },
-  label: { fontFamily: fonts.mono, fontSize: 11, lineHeight: 14, letterSpacing: 1.4 },
+  caption: { fontFamily: fonts.medium, fontSize: 12, lineHeight: 17 },
+  label: { fontFamily: fonts.mono, fontSize: 11, lineHeight: 15, letterSpacing: 0.8 },
   mono: { fontFamily: fonts.mono, fontSize: 13, lineHeight: 18 },
   stat: { fontFamily: fonts.monoBold, fontSize: 28, lineHeight: 32 },
 } as const;
