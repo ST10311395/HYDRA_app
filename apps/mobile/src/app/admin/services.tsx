@@ -13,13 +13,8 @@ import { useServices, useSimpleMutation } from '../../api/queries';
 import { parseAmount } from '../../components/admin';
 import { BrandHeader } from '../../components/layout';
 import { Badge, Button, Card, Checkbox, EmptyState, Icon, Label, SelectField, Text, TextField, colors, spacing, toast } from '../../design-system';
-import { SERVICE_ICON, money } from '../../utils/format';
+import { SERVICE_CATEGORY_LABEL as CATEGORY_LABEL, SERVICE_ICON, money } from '../../utils/format';
 import { QueryFallback, notReady } from '../../components/QueryState';
-
-const CATEGORY_LABEL: Record<ServiceCategory, string> = {
-  SOLAR: 'Solar & renewables', CABLING: 'Industrial cabling & fibre', SUBSTATIONS: 'High-voltage & substations',
-  EMERGENCY: 'Emergency repairs', COMPLIANCE: 'Compliance & CoC', AUTOMATION: 'Smart energy & automation',
-};
 
 /** Structured service types (spec §5.4) — the catalogue customers choose from when requesting work. */
 export default function ServiceTypes() {

@@ -13,7 +13,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import type { PartnerDto, PortfolioItemDto, ServiceTypeDto, TeamMemberDto } from '@hydra/shared';
 import { usePublicContent } from '../api/queries';
 import { Badge, Button, Card, Icon, Label, Text, colors, radius, spacing, type IconName } from '../design-system';
-import { SERVICE_ICON, initials, monthYear } from '../utils/format';
+import { SERVICE_CATEGORY_LABEL as CATEGORY_LABEL, SERVICE_ICON, initials, monthYear } from '../utils/format';
 import { imageFor } from './images';
 import { callNumber } from '../utils/links';
 
@@ -32,22 +32,13 @@ export function PhotoHeader({ imageKey, height = 170, children, fallback }: { im
   );
 }
 
-const CATEGORY_LABEL: Record<string, string> = {
-  SOLAR: 'SOLAR & RENEWABLES',
-  CABLING: 'CABLING & FIBER',
-  SUBSTATIONS: 'SUBSTATIONS & HV',
-  EMERGENCY: '24/7 MAINTENANCE',
-  COMPLIANCE: 'COC & AUDITING',
-  AUTOMATION: 'LIGHTING & AUTOMATION',
-};
-
 /** Full service card (Our Services page). */
 export function ServiceCard({ service, onQuote }: { service: ServiceTypeDto; onQuote: () => void }) {
   return (
     <Card padded={false} testID={`service-${service.slug}`}>
       <PhotoHeader imageKey={service.imageKey} height={150}>
         <View style={styles.rowBetween}>
-          <Badge label={CATEGORY_LABEL[service.category] ?? service.category} tone="neutral" solid />
+          <Badge label={CATEGORY_LABEL[service.category] ?? service.category} tone="neutral" solid mono={false} />
           {service.badge ? <Badge label={service.badge} tone="primary" solid mono={false} /> : null}
         </View>
         {service.slaText ? <Badge label={service.slaText} icon="clock" tone="neutral" solid mono={false} /> : null}
@@ -64,12 +55,12 @@ export function ServiceCard({ service, onQuote }: { service: ServiceTypeDto; onQ
           ))}
         </View>
         <Pressable accessibilityRole="button" onPress={() => router.push(`/service/${service.id}`)} style={[styles.rowBetween, { minHeight: 36 }]}>
-          <Text variant="title" color="primaryBright">Technical Scope & Features</Text>
+          <Text variant="title" color="primaryBright">What’s included</Text>
           <Icon name="chevron-down" size={18} color="primaryBright" />
         </Pressable>
         <View style={{ flexDirection: 'row', gap: spacing.sm }}>
           <Button label="Request Quote" iconRight="arrow-right" onPress={onQuote} style={{ flex: 1 }} />
-          <Button label="Full Specs" variant="outline" fullWidth={false} onPress={() => router.push(`/service/${service.id}`)} />
+          <Button label="Details" variant="outline" fullWidth={false} onPress={() => router.push(`/service/${service.id}`)} />
         </View>
       </View>
     </Card>
@@ -82,7 +73,7 @@ export function ServiceMiniCard({ service, width }: { service: ServiceTypeDto; w
   return (
     <Card padded={false} style={{ width }} onPress={() => router.push(`/service/${service.id}`)} accessibilityLabel={service.name}>
       <PhotoHeader imageKey={service.imageKey} height={120}>
-        <Badge label={service.badge ?? CATEGORY_LABEL[service.category] ?? ''} tone={violet ? 'secondary' : 'neutral'} solid={!violet} />
+        <Badge label={service.badge ?? CATEGORY_LABEL[service.category] ?? ''} tone={violet ? 'secondary' : 'neutral'} solid={!violet} mono={false} />
       </PhotoHeader>
       <View style={{ padding: spacing.md, gap: 6 }}>
         <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
@@ -91,7 +82,7 @@ export function ServiceMiniCard({ service, width }: { service: ServiceTypeDto; w
         </View>
         <Text variant="bodySmall" color="textMuted" numberOfLines={2}>{service.description}</Text>
         <View style={[styles.rowBetween, { marginTop: 6 }]}>
-          <Text variant="bodySmall" color={violet ? 'secondaryBright' : 'primaryBright'} weight="semibold">{violet ? 'Solar Calculator' : 'Scope Specifications'}</Text>
+          <Text variant="bodySmall" color={violet ? 'secondaryBright' : 'primaryBright'} weight="semibold">View service</Text>
           <Icon name="arrow-right" size={15} color={violet ? 'secondaryBright' : 'primaryBright'} />
         </View>
       </View>

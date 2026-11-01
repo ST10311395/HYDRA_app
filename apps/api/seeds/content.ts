@@ -64,48 +64,53 @@ export const PUBLIC_CONTENT: PublicContentDto = {
   isDemoContent: true,
 };
 
+/**
+ * Service catalogue aligned with the PSG website (Part 3). Slugs, categories, prices and image keys
+ * are unchanged so existing jobs, quotes and AI policies keep resolving; only customer-facing wording
+ * changed, and no turnaround or availability promises are made (slaText null).
+ */
 export const SERVICE_TYPES = [
   {
-    slug: 'commercial-solar-micro-grids', name: 'Commercial Solar & Micro-Grids', category: 'SOLAR', basePrice: 18500, slaText: 'SLA: 5–14 Business Days',
-    badge: 'Tribe Solar Partner', imageKey: 'service-solar',
-    description: 'Turnkey high-efficiency photovoltaic installations, grid-tied hybrid inverters, and utility-scale battery storage to eliminate load-shedding downtime.',
-    specs: [{ label: 'Capacity', value: '20kW to 2.5MW' }, { label: 'Storage', value: 'LiFePO4 BESS' }, { label: 'Warranty', value: '25-Yr Panel Guarantee' }, { label: 'Payback', value: '2.5 – 4 Years ROI' }],
-    features: ['Site yield & shading study', 'Hybrid inverter and BESS design', 'Generator sync & load-shedding automation', 'NRS 097 grid-tie compliance', 'Remote monitoring handover'],
+    slug: 'commercial-solar-micro-grids', name: 'Solar & Backup Power', category: 'SOLAR', basePrice: 18500, slaText: null,
+    badge: 'Trite Solar', imageKey: 'service-solar',
+    description: 'Solar panels, inverters and battery backup through our solar division, Trite Solar, integrated with your existing electrical installation.',
+    specs: [{ label: 'Scope', value: 'Panels, inverters & batteries' }, { label: 'Division', value: 'Trite Solar' }],
+    features: ['Site assessment and system sizing', 'Inverter and battery backup installation', 'Integration with existing distribution boards', 'Testing and CoC where required'],
   },
   {
-    slug: 'industrial-cabling-fibre', name: 'Industrial Cabling & Fiber Optics', category: 'CABLING', basePrice: 6500, slaText: 'SLA: 2–7 Business Days',
-    badge: 'High Density', imageKey: 'service-cabling',
-    description: 'Heavy-duty power reticulation, armoured cable jointing, high-density fibre optic backbones, and structured data cabling.',
-    specs: [{ label: 'Cable Type', value: 'XLPE / Armoured SWA' }, { label: 'Data Spec', value: 'Cat6A / Single-Mode' }, { label: 'Voltage', value: 'Low to 33kV High V' }, { label: 'Testing', value: 'OTDR & Insulation' }],
-    features: ['Cable route survey', 'Trenching, ducting & cable ladder', 'MV joints and terminations', 'Fibre splicing and OTDR certification', 'As-built documentation'],
+    slug: 'industrial-cabling-fibre', name: 'Electrical Installations', category: 'CABLING', basePrice: 6500, slaText: null,
+    badge: null, imageKey: 'service-cabling',
+    description: 'Residential installations, commercial fit-outs and industrial electrical work, including cable management systems and infrastructure.',
+    specs: [{ label: 'Sectors', value: 'Residential, commercial & industrial' }, { label: 'Includes', value: 'Cable management & containment' }],
+    features: ['On-site assessment and clear quotation', 'New installations and fit-outs', 'Industrial installations and upgrades', 'Cable routing, trays and containment', 'Testing and CoC where required'],
   },
   {
-    slug: 'hv-substations-distribution', name: 'High-Voltage Substations & Distribution', category: 'SUBSTATIONS', basePrice: 45000, slaText: 'SLA: 10–21 Business Days',
-    badge: 'Utility Grade', imageKey: 'service-substation',
-    description: 'Design, supply, and energization of 11kV – 33kV substations, oil/dry transformers, ring main units and protection systems.',
-    specs: [{ label: 'Rating', value: '11kV / 22kV / 33kV' }, { label: 'Transformer', value: '315kVA to 5MVA' }, { label: 'Switchgear', value: 'Vacuum / SF6 RMU' }, { label: 'Safety', value: 'Arc-Flash Protection' }],
-    features: ['Protection coordination study', 'Transformer supply and installation', 'RMU and switchgear commissioning', 'Earthing & lightning protection', 'Utility energisation liaison'],
+    slug: 'hv-substations-distribution', name: 'Distribution Boards', category: 'SUBSTATIONS', basePrice: 45000, slaText: null,
+    badge: null, imageKey: 'service-substation',
+    description: 'New distribution board installations, upgrades and replacements, inspection and circuit organisation.',
+    specs: [{ label: 'Work', value: 'Install, upgrade, replace' }, { label: 'Includes', value: 'Inspection & circuit labelling' }],
+    features: ['New DB installations', 'Upgrades and replacements', 'Reconfiguration and circuit organisation', 'Inspection and labelling'],
   },
   {
-    slug: 'emergency-repairs-diagnostics', name: '24/7 Emergency Repairs & Diagnostics', category: 'EMERGENCY', basePrice: 1450, slaText: 'SLA: Immediate Dispatch (60m)',
-    badge: '60-Min Emergency SLA', imageKey: 'service-emergency',
-    description: 'Rapid-dispatch industrial electricians equipped with thermal imaging, insulation analysers and fault-location tooling.',
-    specs: [{ label: 'Response', value: 'Under 60 Mins' }, { label: 'Coverage', value: 'Gauteng & Nationwide' }, { label: 'Diagnostics', value: 'FLIR Thermal / Megger' }, { label: 'Availability', value: '24/7/365 Standby' }],
-    features: ['Fault finding and isolation', 'Thermal imaging inspection', 'Cable fault location', 'Generator and panel failure response', 'Make-safe and temporary supply'],
+    slug: 'emergency-repairs-diagnostics', name: 'Fault Finding', category: 'EMERGENCY', basePrice: 1450, slaText: null,
+    badge: null, imageKey: 'service-emergency',
+    description: 'Electrical fault diagnosis, testing and verification, with clear corrective recommendations and repairs.',
+    specs: [{ label: 'Work', value: 'Diagnosis, testing & repair' }, { label: 'Outcome', value: 'Clear recommendations' }],
+    features: ['Fault finding and system diagnostics', 'Testing and verification', 'Corrective recommendations', 'Fault repairs'],
   },
   {
-    slug: 'coc-audits', name: 'Certificate of Compliance (CoC) & Audits', category: 'COMPLIANCE', basePrice: 1850, slaText: 'SLA: 24–48 Hours',
-    badge: 'Master Electrician', imageKey: 'service-coc',
-    description: 'Official Department of Labour accredited 1-phase and 3-phase electrical inspection certificates for residential, commercial and industrial property.',
-    specs: [{ label: 'Authority', value: 'Dept of Labour Accredited' }, { label: 'Phase', value: '1-Phase & 3-Phase Heavy' }, { label: 'Turnaround', value: '24 to 48 Hours' }, { label: 'Legality', value: 'Official Legal Certificate' }],
-    features: ['SANS 10142-1 inspection', 'Earth leakage & insulation testing', 'Remedial quote where required', 'Digital CoC in the app', 'Property transfer ready'],
+    slug: 'coc-audits', name: 'Compliance (CoC) & Inspections', category: 'COMPLIANCE', basePrice: 1850, slaText: null,
+    badge: null, imageKey: 'service-coc',
+    description: 'Inspections and testing towards compliance with SANS 10142-1, with documentation and Certificates of Compliance where required, including work in hazardous areas.',
+    specs: [{ label: 'Standard', value: 'SANS 10142-1' }, { label: 'Includes', value: 'Testing & documentation' }],
+    features: ['SANS 10142-1 inspection and testing', 'Certificate of Compliance documentation', 'Hazardous-area inspections and compliance support', 'Remedial quotation where required'],
   },
   {
-    slug: 'smart-energy-automation', name: 'Smart Energy & Industrial Automation', category: 'AUTOMATION', basePrice: 9800, slaText: 'SLA: 3–10 Business Days',
-    badge: 'Save Up to 40%', imageKey: 'service-automation',
-    description: 'High-bay LED retrofits, Power Factor Correction (PFC) units, automated lighting controls, and peak-demand management.',
-    specs: [{ label: 'Protocol', value: 'DALI-2 / KNX / Modbus' }, { label: 'Lighting', value: 'Industrial High-Bay LED' }, { label: 'PFC Units', value: 'Automatic Capacitor Bank' }, { label: 'Savings', value: '30%–45% KVA Savings' }],
-    features: ['Energy audit and metering', 'LED retrofit design', 'Power factor correction', 'Lighting control integration', 'Savings verification report'],
+    slug: 'smart-energy-automation', name: 'Maintenance & Repairs', category: 'AUTOMATION', basePrice: 9800, slaText: null,
+    badge: null, imageKey: 'service-automation',
+    description: 'Preventative and scheduled maintenance, fault repairs and upgrades, planned to minimise disruption in operational facilities.',
+    specs: [{ label: 'Type', value: 'Preventative & scheduled' }, { label: 'Includes', value: 'Repairs & upgrades' }],
+    features: ['Preventative and scheduled maintenance', 'Electrical infrastructure upgrades', 'Load management improvements', 'Work within live operational facilities'],
   },
 ] as const;
 

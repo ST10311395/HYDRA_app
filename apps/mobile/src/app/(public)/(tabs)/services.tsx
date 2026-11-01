@@ -12,20 +12,17 @@ import type { ServiceCategory } from '@hydra/shared';
 import { useServices } from '../../../api/queries';
 import { BrandHeader, Screen } from '../../../components/layout';
 import { EmergencyCta, ServiceCard } from '../../../components/marketing';
-import { Badge, Button, Card, EmptyState, ErrorState, FilterChips, Icon, IconTile, Label, LoadingCards, SearchField, Segmented, Text, colors, radius, spacing } from '../../../design-system';
+import { Badge, Button, Card, EmptyState, ErrorState, FilterChips, Icon, IconTile, Label, LoadingCards, SearchField, Segmented, Text, colors, radius, spacing, type IconName } from '../../../design-system';
 import { Slider } from '../../../design-system/Slider';
 import { estimateScope, type Sector } from '../../../features/estimator';
+import { TAGLINE } from '../../../content/marketing';
+import { SERVICE_CATEGORY_LABEL, SERVICE_ICON } from '../../../utils/format';
 
 type Filter = 'ALL' | ServiceCategory;
 
-const FILTERS: { value: Filter; label: string; icon: 'layers' | 'sun' | 'git-merge' | 'zap' | 'alert-triangle' | 'shield' | 'cpu' }[] = [
-  { value: 'ALL', label: 'All Services', icon: 'layers' },
-  { value: 'SOLAR', label: 'Solar & Renewables', icon: 'sun' },
-  { value: 'CABLING', label: 'Cabling & Fiber', icon: 'git-merge' },
-  { value: 'SUBSTATIONS', label: 'Substations', icon: 'zap' },
-  { value: 'EMERGENCY', label: 'Emergency', icon: 'alert-triangle' },
-  { value: 'COMPLIANCE', label: 'CoC & Audits', icon: 'shield' },
-  { value: 'AUTOMATION', label: 'Automation', icon: 'cpu' },
+const FILTERS: { value: Filter; label: string; icon: IconName }[] = [
+  { value: 'ALL', label: 'All services', icon: 'layers' },
+  ...(['CABLING', 'EMERGENCY', 'SUBSTATIONS', 'COMPLIANCE', 'AUTOMATION', 'SOLAR'] as const).map((c) => ({ value: c, label: SERVICE_CATEGORY_LABEL[c], icon: SERVICE_ICON[c]! })),
 ];
 
 const CERTS = [
@@ -56,11 +53,11 @@ export default function ServicesScreen() {
       <BrandHeader section="Our Services" />
       <Screen onRefresh={() => void services.refetch()} refreshing={services.isRefetching}>
         <View style={{ gap: spacing.sm }}>
-          <Label color="primaryBright" style={{ fontSize: 12 }}>South Africa Wide ▪ ISO 9001 Certified</Label>
-          <Text variant="display" style={{ fontSize: 26 }}>CORE ENGINEERING SERVICES</Text>
-          <Text variant="body" color="textMuted">Precision high-voltage electrical, renewable solar micro-grids, fiber optic cabling, and emergency maintenance.</Text>
+          <Label color="primaryBright" style={{ fontSize: 12 }}>{TAGLINE}</Label>
+          <Text variant="h1">Our services</Text>
+          <Text variant="body" color="textMuted">Electrical engineering and cabling for residential, commercial and industrial customers, with solar and backup power through Trite Solar.</Text>
         </View>
-        <SearchField value={search} onChangeText={setSearch} placeholder="Search services, e.g., Solar, 33kV, CoC…" />
+        <SearchField value={search} onChangeText={setSearch} placeholder="Search services, e.g. CoC, DB board, solar" />
         <FilterChips options={FILTERS} value={filter} onChange={setFilter} />
 
         {filter === 'ALL' && !search && solar ? (

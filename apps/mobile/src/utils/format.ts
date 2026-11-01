@@ -2,7 +2,7 @@
  * Code Attribution
  * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
  */
-import { JOB_STATUS_LABELS, formatZar, type InvoiceStatus, type JobStatus, type MissedCallStatus } from '@hydra/shared';
+import { JOB_STATUS_LABELS, formatZar, type InvoiceStatus, type JobStatus, type MissedCallStatus, type ServiceCategory } from '@hydra/shared';
 import type { IconName } from '../design-system/Icon';
 
 export const money = formatZar;
@@ -100,10 +100,23 @@ export const MISSED_TONE: Record<MissedCallStatus, 'primary' | 'success' | 'warn
 export const SERVICE_ICON: Record<string, IconName> = {
   SOLAR: 'sun',
   CABLING: 'git-merge',
-  SUBSTATIONS: 'zap',
-  EMERGENCY: 'alert-triangle',
+  SUBSTATIONS: 'grid',
+  EMERGENCY: 'search',
   COMPLIANCE: 'shield',
-  AUTOMATION: 'cpu',
+  AUTOMATION: 'tool',
+};
+
+/**
+ * Customer-facing names for the stored service categories, aligned with the PSG website (Part 3).
+ * The enum values themselves are unchanged so existing jobs and quotes still resolve.
+ */
+export const SERVICE_CATEGORY_LABEL: Record<ServiceCategory, string> = {
+  CABLING: 'Electrical installations',
+  EMERGENCY: 'Fault finding',
+  SUBSTATIONS: 'Distribution boards',
+  COMPLIANCE: 'Compliance (CoC)',
+  AUTOMATION: 'Maintenance & repairs',
+  SOLAR: 'Solar & backup power',
 };
 
 export const initials = (name: string) =>
