@@ -120,6 +120,9 @@ export const URGENCY_OPTIONS: { value: 'STANDARD' | 'HIGH' | 'EMERGENCY'; label:
   { value: 'EMERGENCY', label: 'Urgent fault' },
 ];
 
+/** Customer-facing label for a stored urgency value (never the raw enum). */
+export const urgencyLabel = (u: string): string => URGENCY_OPTIONS.find((o) => o.value === u)?.label ?? u;
+
 export const SERVICE_CATEGORY_LABEL: Record<ServiceCategory, string> = {
   CABLING: 'Electrical installations',
   EMERGENCY: 'Fault finding',

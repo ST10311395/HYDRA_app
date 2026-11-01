@@ -18,7 +18,7 @@ import { BrandHeader, Screen } from '../../../components/layout';
 import { Badge, Button, Card, KeyValue, Label, Segmented, Text, TextField, colors, confirm, radius, spacing, toast } from '../../../design-system';
 import { PhotoPicker } from '../../../features/photos';
 import { useJobSubscription } from '../../../hooks/useRealtime';
-import { fmtDateTime } from '../../../utils/format';
+import { fmtDateTime, urgencyLabel } from '../../../utils/format';
 import { openDirections } from '../../../utils/links';
 import { QueryFallback } from '../../../components/QueryState';
 
@@ -56,7 +56,7 @@ export default function EmployeeJob() {
               <Text variant="h2">{j.serviceType.name}</Text>
               {j.scheduledStart ? <KeyValue label="Appointment" value={`${fmtDateTime(j.scheduledStart)}`} /> : null}
               <KeyValue label="Site" value={j.siteAddress} />
-              {j.urgency !== 'STANDARD' ? <Badge label={j.urgency} tone={j.urgency === 'EMERGENCY' ? 'danger' : 'warning'} /> : null}
+              {j.urgency !== 'STANDARD' ? <Badge label={urgencyLabel(j.urgency)} tone={j.urgency === 'EMERGENCY' ? 'danger' : 'warning'} /> : null}
               <View style={{ flexDirection: 'row', gap: spacing.sm, marginTop: 4 }}>
                 <Button label="Navigate" icon="navigation" variant="secondary" size="sm" style={{ flex: 1 }} onPress={navigate} />
                 {j.timeOnSiteMinutes !== null ? <Badge label={`${Math.floor(j.timeOnSiteMinutes / 60)}h ${j.timeOnSiteMinutes % 60}m on site`} tone="secondary" mono={false} /> : null}

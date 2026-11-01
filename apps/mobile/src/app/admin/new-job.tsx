@@ -14,7 +14,7 @@ import { flatten, useCustomer, useCustomers, useServices, useSimpleMutation } fr
 import { BrandHeader, Screen } from '../../components/layout';
 import { Button, Card, DateField, Icon, Label, SearchField, Segmented, SelectField, Text, TextField, colors, radius, spacing, toast } from '../../design-system';
 import { useSyncFrom } from '../../hooks/useSyncFrom';
-import { todayIso } from '../../utils/format';
+import { URGENCY_OPTIONS, todayIso } from '../../utils/format';
 
 /** Admin logs a job for a customer (phone/walk-in booking) — POST /jobs/admin. */
 export default function NewJob() {
@@ -99,7 +99,7 @@ export default function NewJob() {
           <TextField label="Site address" required value={form.siteAddress} onChangeText={(v) => setForm({ ...form, siteAddress: v })} icon="map-pin" maxLength={300} error={errors.siteAddress} />
           <TextField label="Description" required value={form.description} onChangeText={(v) => setForm({ ...form, description: v })} multiline maxLength={2000} error={errors.description} placeholder="What the customer reported, access details, equipment…" />
           <Text variant="title" weight="bold">Urgency</Text>
-          <Segmented tone="danger" value={form.urgency} onChange={(v) => setForm({ ...form, urgency: v })} options={[{ value: 'STANDARD', label: 'Standard' }, { value: 'HIGH', label: 'High priority' }, { value: 'EMERGENCY', label: 'Emergency' }]} />
+          <Segmented tone="danger" value={form.urgency} onChange={(v) => setForm({ ...form, urgency: v })} options={URGENCY_OPTIONS} />
           <DateField label="Preferred date (optional)" value={form.preferredDate || undefined} onChange={(v) => setForm({ ...form, preferredDate: v })} minDate={todayIso()} error={errors.preferredDate} />
           <Segmented value={form.preferredTimeWindow} onChange={(v) => setForm({ ...form, preferredTimeWindow: v })} options={[{ value: 'MORNING', label: 'Morning' }, { value: 'AFTERNOON', label: 'Afternoon' }, { value: 'ANY', label: 'Any time' }]} />
           <TextField label="Site contact phone" value={form.contactPhone} onChangeText={(v) => setForm({ ...form, contactPhone: v })} keyboardType="phone-pad" maxLength={24} error={errors.contactPhone} />

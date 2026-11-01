@@ -16,7 +16,7 @@ import { BrandHeader, Screen } from '../../../components/layout';
 import { Badge, Button, Card, KeyValue, Label, Text, colors, confirm, radius, spacing, toast } from '../../../design-system';
 import { PhotoPicker } from '../../../features/photos';
 import { useJobSubscription } from '../../../hooks/useRealtime';
-import { fmtDate, fmtDateTime, money } from '../../../utils/format';
+import { fmtDate, fmtDateTime, money, urgencyLabel } from '../../../utils/format';
 import { QueryFallback } from '../../../components/QueryState';
 
 export default function CustomerJob() {
@@ -42,7 +42,7 @@ export default function CustomerJob() {
               <Text variant="h2">{j.serviceType.name}</Text>
               <KeyValue label="Site" value={j.siteAddress} />
               {j.scheduledStart ? <KeyValue label="Scheduled" value={fmtDateTime(j.scheduledStart)} /> : j.preferredDate ? <KeyValue label="Preferred date" value={fmtDate(j.preferredDate)} /> : null}
-              {j.urgency !== 'STANDARD' ? <Badge label={j.urgency} tone={j.urgency === 'EMERGENCY' ? 'danger' : 'warning'} /> : null}
+              {j.urgency !== 'STANDARD' ? <Badge label={urgencyLabel(j.urgency)} tone={j.urgency === 'EMERGENCY' ? 'danger' : 'warning'} /> : null}
               {j.cancelledReason ? <Text variant="bodySmall" color="dangerBright">Cancelled: {j.cancelledReason}</Text> : null}
             </Card>
 

@@ -12,7 +12,7 @@ import type { ContactQueryStatus } from '@hydra/shared';
 import { flatten, useEnquiries } from '../../../api/queries';
 import { BrandHeader } from '../../../components/layout';
 import { Badge, Button, Card, EmptyState, FilterChips, SearchField, Text, colors, spacing } from '../../../design-system';
-import { fmtRelative } from '../../../utils/format';
+import { fmtRelative, urgencyLabel } from '../../../utils/format';
 import { QueryFallback, notReady } from '../../../components/QueryState';
 
 type F = 'ALL' | ContactQueryStatus;
@@ -43,7 +43,7 @@ export default function EnquiriesTab() {
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text variant="mono" color="primaryBright">{e.reference}</Text>
               <View style={{ flexDirection: 'row', gap: 6 }}>
-                {e.urgency !== 'STANDARD' ? <Badge label={e.urgency} tone={e.urgency === 'EMERGENCY' ? 'danger' : 'warning'} /> : null}
+                {e.urgency !== 'STANDARD' ? <Badge label={urgencyLabel(e.urgency)} tone={e.urgency === 'EMERGENCY' ? 'danger' : 'warning'} /> : null}
                 <Badge label={e.status.replace('_', ' ')} tone={TONE[e.status]} />
               </View>
             </View>

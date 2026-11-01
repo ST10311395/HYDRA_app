@@ -6,30 +6,24 @@
  * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { email as emailSchema, phone as phoneSchema, type JobUrgency } from '@hydra/shared';
 import { errorMessage, newIdempotencyKey } from '../../../api/client';
 import { useCreateJob, useFaqs, useServices, useSubmitEnquiry } from '../../../api/queries';
-import { imageFor } from '../../../components/images';
 import { BrandHeader, Screen } from '../../../components/layout';
-import { Accordion, Badge, Button, Card, Checkbox, DateField, Icon, Label, ProgressBar, SelectField, Segmented, Text, TextField, colors, noSelect, radius, spacing, toast } from '../../../design-system';
+import { Accordion, Button, Card, Checkbox, DateField, Icon, Label, ProgressBar, SelectField, Segmented, Text, TextField, colors, noSelect, radius, spacing, toast } from '../../../design-system';
 import { PhotoPicker, type UploadedPhoto } from '../../../features/photos';
 import { useAuth } from '../../../store/auth';
-import { todayIso } from '../../../utils/format';
+import { URGENCY_OPTIONS, todayIso, urgencyLabel } from '../../../utils/format';
+import { PSG_CONTACT } from '../../../content/company';
+import { SAFETY_NOTE } from '../../../content/marketing';
 import { useSyncFrom } from '../../../hooks/useSyncFrom';
 import { SECTORS, SITE_LABEL, SITE_TYPES, resolveSector, type SectorKey, type SiteType } from '../../../features/quoteSectors';
 
-const VOLTAGES = [
-  'Low Voltage (230V Single-Phase)',
-  'Low Voltage (400V / 230V Three-Phase)',
-  'Medium Voltage (11kV)',
-  'Medium Voltage (22kV)',
-  'High Voltage (33kV+)',
-  'Not sure — engineer to confirm',
-].map((v) => ({ value: v, label: v }));
+/** Optional supply type (advanced details); not sure is fine — we confirm on assessment. */
+const VOLTAGES = ['Single-phase (230 V)', 'Three-phase (400 V)', 'Not sure'].map((v) => ({ value: v, label: v }));
 
 const STEPS = ['Service', 'Scope', 'Location', 'Submit'] as const;
 const DRAFT_KEY = 'hydra.quote-draft.v1';
@@ -53,7 +47,7 @@ interface Draft {
 const EMPTY: Draft = {
   sector: 'INSTALL',
   siteType: '',
-  voltage: VOLTAGES[1]!.value,
+  voltage: '',
   serviceTypeId: '',
   scope: '',
   urgency: 'STANDARD',
@@ -79,7 +73,6 @@ export default function QuoteScreen() {
   const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [done, setDone] = useState<null | { reference: string; jobId?: string }>(null);
-  const [draftRef] = useState(() => `RFQ-${Math.floor(1000 + Math.random() * 9000)}`);
   // Stable per request: a double tap or retry replays rather than logging a second job.
   const [requestKey, setRequestKey] = useState(newIdempotencyKey);
   const sending = useRef(false);
@@ -100,6 +93,8 @@ export default function QuoteScreen() {
         // Corrupt draft: start fresh.
       }
       const saved = { ...EMPTY, ...parsed };
+      // Supply types from before Part 3 (e.g. “Medium Voltage (11kV)”) are no longer offered.
+      if (saved.voltage && !VOLTAGES.some((v) => v.value === saved.voltage)) saved.voltage = '';
       // A draft saved before Part 3 may hold a removed sector (e.g. FIBRE): map it, never crash.
       const savedSector = resolveSector(saved.sector) ?? { sector: EMPTY.sector };
       // Deep links preselect a sector (legacy keys included); a fault opens exactly as tapping it would.
@@ -174,7 +169,7 @@ export default function QuoteScreen() {
     if (sending.current || !validate(3)) return;
     sending.current = true;
     const site = draft.siteType ? SITE_LABEL[draft.siteType] : null;
-    const description = [`[${sector.title}] ${draft.scope.trim()}`, site ? `Site type: ${site}` : null, `Voltage: ${draft.voltage}`, draft.loadKva ? `Estimated load: ${draft.loadKva} kVA` : null].filter(Boolean).join('\n');
+    const description = [`[${sector.title}] ${draft.scope.trim()}`, site ? `Site type: ${site}` : null, draft.voltage ? `Supply: ${draft.voltage}` : null, draft.loadKva ? `Estimated load: ${draft.loadKva} kVA` : null].filter(Boolean).join('\n');
     try {
       if (user?.role === 'CUSTOMER') {
         const job = await createJob.mutateAsync({
@@ -201,7 +196,7 @@ export default function QuoteScreen() {
           consent: true,
           details: {
             sector: site ? `${sector.title} (${site})` : sector.title,
-            voltageLevel: draft.voltage,
+            voltageLevel: draft.voltage || undefined,
             scope: draft.scope.trim(),
             siteAddress: draft.siteAddress.trim(),
             estimatedLoadKva: draft.loadKva ? Number(draft.loadKva) : undefined,
@@ -229,19 +224,12 @@ export default function QuoteScreen() {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <BrandHeader section="Quotation" />
       <Screen>
-        <Card padded={false} style={{ overflow: 'hidden' }}>
-          <View style={styles.hero}>
-            <Image source={imageFor('quote-blueprint')} style={StyleSheet.absoluteFill} contentFit="cover" accessibilityLabel="Engineering blueprint on a tablet" />
-            <View style={styles.heroShade} />
-            <Badge label="Official B2B RFQ" icon="star" tone="neutral" solid mono={false} />
-            <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: spacing.sm }}>
-              <View style={{ flex: 1 }}>
-                <Label color="primaryBright">Turnaround Guarantee</Label>
-                <Text variant="h1">Project Quotation Request</Text>
-              </View>
-              <Badge label={`< 4h SLA`} icon="clock" tone="primary" mono={false} />
-            </View>
-          </View>
+        <Card style={{ gap: spacing.sm }} testID="quote-intro">
+          <Label color="primaryBright">Request a quote</Label>
+          <Text variant="h1">Tell us what you need</Text>
+          <Text variant="bodySmall" color="textMuted">
+            We review every request and contact you during office hours ({PSG_CONTACT.hours}) to confirm the scope. You decide whether to accept the quotation.
+          </Text>
         </Card>
 
         {done ? (
@@ -250,7 +238,7 @@ export default function QuoteScreen() {
             <Text variant="h2" align="center">{done.jobId ? 'Service request logged' : 'Quotation request received'}</Text>
             <Text variant="body" color="textMuted" align="center">
               Reference <Text variant="mono" color="primaryBright">{done.reference}</Text>.{' '}
-              {done.jobId ? 'An engineer is preparing your quote — you will be notified in the app.' : 'Our engineering desk will contact you shortly.'}
+              {done.jobId ? 'We will review it and send your quotation in the app.' : `We will contact you during office hours (${PSG_CONTACT.hours}).`}
             </Text>
             {done.jobId ? (
               <Button label="Track this request" iconRight="arrow-right" onPress={() => router.push(`/customer/job/${done.jobId}`)} />
@@ -308,17 +296,6 @@ export default function QuoteScreen() {
                 })}
                 <Card style={{ gap: spacing.sm }}>
                   <SelectField label="Type of site (optional)" value={draft.siteType || undefined} options={[...SITE_TYPES]} onChange={(v) => set('siteType', v as SiteType)} placeholder="Choose a site type" />
-                  <SelectField label="Infrastructure Voltage Level" value={draft.voltage} options={VOLTAGES} onChange={(v) => set('voltage', v)} />
-                </Card>
-                <Card style={{ gap: spacing.md }}>
-                  <View style={styles.between}>
-                    <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}><Icon name="file-text" size={16} color="primaryBright" /><Text variant="title" weight="bold">RFQ Overview</Text></View>
-                    <Badge label={`Draft #${draftRef}`} tone="primary" mono={false} />
-                  </View>
-                  <View style={{ flexDirection: 'row' }}>
-                    <View style={{ flex: 1 }}><Text variant="caption" color="textMuted">Sector:</Text><Text variant="title" weight="bold">{sector.title}</Text></View>
-                    <View style={{ flex: 1 }}><Text variant="caption" color="textMuted">Site:</Text><Text variant="title" weight="bold">{draft.siteType ? SITE_LABEL[draft.siteType] : 'Not specified'}</Text></View>
-                  </View>
                 </Card>
               </View>
             ) : null}
@@ -328,12 +305,19 @@ export default function QuoteScreen() {
                 <SelectField label="Service required" value={draft.serviceTypeId || undefined} options={serviceOptions} onChange={(v) => set('serviceTypeId', v)} error={errors.serviceTypeId} placeholder={services.isLoading ? 'Loading services…' : 'Choose a service'} />
                 <TextField label="Scope brief" required multiline value={draft.scope} onChangeText={(v) => set('scope', v)} placeholder="Describe the installation, fault or project scope…" error={errors.scope} maxLength={1800} />
                 <View style={{ gap: 6 }}>
-                  <Text variant="title" weight="bold">Urgency level</Text>
-                  <Segmented tone="danger" value={draft.urgency} onChange={(v) => set('urgency', v)} options={[{ value: 'STANDARD', label: 'Standard (24h)' }, { value: 'HIGH', label: 'High Priority' }, { value: 'EMERGENCY', label: '24/7 Critical' }]} />
+                  <Text variant="title" weight="bold">How urgent is it?</Text>
+                  <Segmented tone="danger" value={draft.urgency} onChange={(v) => set('urgency', v)} options={URGENCY_OPTIONS} />
+                  <Text variant="caption" color="textMuted">We prioritise urgent faults; this is not a guaranteed response time. {SAFETY_NOTE}</Text>
                 </View>
-                <TextField label="Estimated load (kVA, optional)" keyboardType="number-pad" value={draft.loadKva} onChangeText={(v) => set('loadKva', v.replace(/\D/g, ''))} error={errors.loadKva} icon="activity" />
                 <DateField label="Preferred date (optional)" value={draft.preferredDate || undefined} minDate={todayIso()} onChange={(v) => set('preferredDate', v)} />
                 {user?.role === 'CUSTOMER' ? <PhotoPicker value={photos} onChange={setPhotos} purpose="JOB_PHOTO" label="Site photos (optional)" /> : null}
+                {/* Technical details kept for experienced customers (and the load estimator), hidden by default. */}
+                <Accordion title="Advanced details (optional)" defaultOpen={!!draft.loadKva || !!draft.voltage || !!errors.loadKva}>
+                  <View style={{ gap: spacing.md }}>
+                    <SelectField label="Supply type" value={draft.voltage || undefined} options={VOLTAGES} onChange={(v) => set('voltage', v)} placeholder="Not specified" />
+                    <TextField label="Estimated load (kVA)" keyboardType="number-pad" value={draft.loadKva} onChangeText={(v) => set('loadKva', v.replace(/\D/g, ''))} error={errors.loadKva} icon="activity" maxLength={5} />
+                  </View>
+                </Accordion>
               </Card>
             ) : null}
 
@@ -361,9 +345,9 @@ export default function QuoteScreen() {
                   ['Request', sector.title],
                   ['Site type', draft.siteType ? SITE_LABEL[draft.siteType] : 'Not specified'],
                   ['Service', serviceOptions.find((o) => o.value === draft.serviceTypeId)?.label ?? '—'],
-                  ['Voltage', draft.voltage],
-                  ['Urgency', draft.urgency === 'EMERGENCY' ? '24/7 Critical' : draft.urgency === 'HIGH' ? 'High Priority' : 'Standard'],
-                  ['Load', draft.loadKva ? `${draft.loadKva} kVA` : 'Engineer to confirm'],
+                  ['Urgency', urgencyLabel(draft.urgency)],
+                  ...(draft.voltage ? [['Supply', draft.voltage]] : []),
+                  ...(draft.loadKva ? [['Load', `${draft.loadKva} kVA`]] : []),
                   ['Site', draft.siteAddress],
                   ['Contact', `${user ? `${user.firstName} ${user.lastName}` : draft.name} · ${draft.phone}`],
                   ['Photos', photos.length ? `${photos.length} attached` : 'None'],
@@ -441,7 +425,7 @@ function SubmissionMode() {
       <Icon name="info" size={18} color="primaryBright" />
       <View style={{ flex: 1, gap: spacing.sm }}>
         <Text variant="title" weight="bold">Sending as a guest</Text>
-        <Text variant="bodySmall" color="textMuted">Your request goes to our engineering desk as an enquiry and we’ll contact you. Sign in or create an account to log it as a trackable service request instead.</Text>
+        <Text variant="bodySmall" color="textMuted">Your request goes to our office as an enquiry and we’ll contact you. Sign in or create an account to log it as a trackable service request instead.</Text>
         <View style={{ flexDirection: 'row', gap: spacing.sm, flexWrap: 'wrap' }}>
           <Button label="Sign in" size="sm" variant="secondary" fullWidth={false} onPress={() => router.push('/login')} />
           <Button label="Create account" size="sm" variant="outline" fullWidth={false} onPress={() => router.push('/register')} />
@@ -453,8 +437,6 @@ function SubmissionMode() {
 
 const styles = StyleSheet.create({
   mode: { flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' },
-  hero: { height: 200, padding: spacing.lg, justifyContent: 'space-between' },
-  heroShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(11,15,22,0.55)' },
   between: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.sm },
   stepPill: { flex: 1, alignItems: 'center', gap: 2, paddingVertical: 8, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceElevated },
   stepActive: { borderColor: colors.primaryBright, backgroundColor: '#152037' },

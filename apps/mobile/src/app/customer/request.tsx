@@ -17,7 +17,7 @@ import { BrandHeader, Screen } from '../../components/layout';
 import { Button, Card, Checkbox, DateField, Label, SelectField, Segmented, Text, TextField, colors, spacing, toast } from '../../design-system';
 import { PhotoPicker, type UploadedPhoto } from '../../features/photos';
 import { useAuth } from '../../store/auth';
-import { todayIso } from '../../utils/format';
+import { URGENCY_OPTIONS, todayIso } from '../../utils/format';
 import { useRef, useState } from 'react';
 
 const formSchema = createJobSchema.omit({ attachmentIds: true, siteLocation: true });
@@ -86,7 +86,7 @@ export default function RequestService() {
           <Controller control={control} name="urgency" render={({ field }) => (
             <View style={{ gap: 6 }}>
               <Text variant="title" weight="bold">Urgency</Text>
-              <Segmented tone="danger" value={field.value ?? 'STANDARD'} onChange={field.onChange} options={[{ value: 'STANDARD', label: 'Standard' }, { value: 'HIGH', label: 'High priority' }, { value: 'EMERGENCY', label: 'Emergency' }]} />
+              <Segmented tone="danger" value={field.value ?? 'STANDARD'} onChange={field.onChange} options={URGENCY_OPTIONS} />
             </View>
           )} />
           <Controller control={control} name="preferredDate" render={({ field }) => (
