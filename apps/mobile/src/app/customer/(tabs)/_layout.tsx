@@ -8,12 +8,17 @@ import { Tabs } from 'expo-router/js-tabs';
 import { makeTabBar } from '../../../components/TabBar';
 import { colors } from '../../../design-system';
 
+/**
+ * Customer navigation (Part 3): the everyday journey first — Home, My jobs (incl. quotes to review),
+ * a prominent Request action, Billing and Account. Rewards stays a screen of its own, reached from
+ * Home, Billing and Account.
+ */
 const CustomerTabBar = makeTabBar([
-  { name: 'index', label: 'Dashboard', icon: 'grid' },
-  { name: 'jobs', label: 'Jobs', icon: 'briefcase' },
-  { name: 'rewards', label: 'Rewards', icon: 'gift' },
+  { name: 'index', label: 'Home', icon: 'home' },
+  { name: 'jobs', label: 'My jobs', icon: 'briefcase' },
+  { name: 'request', label: 'Request', icon: 'plus', href: '/customer/request' },
   { name: 'billing', label: 'Billing', icon: 'credit-card' },
-  { name: 'profile', label: 'Profile', icon: 'user' },
+  { name: 'profile', label: 'Account', icon: 'user' },
 ]);
 
 export default function CustomerTabs() {

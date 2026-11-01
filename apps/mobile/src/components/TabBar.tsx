@@ -7,6 +7,7 @@
  */
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
 import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon, Text, colors, type IconName } from '../design-system';
@@ -15,16 +16,42 @@ export interface TabSpec {
   name: string;
   label: string;
   icon: IconName;
+  /**
+   * Makes this an action rather than a tab: pressing opens `href` on top of the current tab (e.g. the
+   * customer's prominent “Request” button). The underlying screen keeps its own route.
+   */
+  href?: string;
 }
 
 /** Persistent five-item bottom navigation matching the wireframes (Home · Services · Work · Quote · Contact). */
 export function makeTabBar(tabs: TabSpec[]) {
   return function TabBar({ state, navigation }: BottomTabBarProps) {
     const insets = useSafeAreaInsets();
-    const visible = tabs.filter((t) => state.routes.some((r) => r.name === t.name));
+    const visible = tabs.filter((t) => t.href || state.routes.some((r) => r.name === t.name));
     return (
       <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 8) }]} accessibilityRole="tablist">
         {visible.map((tab) => {
+          if (tab.href) {
+            const href = tab.href;
+            return (
+              <Pressable
+                key={tab.name}
+                accessibilityRole="button"
+                accessibilityLabel={tab.label}
+                onPress={() => {
+                  void Haptics.selectionAsync();
+                  router.push(href as never);
+                }}
+                style={styles.item}
+                testID={`tab-action-${tab.name}`}
+              >
+                <View style={styles.action}><Icon name={tab.icon} size={20} color="white" /></View>
+                <Text variant="caption" color="white" weight="bold" style={{ fontSize: 11 }} numberOfLines={1}>
+                  {tab.label}
+                </Text>
+              </Pressable>
+            );
+          }
           const routeIndex = state.routes.findIndex((r) => r.name === tab.name);
           const route = state.routes[routeIndex]!;
           const focused = state.index === routeIndex;
@@ -58,4 +85,5 @@ export function makeTabBar(tabs: TabSpec[]) {
 const styles = StyleSheet.create({
   bar: { flexDirection: 'row', backgroundColor: colors.backgroundDeep, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border, paddingTop: 8 },
   item: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4, minHeight: 48 },
+  action: { width: 40, height: 28, borderRadius: 14, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
 });
