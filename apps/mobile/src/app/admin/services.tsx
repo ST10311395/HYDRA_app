@@ -74,7 +74,7 @@ function ServiceForm({ service, onDone }: { service?: ServiceTypeDto; onDone: ()
         <View style={{ flex: 1 }}><TextField label="Display order" value={f.displayOrder} onChangeText={(v) => setF({ ...f, displayOrder: v })} keyboardType="number-pad" /></View>
       </View>
       <TextField label="SLA text (optional)" value={f.slaText} onChangeText={(v) => setF({ ...f, slaText: v })} maxLength={80} placeholder="e.g. 4-hour response" />
-      <TextField label="Badge (optional)" value={f.badge} onChangeText={(v) => setF({ ...f, badge: v })} maxLength={40} placeholder="e.g. 24/7" />
+      <TextField label="Badge (optional)" value={f.badge} onChangeText={(v) => setF({ ...f, badge: v })} maxLength={40} placeholder="e.g. Trite Solar" />
       <Checkbox checked={f.isActive} onChange={(v) => setF({ ...f, isActive: v })} label="Visible to customers" />
       <View style={{ flexDirection: 'row', gap: spacing.sm }}>
         <Button label="Cancel" variant="secondary" style={{ flex: 1 }} onPress={onDone} />

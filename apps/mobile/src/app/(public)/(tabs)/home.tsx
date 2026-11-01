@@ -10,9 +10,9 @@ import { router } from 'expo-router';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { usePortfolio, usePublicContent, useServices } from '../../../api/queries';
 import { imageFor } from '../../../components/images';
-import { BrandHeader, DemoNote, Screen } from '../../../components/layout';
-import { MarketingFooter, ProjectMiniCard, QuoteCta, ServiceMiniCard, TestimonialCard } from '../../../components/marketing';
-import { Badge, Button, Card, HorizontalScroller, Icon, IconTile, Label, LoadingCards, MonoHeading, SectionHeader, StatTile, Text, colors, radius, spacing } from '../../../design-system';
+import { BrandHeader, Screen } from '../../../components/layout';
+import { MarketingFooter, ProjectMiniCard, QualityCard, QuoteCta, ServiceMiniCard, TestimonialCard, published } from '../../../components/marketing';
+import { Badge, Button, Card, HorizontalScroller, Icon, IconTile, Label, LoadingCards, SectionHeader, Text, colors, radius, spacing } from '../../../design-system';
 import { homeForRole, useAuth } from '../../../store/auth';
 import { callNumber } from '../../../utils/links';
 import { QueryFallback, notReady } from '../../../components/QueryState';
@@ -24,8 +24,6 @@ const TRUST = [
   { label: 'ECA & NSI Accredited', tone: 'secondaryBright' as const },
 ];
 
-const STAT_ICON = { years: 'award', solar: 'sun', uptime: 'shield', dispatch: 'clock' } as const;
-
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
   const cardWidth = Math.min(width * 0.62, 300);
@@ -33,7 +31,6 @@ export default function HomeScreen() {
   const services = useServices();
   const featured = usePortfolio({ featured: 'true' });
   const user = useAuth((s) => s.user);
-  const metrics = content.data?.metrics.filter((m) => m.group === 'home') ?? [];
   const emergency = content.data?.company.emergencyLine;
   const refreshing = content.isRefetching || services.isRefetching;
 
@@ -95,18 +92,8 @@ export default function HomeScreen() {
           </View>
         </Card>
 
-        {/* 2 · Performance track record */}
-        <MonoHeading right={<Label color="primaryBright">{new Date().getFullYear()} Metrics</Label>}>{'// PERFORMANCE TRACK RECORD'}</MonoHeading>
-        <View style={styles.grid2}>
-          {metrics.map((m) => (
-            <View key={m.key} style={styles.half}>
-              <StatTile value={m.value} label={m.label} caption={m.caption} accent={m.accent} icon={STAT_ICON[m.key as keyof typeof STAT_ICON]} />
-            </View>
-          ))}
-        </View>
-
         {/* 3 · Core services */}
-        <SectionHeader title="Core Services" subtitle="Turnkey industrial & commercial solutions" actionLabel="View All" onAction={() => router.navigate('/services')} />
+        <SectionHeader title="Our services" actionLabel="View all" onAction={() => router.navigate('/services')} />
         {services.isLoading ? (
           <LoadingCards count={1} />
         ) : (
@@ -115,36 +102,17 @@ export default function HomeScreen() {
           </HorizontalScroller>
         )}
 
-        {/* 4 · Safety & ISO compliance */}
-        <Card style={{ gap: spacing.md }}>
-          <View style={{ flexDirection: 'row', gap: spacing.md }}>
-            <IconTile icon="shield" />
-            <View style={{ flex: 1 }}>
-              <Text variant="title" weight="bold">SAFETY & ISO COMPLIANCE</Text>
-              <Text variant="bodySmall" color="textMuted">Certified technical excellence & zero-compromise standards</Text>
-            </View>
-          </View>
-          <View style={styles.certImage}>
-            <Image source={imageFor('compliance-certificate')} style={StyleSheet.absoluteFill} contentFit="cover" accessibilityLabel="Electrical compliance certificate" />
-            <View style={styles.certPill}><Text variant="mono" style={{ fontSize: 11 }}>COMPLIANCE REF: ISO-9001:2015</Text></View>
-          </View>
-          {[
-            ['Certified High Voltage Technicians:', 'All site managers hold certified HV switching credentials.'],
-            ['Department of Labour Registered:', 'Full Certificate of Compliance (CoC) issuance authority.'],
-          ].map(([b, t]) => (
-            <View key={b} style={{ flexDirection: 'row', gap: 10 }}>
-              <Icon name="check-circle" size={16} color="primaryBright" />
-              <Text variant="bodySmall" color="textSecondary" style={{ flex: 1 }}><Text variant="bodySmall" weight="bold">{b} </Text>{t}</Text>
-            </View>
-          ))}
-          <Button label="Read Compliance & Accreditation Policy" iconRight="external-link" variant="secondary" onPress={() => router.push('/why-psg')} />
-        </Card>
+        {/* 4 · Quality & compliance (portfolio statement, no certification claims) */}
+        <QualityCard />
 
         {/* 5 · Recent projects + testimonial */}
-        <SectionHeader title="Recent Projects" subtitle="Industrial & commercial portfolio showcase" actionLabel="Portfolio" onAction={() => router.navigate('/work')} />
-        {notReady(featured) ? <QueryFallback query={featured} count={2} /> : (featured.data ?? []).map((p) => <ProjectMiniCard key={p.id} project={p} />)}
+        {notReady(featured) ? <QueryFallback query={featured} count={2} /> : published(featured.data).length ? (
+          <>
+            <SectionHeader title="Recent projects" actionLabel="Our work" onAction={() => router.navigate('/work')} />
+            {published(featured.data).map((p) => <ProjectMiniCard key={p.id} project={p} />)}
+          </>
+        ) : null}
         <TestimonialCard />
-        <DemoNote show={content.data?.isDemoContent} />
 
         {/* 6 · Final CTA + footer */}
         <QuoteCta />

@@ -110,7 +110,8 @@ export default function QuoteScreen() {
       const saved = { ...EMPTY, ...parsed };
       setDraft({
         ...saved,
-        ...(params.sector === 'COMMERCIAL' ? { sector: 'COMMERCIAL' as const } : params.sector === 'INDUSTRIAL' ? { sector: 'INDUSTRIAL' as const } : {}),
+        // Deep links preselect any listed sector; "Report a fault" opens the fault sector exactly as tapping it would.
+        ...(SECTORS.some((x) => x.key === params.sector) ? { sector: params.sector as SectorKey, ...(params.sector === 'EMERGENCY' ? { urgency: 'EMERGENCY' as const } : {}) } : {}),
         ...(params.kva ? { loadKva: params.kva } : {}),
         ...(params.serviceTypeId ? { serviceTypeId: params.serviceTypeId } : {}),
         name: saved.name || (user ? `${user.firstName} ${user.lastName}`.trim() : ''),

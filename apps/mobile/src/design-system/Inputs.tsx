@@ -122,7 +122,7 @@ export function FilterChips<T extends string>({ options, value, onChange }: { op
   );
 }
 
-/** Equal-width segmented selector (“Standard (24h) / High Priority / 24/7 Critical”). */
+/** Equal-width segmented selector (e.g. “Standard / Priority / Urgent fault”). */
 export function Segmented<T extends string>({ options, value, onChange, tone = 'primary' }: { options: ChipOption<T>[]; value: T; onChange: (v: T) => void; tone?: 'primary' | 'danger' }) {
   return (
     <View style={styles.segment} accessibilityRole="radiogroup">

@@ -71,19 +71,20 @@ export const DEFAULT_SEVERITY_POLICY: SeverityPolicy = {
       'Priority booking', '1–3 business days',
       'Priority booking — expected response window of 1–3 business days, subject to technician availability.', false, false, 'STANDARD'),
     L(3, 'High', 'Material operational impact.', ['Repeated breaker tripping', 'Significant loss of power', 'Solar / inverter system failure', 'Multiple affected circuits', 'Business interruption'],
-      'Priority response', 'within approximately 24 hours',
-      'Priority response — target response within approximately 24 hours, subject to technician availability.', false, false, 'HIGH'),
+      'Priority response', 'prioritised during office hours',
+      'Priority response — your request is prioritised and our team will contact you during office hours, subject to technician availability.', false, false, 'HIGH'),
     L(4, 'Urgent', 'Possible safety risk or major operational impact.', ['Severe overheating', 'Sparking reports', 'Burning smell', 'Damaged electrical equipment', 'Important site without power', 'Serious inverter / battery fault'],
       'Urgent', 'same-day target where available',
       'Urgent — our team has been alerted and will aim for a same-day response where available, subject to technician availability.', true, true, 'EMERGENCY'),
     L(5, 'Critical', 'Potential immediate danger.', ['Electrical fire', 'Exposed live conductors', 'Smoke', 'Serious arcing', 'Electrical shock incident', 'Flooding around electrical equipment', 'Severe battery thermal event'],
-      'Emergency escalation', 'immediate contact workflow',
-      'Emergency escalation — our team has been alerted immediately. If anyone is in danger, contact emergency services now.', true, true, 'EMERGENCY'),
+      'Safety escalation', 'flagged to the team for urgent review',
+      'Safety escalation — our team has been alerted. If anyone is in danger, move to safety and contact your local emergency services now.', true, true, 'EMERGENCY'),
   ],
   additionalSafetyRules: [],
-  businessHours: { timezone: 'Africa/Johannesburg', days: [1, 2, 3, 4, 5], start: '07:00', end: '17:00' },
+  // Published PSG hours are 07:00–18:00; working days still to be confirmed by the owner (Part 3, Q3).
+  businessHours: { timezone: 'Africa/Johannesburg', days: [1, 2, 3, 4, 5], start: '07:00', end: '18:00' },
   outOfHoursNotice:
-    'It is currently outside office hours. Our team will review this at the start of the next business day — for anything dangerous, call the 24/7 emergency line.',
+    'It is currently outside office hours. Our team will review this at the start of the next business day. If anyone is in danger, contact your local emergency services.',
 };
 
 type Cat = PricingPolicy['categories'][number];

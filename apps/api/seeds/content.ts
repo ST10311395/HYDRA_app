@@ -12,56 +12,27 @@
  */
 import type { PublicContentDto } from '@hydra/shared';
 
+/**
+ * Public company content (Part 3). Contact details are the verified ones from the PSG website and
+ * portfolio; metrics, accreditations, certifications and testimonials are empty until the owner
+ * supplies evidence for them. `emergencyLine` is kept for the API contract but is the normal business
+ * line — the app makes no 24/7 or emergency-dispatch claim.
+ */
 export const PUBLIC_CONTENT: PublicContentDto = {
   company: {
     name: 'PSG Electrical & Cables',
-    tagline: '& Cables · South Africa',
-    hotline: '+27 11 987 6500',
-    emergencyLine: '+27 800 911 911',
-    whatsapp: '+27 11 987 6500',
-    email: 'jhb.dispatch@psgelectrical.co.za',
-    established: 2008,
+    tagline: 'Innovation-driven electrical solutions',
+    hotline: '082 603 9283',
+    emergencyLine: '082 603 9283',
+    whatsapp: '',
+    email: 'keoran@psgelectrical.co.za',
+    established: 0,
   },
-  metrics: [
-    { group: 'home', key: 'years', value: '15+', label: 'Years Experience', caption: 'Industrial & commercial power', accent: 'primary' },
-    { group: 'home', key: 'solar', value: '500+', label: 'MW Solar Capacity', caption: 'Rooftop & ground-mount PV', accent: 'secondary' },
-    { group: 'home', key: 'uptime', value: '99.9%', label: 'Uptime Guarantee', caption: 'Critical infrastructure SLAs', accent: 'primary' },
-    { group: 'home', key: 'dispatch', value: '<60m', label: 'Dispatch Response', caption: 'High-priority fault callouts', accent: 'neutral' },
-    { group: 'work', key: 'projects', value: '250+', label: 'Projects', caption: 'Completed Nationwide', accent: 'primary' },
-    { group: 'work', key: 'solar', value: '18.5MW', label: 'Solar Installed', caption: 'Grid & Off-Grid Capacity', accent: 'secondary' },
-    { group: 'why', key: 'years', value: '15+', label: 'Years Lead', caption: '', accent: 'primary' },
-    { group: 'why', key: 'iso', value: '100%', label: 'SANS ISO', caption: '', accent: 'secondary' },
-    { group: 'why', key: 'dispatch', value: '<60m', label: 'Dispatch', caption: '', accent: 'neutral' },
-    { group: 'partners', key: 'oems', value: '45+', label: 'Global OEMs', caption: '', accent: 'primary' },
-    { group: 'partners', key: 'sabs', value: '100%', label: 'SABS Approved', caption: '', accent: 'secondary' },
-    { group: 'partners', key: 'warranty', value: '25 Yr', label: 'Solar Warranty', caption: '', accent: 'neutral' },
-    { group: 'team', key: 'experience', value: '15+ Yrs', label: 'Avg Experience', caption: '', accent: 'primary' },
-    { group: 'team', key: 'coc', value: '100%', label: 'CoC Compliance', caption: '', accent: 'neutral' },
-    { group: 'team', key: 'incidents', value: 'Zero', label: 'Lost Time Incidents', caption: '', accent: 'secondary' },
-    { group: 'contact', key: 'emergency', value: '< 15 Mins', label: 'Emergency', caption: '', accent: 'neutral' },
-    { group: 'contact', key: 'commercial', value: '< 2 Hours', label: 'Commercial', caption: '', accent: 'primary' },
-    { group: 'contact', key: 'audit', value: 'Same Day', label: 'Site Audit', caption: '', accent: 'secondary' },
-  ],
-  accreditations: [
-    { code: 'ISO 9001', title: 'Quality System', caption: 'Certified quality assurance for high-voltage installations, switchgear assembly, fibre terminations and preventative maintenance.', accent: 'primary' },
-    { code: 'ECB GRADE A', title: 'Contractor Board', caption: 'Registered electrical contractor.', accent: 'primary' },
-    { code: 'PV GREENCARD', title: 'Solar Master', caption: 'Accredited solar PV installers.', accent: 'secondary' },
-    { code: 'CIDB LEVEL 7', title: 'Infrastructure', caption: 'Construction Industry Development Board grading.', accent: 'primary' },
-  ],
-  certifications: [
-    { title: 'ECSA Registered Engineers', caption: 'Pr.Eng & Pr.Tech — Engineering Council of South Africa certified professionals on every project.', accent: 'primary' },
-    { title: 'SANS 10142 Compliance', caption: 'Wiring Code 100% — guaranteed valid Certificate of Compliance (CoC) issued for all installations.', accent: 'primary' },
-    { title: 'Master Wireman Licensed', caption: 'Department of Labour — single & three-phase wireman licences held by all senior field inspectors.', accent: 'secondary' },
-    { title: 'Tribe Solar Master Certified', caption: 'PV GreenCard Accredited — authorised installers for commercial solar PV and industrial battery storage.', accent: 'secondary' },
-  ],
-  testimonial: {
-    quote:
-      'PSG Electrical handled our entire 1.2MW solar transition and HV substation commissioning with zero downtime to production. Outstanding engineering rigor and compliance.',
-    author: 'David Marais',
-    role: 'Operations Director, Mining Supplies Co.',
-    rating: 5,
-  },
-  isDemoContent: true,
+  metrics: [],
+  accreditations: [],
+  certifications: [],
+  testimonial: null,
+  isDemoContent: false,
 };
 
 /**
@@ -178,30 +149,23 @@ export const TEAM = [
   { name: 'Elena Rostova', title: 'Lead Cabling Infrastructure Specialist', category: 'ENGINEERING', rating: 4.9, registration: 'FOA Master #59102', licence: 'Wireman Red Seal #RS-8819', skills: ['High-Density Fiber Optics', 'Server Room Cabling', 'OTDR Cable Testing', 'Structured Cabling'], years: 10, projects: 87, lead: 'Bank Headquarters Fiber Backbone - Rosebank', availability: 'AVAILABLE', photoKey: 'team-elena' },
 ] as const;
 
-export const OFFICES = [
-  { region: 'Gauteng', name: 'Gauteng Main HQ', area: 'Sandton, Johannesburg', address: '14 Commerce Crescent, Eastgate Ext 12, Sandton, 2090', phone: '+27 (11) 987-6500', email: 'jhb.dispatch@psgelectrical.co.za', manager: 'Eng. Johan van der Merwe (Pr. Eng)', hours: 'Mon-Fri: 07:00 - 18:00 | 24/7 Hotline', lat: -26.1087, lng: 28.0676 },
-  { region: 'KZN', name: 'KwaZulu-Natal Coastal Office', area: 'Umhlanga, Durban', address: '3 Park Lane, Umhlanga Ridge, 4319', phone: '+27 (31) 555-0140', email: 'kzn.dispatch@psgelectrical.co.za', manager: 'Eng. Nomvula Dlamini (Pr. Tech)', hours: 'Mon-Fri: 07:30 - 17:30 | 24/7 Hotline', lat: -29.7274, lng: 31.0694 },
-  { region: 'W. Cape', name: 'Western Cape Depot', area: 'Montague Gardens, Cape Town', address: '21 Marine Drive, Montague Gardens, 7441', phone: '+27 (21) 555-0190', email: 'cpt.dispatch@psgelectrical.co.za', manager: 'Eng. Pieter Louw (Pr. Eng)', hours: 'Mon-Fri: 07:00 - 17:00 | 24/7 Hotline', lat: -33.8622, lng: 18.5231 },
-] as const;
+/** No office addresses have been published by PSG yet (Part 3); add verified offices here. */
+export const OFFICES: readonly { region: string; name: string; area: string; address: string; phone: string; email: string; manager: string | null; hours: string; lat: number; lng: number }[] = [];
 
-export const DEPARTMENTS = [
-  { name: 'Industrial & High Voltage Tenders', email: 'tenders@psgelectrical.co.za', phone: '+27 (11) 987-6501', sla: '1-Hour Priority Callback', icon: 'zap' },
-  { name: 'Solar Systems & Commercial Microgrids', email: 'solar.projects@psgelectrical.co.za', phone: '+27 (11) 987-6502', sla: '2-Hour Turnaround', icon: 'sparkles' },
-  { name: 'Safety & Compliance / C.O.C Audits', email: 'compliance@psgelectrical.co.za', phone: '+27 (11) 987-6503', sla: 'Same-Day Field Inspection', icon: 'shield-check' },
-  { name: '24/7 Emergency Technical Support', email: 'emergency@psgelectrical.co.za', phone: '+27 (800) 911-911', sla: 'Immediate Rapid Dispatch', icon: 'siren' },
-] as const;
+/** Department desks: none published yet (Part 3). The contact screen uses the verified main numbers. */
+export const DEPARTMENTS: readonly { name: string; email: string; phone: string; sla: string; icon: string }[] = [];
 
+/** FAQs reworded for Part 3: no turnaround, dispatch or 24/7 promises and no unverified claims. */
 export const FAQS = [
-  { category: 'QUOTATION', q: 'How quickly will I receive the official quotation?', a: 'Standard commercial & industrial quotes are processed within 4 business hours. Emergency breakdown and high-voltage requests trigger immediate engineer dispatch.' },
-  { category: 'QUOTATION', q: 'Are physical site surveys included?', a: 'Yes. Where the scope cannot be confirmed from photos and drawings, a registered electrician performs a site survey before the binding quotation is issued. Survey fees are credited against accepted work.' },
-  { category: 'QUOTATION', q: 'Can I accept or decline a quote in the app?', a: 'Yes. Your quote shows labour, materials, VAT and validity. Accepting it schedules an electrician; declining lets you request an alternative service.' },
-  { category: 'COMPLIANCE', q: 'Are all installations issued with an official CoC?', a: 'Yes. Every electrical installation, modification, or solar integration performed by PSG Electrical is inspected by an accredited Master Electrician and issued with a legal Certificate of Compliance (CoC) per SANS 10142-1 standards.' },
-  { category: 'COMPLIANCE', q: 'What is your average response time for emergencies?', a: 'High-priority fault callouts are dispatched within 60 minutes across Gauteng, with emergency crews on 24/7 standby.' },
-  { category: 'COMPLIANCE', q: 'Is PSG covered by public liability insurance?', a: 'Yes. All site work is covered by public and site liability insurance, and certificates are available on request for tender submissions.' },
-  { category: 'CONTACT', q: 'How fast is 24/7 emergency response?', a: 'Emergency calls are triaged immediately and a field team is dispatched — typically on site in under 60 minutes in metropolitan Gauteng.' },
-  { category: 'CONTACT', q: 'Can I request an official C.O.C audit?', a: 'Yes. Choose "Certificate of Compliance & Audits" when requesting a service. Most CoC inspections are completed within 24–48 hours.' },
-  { category: 'CONTACT', q: 'How do I tender for large industrial contracts?', a: 'Send tender documentation to the Industrial & High Voltage Tenders desk. A project engineer will acknowledge within one business hour.' },
-  { category: 'GENERAL', q: 'Do I need an account to browse services?', a: 'No. Services, recent work, partners and team profiles are available without signing in. An account is only needed to request and track jobs.' },
+  { category: 'QUOTATION', q: 'How long does a quotation take?', a: 'We review each request and contact you to confirm the scope. Where needed we arrange an on-site assessment before issuing a clear quotation, so timing depends on the size of the job.' },
+  { category: 'QUOTATION', q: 'Is a site assessment included?', a: 'Where the scope cannot be confirmed from photos or a description, we arrange an on-site assessment before the quotation is issued.' },
+  { category: 'QUOTATION', q: 'Can I accept or decline a quote in the app?', a: 'Yes. Your quote shows labour, materials, VAT and validity. Accepting it lets us schedule the work; declining lets you request an alternative.' },
+  { category: 'COMPLIANCE', q: 'Do you issue Certificates of Compliance?', a: 'Yes. Where required, installations are tested and a Certificate of Compliance (CoC) is issued in line with SANS 10142-1.' },
+  { category: 'COMPLIANCE', q: 'What should I do if there is a fire, smoke or someone has been shocked?', a: 'Move to safety and contact your local emergency services first. PSG Electrical is not an emergency service. Once everyone is safe, report the fault in the app or call us during office hours.' },
+  { category: 'CONTACT', q: 'When can I contact PSG?', a: 'Our published office hours are 07:00–18:00. You can send a request or report a fault in the app at any time, and we respond during office hours.' },
+  { category: 'CONTACT', q: 'How do I request a CoC inspection?', a: 'Choose “Compliance (CoC)” when you request a service or a quote.' },
+  { category: 'CONTACT', q: 'How do I request work for a large commercial or industrial site?', a: 'Use the quote form with as much detail as you can, or email keoran@psgelectrical.co.za.' },
+  { category: 'GENERAL', q: 'Do I need an account to browse services?', a: 'No. Services and company information are available without signing in. An account is only needed to request and track jobs.' },
   { category: 'GENERAL', q: 'How do reward points work?', a: 'You earn 1 point for every R10 of a fully paid invoice. Redeem points for discounts on eligible future invoices from the Rewards tab.' },
 ] as const;
 

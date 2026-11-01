@@ -9,7 +9,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { View } from 'react-native';
 import { useService } from '../../../api/queries';
 import { BrandHeader, Screen } from '../../../components/layout';
-import { EmergencyCta, PhotoHeader } from '../../../components/marketing';
+import { FaultCta, PhotoHeader } from '../../../components/marketing';
 import { Badge, Button, Card, Icon, KeyValue, Label, Text, colors, spacing } from '../../../design-system';
 import { money } from '../../../utils/format';
 import { QueryFallback } from '../../../components/QueryState';
@@ -36,15 +36,15 @@ export default function ServiceDetail() {
                 <Text variant="h1">{s.name}</Text>
                 <Text variant="body" color="textMuted">{s.description}</Text>
                 <KeyValue label="Call-out / starting from" value={money(s.basePrice)} valueColor="primaryBright" mono />
-                <Text variant="caption" color="textFaint">Final pricing is confirmed in an engineer-reviewed quotation after scoping.</Text>
+                <Text variant="caption" color="textFaint">Final pricing is confirmed in a quotation once the scope has been assessed.</Text>
               </View>
             </Card>
             <Card style={{ gap: spacing.sm }}>
-              <Label>Technical Specifications</Label>
+              <Label>Overview</Label>
               {s.specs.map((sp) => <KeyValue key={sp.label} label={sp.label} value={sp.value} />)}
             </Card>
             <Card style={{ gap: spacing.md }}>
-              <Label>Technical Scope & Features</Label>
+              <Label>What’s included</Label>
               {s.features.map((f) => (
                 <View key={f} style={{ flexDirection: 'row', gap: 10 }}>
                   <Icon name="check-circle" size={16} color="primaryBright" />
@@ -52,7 +52,7 @@ export default function ServiceDetail() {
                 </View>
               ))}
             </Card>
-            <EmergencyCta />
+            <FaultCta />
           </>
         )}
       </Screen>

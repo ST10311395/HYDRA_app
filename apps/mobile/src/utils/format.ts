@@ -110,6 +110,16 @@ export const SERVICE_ICON: Record<string, IconName> = {
  * Customer-facing names for the stored service categories, aligned with the PSG website (Part 3).
  * The enum values themselves are unchanged so existing jobs and quotes still resolve.
  */
+/**
+ * Customer-facing urgency labels (Part 3 brief §6). The stored values STANDARD | HIGH | EMERGENCY and
+ * all triage logic are unchanged; only the wording is neutral, with no turnaround promise.
+ */
+export const URGENCY_OPTIONS: { value: 'STANDARD' | 'HIGH' | 'EMERGENCY'; label: string }[] = [
+  { value: 'STANDARD', label: 'Standard' },
+  { value: 'HIGH', label: 'Priority' },
+  { value: 'EMERGENCY', label: 'Urgent fault' },
+];
+
 export const SERVICE_CATEGORY_LABEL: Record<ServiceCategory, string> = {
   CABLING: 'Electrical installations',
   EMERGENCY: 'Fault finding',

@@ -15,7 +15,17 @@ import { usePublicContent } from '../api/queries';
 import { Badge, Button, Card, Icon, Label, Text, colors, radius, spacing, type IconName } from '../design-system';
 import { SERVICE_CATEGORY_LABEL as CATEGORY_LABEL, SERVICE_ICON, initials, monthYear } from '../utils/format';
 import { imageFor } from './images';
+import { PSG_CONTACT } from '../content/company';
+import { QUALITY, SAFETY_NOTE } from '../content/marketing';
 import { callNumber } from '../utils/links';
+
+/**
+ * Seeded / illustrative records (`isDemo`) are never presented to the public as real PSG work, people
+ * or partners (Part 3 brief §2). Owner-approved records added through the API are shown.
+ */
+export function published<T extends { isDemo: boolean }>(items: T[] | undefined): T[] {
+  return (items ?? []).filter((i) => !i.isDemo);
+}
 
 export function TagPill({ label, icon, tone = 'primary' }: { label: string; icon?: IconName; tone?: 'primary' | 'secondary' }) {
   return <Badge label={label} icon={icon} tone={tone} />;
@@ -159,7 +169,8 @@ export function ProjectMiniCard({ project }: { project: PortfolioItemDto }) {
 export function TestimonialCard() {
   const content = usePublicContent();
   const t = content.data?.testimonial;
-  if (!t) return null;
+  // Only a real, owner-approved testimonial is shown; seeded demo content never is.
+  if (!t || content.data?.isDemoContent !== false) return null;
   return (
     <Card>
       <View style={[styles.rowBetween, { marginBottom: spacing.md }]}>
@@ -178,14 +189,14 @@ export function TestimonialCard() {
           <Text variant="title" weight="bold">{t.author}</Text>
           <Text variant="caption" color="textMuted">{t.role}</Text>
         </View>
-        <Badge label="VERIFIED CLIENT" tone="primary" />
+        <Badge label="Client" tone="primary" mono={false} />
       </View>
     </Card>
   );
 }
 
 /** Closing quotation CTA block used across marketing pages. */
-export function QuoteCta({ eyebrow = '// READY TO START YOUR PROJECT?', title = 'GET AN ENGINEER-REVIEWED QUOTATION WITHIN 24 HOURS', body = 'Select your sector, specify your electrical scope, and receive a binding technical proposal.', primary = 'Launch Multi-Step Quote Tool', secondary = 'Contact Engineering Desk' }: { eyebrow?: string; title?: string; body?: string; primary?: string; secondary?: string }) {
+export function QuoteCta({ eyebrow = 'Start a project', title = 'Request a quotation', body = 'Tell us what you need. We review every request and contact you to confirm the scope before quoting.', primary = 'Request a quote', secondary = 'Contact PSG' }: { eyebrow?: string; title?: string; body?: string; primary?: string; secondary?: string }) {
   return (
     <Card accent="primary" style={{ gap: spacing.md, backgroundColor: '#121A2B' }}>
       <Label color="primaryBright">{eyebrow}</Label>
@@ -197,21 +208,45 @@ export function QuoteCta({ eyebrow = '// READY TO START YOUR PROJECT?', title = 
   );
 }
 
-export function EmergencyCta({ title = 'Unplanned Power Failure?', body = 'Our high-voltage field team dispatches within 60 minutes across Gauteng for critical cable faults & generator panel failure.' }: { title?: string; body?: string }) {
-  const content = usePublicContent();
-  const line = content.data?.company.emergencyLine;
+/**
+ * Fault reporting call-to-action (replaces the former 24/7 emergency panel, Part 3 brief §6): routes to
+ * the existing fault request flow or the verified business line, with neutral safety guidance and no
+ * availability or response-time promise.
+ */
+export function FaultCta({ title = 'Electrical fault?', body = 'Report it with as much detail as you can and we will contact you to arrange diagnosis and repair.' }: { title?: string; body?: string }) {
   return (
-    <Card accent="danger" style={{ gap: spacing.md, backgroundColor: '#1E1418' }}>
+    <Card accent="danger" style={{ gap: spacing.md, backgroundColor: '#1E1418' }} testID="fault-cta">
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <Icon name="alert-octagon" size={20} color="dangerBright" />
+        <Icon name="alert-triangle" size={20} color="dangerBright" />
         <Text variant="h3" style={{ flex: 1 }}>{title}</Text>
-        <Badge label="24/7 STANDBY" tone="danger" solid mono={false} />
       </View>
       <Text variant="bodySmall" color="textSecondary">{body}</Text>
+      <Text variant="caption" color="textMuted">{SAFETY_NOTE}</Text>
       <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-        <Button label="Call Emergency Hotline" icon="phone-call" variant="danger" size="sm" style={{ flex: 1.3 }} onPress={() => line && void callNumber(line)} />
-        <Button label="Contact Dispatch" variant="outline" size="sm" style={{ flex: 1 }} onPress={() => router.navigate('/contact')} />
+        <Button label="Report a fault" icon="alert-triangle" variant="dangerOutline" size="sm" style={{ flex: 1.2 }} onPress={() => router.navigate({ pathname: '/quote', params: { sector: 'EMERGENCY' } })} />
+        <Button label="Call PSG" icon="phone-call" variant="secondary" size="sm" style={{ flex: 1 }} onPress={() => void callNumber(PSG_CONTACT.primaryPhone)} />
       </View>
+      <Text variant="caption" color="textMuted">Office hours {PSG_CONTACT.hours}</Text>
+    </Card>
+  );
+}
+
+/** Quality & compliance statement from the PSG company portfolio. No certification claims. */
+export function QualityCard() {
+  return (
+    <Card style={{ gap: spacing.md }} testID="quality-card">
+      <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+        <Icon name="shield" size={18} color="secondaryBright" />
+        <Text variant="h3">Quality & compliance</Text>
+      </View>
+      <Text variant="bodySmall" color="textMuted">All work carried out by PSG Electrical & Cables adheres to:</Text>
+      {QUALITY.standards.map((s) => (
+        <View key={s} style={{ flexDirection: 'row', gap: 10 }}>
+          <Icon name="check-circle" size={16} color="primaryBright" />
+          <Text variant="bodySmall" style={{ flex: 1 }}>{s}</Text>
+        </View>
+      ))}
+      <Text variant="caption" color="textMuted">We prioritise {QUALITY.priorities.join(', ').toLowerCase()}.</Text>
     </Card>
   );
 }
@@ -220,13 +255,13 @@ export function MarketingFooter() {
   return (
     <View style={{ alignItems: 'center', gap: 6, paddingVertical: spacing.lg, borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.border }}>
       <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-        <Icon name="map" size={14} color="primaryBright" />
-        <Text variant="bodySmall" color="textSecondary">Johannesburg · Durban · Cape Town</Text>
+        <Icon name="clock" size={14} color="primaryBright" />
+        <Text variant="bodySmall" color="textSecondary">Hours {PSG_CONTACT.hours}</Text>
         <Text variant="bodySmall" color="textMuted">·</Text>
-        <Icon name="radio" size={14} color="secondaryBright" />
-        <Text variant="bodySmall" color="textSecondary">24/7 Hotline</Text>
+        <Icon name="phone" size={14} color="secondaryBright" />
+        <Text variant="bodySmall" color="textSecondary">{PSG_CONTACT.primaryPhone}</Text>
       </View>
-      <Text variant="mono" color="textMuted" align="center" style={{ fontSize: 11 }}>© {new Date().getFullYear()} PSG Electrical and Cables (Pty) Ltd. All Rights Reserved.</Text>
+      <Text variant="mono" color="textMuted" align="center" style={{ fontSize: 11 }}>© {new Date().getFullYear()} PSG Electrical & Cables. All rights reserved.</Text>
       <Pressable accessibilityRole="link" onPress={() => router.push('/privacy')} hitSlop={8}>
         <Text variant="caption" color="primaryBright">Privacy notice (POPIA)</Text>
       </Pressable>

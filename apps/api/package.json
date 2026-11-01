@@ -20,7 +20,8 @@
     "jobs": "tsx --env-file-if-exists=.env src/jobs/worker.ts",
     "openapi": "tsx scripts/export-openapi.ts",
     "db:migrate:prod": "node dist/db/migrate.js",
-    "owner:create": "tsx --env-file-if-exists=.env src/db/createOwner.ts"
+    "owner:create": "tsx --env-file-if-exists=.env src/db/createOwner.ts",
+    "db:content:refresh": "tsx --env-file-if-exists=.env scripts/refresh-public-content.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

@@ -6,19 +6,21 @@
  * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
  */
 import * as Clipboard from 'expo-clipboard';
-import { Image } from 'expo-image';
 import { useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { email as emailSchema, phone as phoneSchema, type JobUrgency } from '@hydra/shared';
 import { ApiError, errorMessage } from '../../../api/client';
 import { useDepartments, useFaqs, useOffices, usePublicContent, useSubmitEnquiry } from '../../../api/queries';
-import { imageFor } from '../../../components/images';
-import { BrandHeader, DemoNote, Screen } from '../../../components/layout';
-import { Accordion, Badge, Button, Card, Checkbox, FilterChips, Icon, Label, SelectField, Segmented, Text, TextField, colors, radius, spacing, toast, type IconName } from '../../../design-system';
+import { BrandHeader, Screen } from '../../../components/layout';
+import { PSG_CONTACT } from '../../../content/company';
+import { SAFETY_NOTE } from '../../../content/marketing';
+import { Accordion, Button, Card, Checkbox, FilterChips, Icon, Label, SelectField, Segmented, Text, TextField, colors, radius, spacing, toast, type IconName } from '../../../design-system';
 import { useAuth } from '../../../store/auth';
+import { URGENCY_OPTIONS } from '../../../utils/format';
 import { callNumber, openDirections, openWhatsApp, sendEmail } from '../../../utils/links';
 
-const SECTORS = ['Industrial High Voltage Substation', 'Commercial Building', 'Solar & Energy Storage', 'Fiber & Data Cabling', 'Residential', 'Certificate of Compliance', 'Other'].map((v) => ({ value: v, label: v }));
+/** Quick-intake categories published on the PSG website (Part 3). Stored as free text on the enquiry. */
+const SECTORS = ['New installation', 'Fault or repair', 'DB board', 'Compliance (CoC)', 'Solar & backup', 'Maintenance', 'Other'].map((v) => ({ value: v, label: v }));
 const DEPT_ICON: Record<string, IconName> = { zap: 'zap', sparkles: 'star', 'shield-check': 'shield', siren: 'alert-octagon' };
 
 export default function ContactScreen() {
@@ -34,12 +36,10 @@ export default function ContactScreen() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sentRef, setSentRef] = useState<string | null>(null);
 
-  const company = content.data?.company;
+  const whatsapp = content.data?.company.whatsapp?.trim();
+  // Offices and department desks are shown only when the business has configured them.
   const officeList = offices.data ?? [];
   const office = officeList.find((o) => o.region === region) ?? officeList[0];
-  const sla = content.data?.metrics.filter((m) => m.group === 'contact') ?? [];
-
-  // Directions to the selected office's own configured location.
   const officeDirections = () => office && void openDirections({ latitude: office.latitude, longitude: office.longitude, address: office.address });
 
   // Blocks a second tap before the pending state re-renders the button.
@@ -72,129 +72,106 @@ export default function ContactScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <BrandHeader section="Contact Us" />
-      <Screen onRefresh={() => void Promise.all([offices.refetch(), departments.refetch()])} refreshing={offices.isRefetching}>
-        <Card padded={false} style={{ overflow: 'hidden' }}>
-          <View style={styles.hero}>
-            <Image source={imageFor('contact-hq')} style={StyleSheet.absoluteFill} contentFit="cover" accessibilityLabel="Headquarters building" />
-            <View style={styles.shade} />
-            <Badge label="CORPORATE HQ" icon="home" tone="primary" solid />
-            <View>
-              <Label color="primaryBright">24/7 Operations Hub</Label>
-              <Text variant="h1">PSG Electrical Headquarters</Text>
-              <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
-                <Icon name="map-pin" size={13} color="textSecondary" />
-                <Text variant="bodySmall" color="textSecondary">{officeList[0]?.area ?? 'South Africa'}</Text>
-              </View>
+      <Screen onRefresh={() => void Promise.all([offices.refetch(), departments.refetch(), content.refetch()])} refreshing={offices.isRefetching}>
+        <Card style={{ gap: spacing.md }} testID="contact-details">
+          <View style={{ gap: 4 }}>
+            <Text variant="h1">Contact {PSG_CONTACT.name}</Text>
+            <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+              <Icon name="clock" size={14} color="primaryBright" />
+              <Text variant="bodySmall" color="textSecondary">Office hours {PSG_CONTACT.hours}</Text>
             </View>
           </View>
-          <View style={{ flexDirection: 'row', gap: spacing.sm, padding: spacing.md }}>
-            <QuickAction icon="phone-call" label="Call HQ" color={colors.primary} onPress={() => company && void callNumber(company.hotline)} />
-            <QuickAction icon="shield" label="Emergency" color={colors.danger} onPress={() => company && void callNumber(company.emergencyLine)} />
-            <QuickAction icon="message-square" label="WhatsApp" color={colors.surfaceElevated} onPress={() => company && void openWhatsApp(company.whatsapp, 'Hello PSG Electrical, I would like assistance with…')} />
-          </View>
-        </Card>
-
-        <Card style={{ gap: spacing.md }}>
-          <View style={styles.between}>
-            <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="clock" size={18} color="primaryBright" /><Text variant="title" weight="bold">DISPATCH SLA GUARANTEE</Text></View>
-            <Badge label="Verified ISO 9001" tone="secondary" mono={false} />
-          </View>
-          <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-            {sla.map((m) => (
-              <View key={m.key} style={styles.slaBox}>
-                <Text variant="caption" color="textMuted">{m.label}</Text>
-                <Text variant="mono" color={m.accent === 'neutral' ? 'dangerBright' : m.accent === 'primary' ? 'primaryBright' : 'secondaryBright'}>{m.value}</Text>
-              </View>
-            ))}
-          </View>
-        </Card>
-
-        <View style={styles.between}>
-          <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="navigation" size={16} color="primaryBright" /><Label color="primaryBright" style={{ fontSize: 13 }}>Regional Offices & Dispatch</Label></View>
-          <Text variant="caption" color="textMuted">{officeList.length} South Africa Hubs</Text>
-        </View>
-        {officeList.length ? <FilterChips value={office?.region ?? ''} onChange={setRegion} options={officeList.map((o) => ({ value: o.region, label: o.region }))} /> : null}
-        {office ? (
-          <Card style={{ gap: spacing.md }}>
-            <View style={styles.between}>
-              <View style={{ flex: 1 }}>
-                <Text variant="h3">{office.name}</Text>
-                <Text variant="mono" color="primaryBright" style={{ fontSize: 12 }}>{office.area}</Text>
-              </View>
-              <Badge label="GPS Active" tone="neutral" mono={false} />
-            </View>
-            <Row icon="map-pin" text={office.address} />
-            <View style={styles.between}>
-              <Row icon="phone" text={office.phone} bold onPress={() => void callNumber(office.phone)} />
-              <Pressable accessibilityRole="button" accessibilityLabel="Copy phone number" hitSlop={10} onPress={() => void Clipboard.setStringAsync(office.phone).then(() => toast.success('Number copied'))}>
+          {PSG_CONTACT.phones.map((p) => (
+            <View key={p.number} style={styles.between}>
+              <Row icon="phone" text={`${p.label}: ${p.number}`} bold onPress={() => void callNumber(p.number)} label={`Call ${p.label.toLowerCase()} ${p.number}`} />
+              <Pressable accessibilityRole="button" accessibilityLabel={`Copy ${p.number}`} hitSlop={10} onPress={() => void Clipboard.setStringAsync(p.number).then(() => toast.success('Number copied'))}>
                 <Text variant="bodySmall" color="primaryBright">Copy</Text>
               </Pressable>
             </View>
-            <Row icon="mail" text={office.email} mono onPress={() => void sendEmail(office.email)} />
-            {office.manager ? <Row icon="user" text={office.manager} /> : null}
-            <Row icon="clock" text={office.hours} />
-            <Button label="Open GPS Directions" icon="external-link" variant="secondary" onPress={officeDirections} />
-          </Card>
+          ))}
+          <Row icon="mail" text={PSG_CONTACT.email} mono onPress={() => void sendEmail(PSG_CONTACT.email, 'Enquiry from the PSG app')} />
+          <Row icon="sun" text={`Solar (Trite Solar): ${PSG_CONTACT.solarEmail}`} mono onPress={() => void sendEmail(PSG_CONTACT.solarEmail, 'Solar enquiry from the PSG app')} />
+          <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+            <QuickAction icon="phone-call" label="Call PSG" color={colors.primary} onPress={() => void callNumber(PSG_CONTACT.primaryPhone)} />
+            {whatsapp ? <QuickAction icon="message-square" label="WhatsApp" color={colors.surfaceElevated} onPress={() => void openWhatsApp(whatsapp, 'Hello PSG Electrical, I would like assistance with…')} /> : null}
+          </View>
+          <Text variant="caption" color="textMuted">You can send a request at any time; we respond during office hours.</Text>
+        </Card>
+
+        <Card accent="danger" style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' }}>
+          <Icon name="alert-triangle" size={18} color="dangerBright" />
+          <Text variant="bodySmall" color="textSecondary" style={{ flex: 1 }}>{SAFETY_NOTE}</Text>
+        </Card>
+
+        {officeList.length ? (
+          <>
+            <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="navigation" size={16} color="primaryBright" /><Label color="primaryBright" style={{ fontSize: 13 }}>Offices</Label></View>
+            {officeList.length > 1 ? <FilterChips value={office?.region ?? ''} onChange={setRegion} options={officeList.map((o) => ({ value: o.region, label: o.region }))} /> : null}
+            {office ? (
+              <Card style={{ gap: spacing.md }}>
+                <View>
+                  <Text variant="h3">{office.name}</Text>
+                  <Text variant="mono" color="primaryBright" style={{ fontSize: 12 }}>{office.area}</Text>
+                </View>
+                <Row icon="map-pin" text={office.address} />
+                <Row icon="phone" text={office.phone} bold onPress={() => void callNumber(office.phone)} />
+                <Row icon="mail" text={office.email} mono onPress={() => void sendEmail(office.email)} />
+                {office.manager ? <Row icon="user" text={office.manager} /> : null}
+                <Row icon="clock" text={office.hours} />
+                <Button label="Open directions" icon="external-link" variant="secondary" onPress={officeDirections} />
+              </Card>
+            ) : null}
+          </>
         ) : null}
 
-        <View style={styles.between}>
-          <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="file-text" size={16} color="primaryBright" /><Label color="primaryBright" style={{ fontSize: 13 }}>Direct Technical Dispatch Form</Label></View>
-          <Text variant="caption" color="textMuted">Fast Response</Text>
-        </View>
+        <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="file-text" size={16} color="primaryBright" /><Label color="primaryBright" style={{ fontSize: 13 }}>Send us a message</Label></View>
         <Card style={{ gap: spacing.lg }}>
           {sentRef ? (
             <View style={styles.sent}>
               <Icon name="check-circle" size={20} color="success" />
-              <Text variant="bodySmall" style={{ flex: 1 }}>Enquiry <Text variant="mono" color="primaryBright">{sentRef}</Text> received. Our dispatch desk will respond shortly.</Text>
+              <Text variant="bodySmall" style={{ flex: 1 }}>Enquiry <Text variant="mono" color="primaryBright">{sentRef}</Text> received. We will respond during office hours ({PSG_CONTACT.hours}).</Text>
             </View>
           ) : null}
           <TextField label="Full Name" required value={form.name} onChangeText={(v) => setForm({ ...form, name: v })} placeholder="e.g. David Nkosi" error={errors.name} autoComplete="name" />
           <TextField label="Email Address" required value={form.email} onChangeText={(v) => setForm({ ...form, email: v })} placeholder="name@company.co.za" keyboardType="email-address" autoCapitalize="none" error={errors.email} />
           <TextField label="Phone Number" required value={form.phone} onChangeText={(v) => setForm({ ...form, phone: v })} placeholder="+27 82 000 0000" keyboardType="phone-pad" error={errors.phone} />
-          <SelectField label="Project Sector" value={form.sector} options={SECTORS} onChange={(v) => setForm({ ...form, sector: v })} />
+          <SelectField label="What do you need?" value={form.sector} options={SECTORS} onChange={(v) => setForm({ ...form, sector: v })} />
           <View style={{ gap: 6 }}>
-            <Text variant="title" weight="bold">Urgency Level</Text>
-            <Segmented tone="danger" value={form.urgency} onChange={(v) => setForm({ ...form, urgency: v })} options={[{ value: 'STANDARD', label: 'Standard (24h)' }, { value: 'HIGH', label: 'High Priority' }, { value: 'EMERGENCY', label: '24/7 Critical' }]} />
+            <Text variant="title" weight="bold">Urgency</Text>
+            <Segmented tone="danger" value={form.urgency} onChange={(v) => setForm({ ...form, urgency: v })} options={URGENCY_OPTIONS} />
           </View>
-          <TextField label="Scope Brief / Message" required multiline value={form.message} onChangeText={(v) => setForm({ ...form, message: v })} placeholder="Describe your electrical requirements or technical inquiry…" error={errors.message} maxLength={3000} />
+          <TextField label="Message" required multiline value={form.message} onChangeText={(v) => setForm({ ...form, message: v })} placeholder="Describe the work you need or your question…" error={errors.message} maxLength={3000} />
           <Checkbox checked={consent} onChange={setConsent} error={errors.consent} label="I consent to PSG Electrical storing these details to respond to my enquiry (POPIA)." />
-          <Button label="Dispatch Technical Inquiry" icon="send" loading={submit.isPending} onPress={() => void onSubmit()} haptic />
+          <Button label="Send enquiry" icon="send" loading={submit.isPending} onPress={() => void onSubmit()} haptic />
           <Text variant="caption" color="textMuted" align="center">
             {user?.role === 'CUSTOMER' ? 'This sends a message to the office. To book work you can track, use Request service in your dashboard.' : 'This sends an enquiry to the office — no account needed. We reply by your preferred method.'}
           </Text>
         </Card>
 
-        <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="headphones" size={16} color="primaryBright" /><Label color="primaryBright" style={{ fontSize: 13 }}>Department Direct Contacts</Label></View>
-        {(departments.data ?? []).map((d) => (
-          <Card key={d.id} onPress={() => void callNumber(d.phone)} accessibilityLabel={`Call ${d.name}`}>
-            <View style={{ flexDirection: 'row', gap: spacing.md }}>
-              <View style={styles.deptIcon}><Icon name={DEPT_ICON[d.icon] ?? 'phone'} size={18} color="primaryBright" /></View>
-              <View style={{ flex: 1, gap: 2 }}>
-                <View style={styles.between}>
-                  <Text variant="title" weight="bold" style={{ flex: 1 }}>{d.name}</Text>
-                  <Badge label={d.sla} tone="primary" mono={false} />
+        {(departments.data ?? []).length ? (
+          <>
+            <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="headphones" size={16} color="primaryBright" /><Label color="primaryBright" style={{ fontSize: 13 }}>Department contacts</Label></View>
+            {(departments.data ?? []).map((d) => (
+              <Card key={d.id} onPress={() => void callNumber(d.phone)} accessibilityLabel={`Call ${d.name}`}>
+                <View style={{ flexDirection: 'row', gap: spacing.md }}>
+                  <View style={styles.deptIcon}><Icon name={DEPT_ICON[d.icon] ?? 'phone'} size={18} color="primaryBright" /></View>
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <Text variant="title" weight="bold">{d.name}</Text>
+                    <Text variant="mono" color="textMuted" style={{ fontSize: 12 }}>{d.email}</Text>
+                    <Text variant="mono" style={{ fontSize: 13 }}>{d.phone}</Text>
+                  </View>
                 </View>
-                <Text variant="mono" color="textMuted" style={{ fontSize: 12 }}>{d.email}</Text>
-                <Text variant="mono" style={{ fontSize: 13 }}>{d.phone}</Text>
-              </View>
-            </View>
-          </Card>
-        ))}
+              </Card>
+            ))}
+          </>
+        ) : null}
 
-        <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="help-circle" size={16} color="primaryBright" /><Label color="primaryBright" style={{ fontSize: 13 }}>Contact FAQ & Guidelines</Label></View>
-        {(faqs.data ?? []).map((f) => <Accordion key={f.id} title={f.question}>{f.answer}</Accordion>)}
-
-        <Card>
-          <View style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'center' }}>
-            <Icon name="shield" size={22} color="secondaryBright" />
-            <View style={{ flex: 1 }}>
-              <Text variant="title" weight="bold">ISO 9001 & OHSAS 18001 Certified</Text>
-              <Text variant="caption" color="textMuted">Full Safety & High Voltage Compliance</Text>
-            </View>
-            <Badge label="Verified" tone="neutral" mono={false} />
-          </View>
-        </Card>
-        <DemoNote show={content.data?.isDemoContent} />
+        {(faqs.data ?? []).length ? (
+          <>
+            <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="help-circle" size={16} color="primaryBright" /><Label color="primaryBright" style={{ fontSize: 13 }}>Contact FAQ</Label></View>
+            {(faqs.data ?? []).map((f) => <Accordion key={f.id} title={f.question}>{f.answer}</Accordion>)}
+          </>
+        ) : null}
       </Screen>
     </View>
   );
@@ -209,22 +186,19 @@ function QuickAction({ icon, label, color, onPress }: { icon: IconName; label: s
   );
 }
 
-function Row({ icon, text, bold, mono, onPress }: { icon: IconName; text: string; bold?: boolean; mono?: boolean; onPress?: () => void }) {
+function Row({ icon, text, bold, mono, onPress, label }: { icon: IconName; text: string; bold?: boolean; mono?: boolean; onPress?: () => void; label?: string }) {
   const body = (
     <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center', flexShrink: 1 }}>
       <Icon name={icon} size={16} color={icon === 'user' ? 'secondaryBright' : 'primaryBright'} />
       <Text variant={mono ? 'mono' : 'bodySmall'} weight={bold ? 'bold' : undefined} color={bold || mono ? 'text' : 'textSecondary'} style={{ flexShrink: 1 }}>{text}</Text>
     </View>
   );
-  return onPress ? <Pressable accessibilityRole="link" onPress={onPress} style={{ flexShrink: 1 }}>{body}</Pressable> : body;
+  return onPress ? <Pressable accessibilityRole="link" accessibilityLabel={label} onPress={onPress} style={{ flexShrink: 1, minHeight: 32, justifyContent: 'center' }}>{body}</Pressable> : body;
 }
 
 const styles = StyleSheet.create({
-  hero: { height: 200, padding: spacing.lg, justifyContent: 'space-between' },
-  shade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(11,15,22,0.5)' },
   between: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.sm },
   quick: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4, borderRadius: radius.md, minHeight: 64 },
-  slaBox: { flex: 1, alignItems: 'center', gap: 6, backgroundColor: colors.surfaceElevated, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, paddingVertical: spacing.md },
   deptIcon: { width: 40, height: 40, borderRadius: radius.sm, backgroundColor: colors.surfaceElevated, alignItems: 'center', justifyContent: 'center' },
   sent: { flexDirection: 'row', gap: 10, alignItems: 'center', backgroundColor: colors.successMuted, borderRadius: radius.md, padding: spacing.md },
 });
