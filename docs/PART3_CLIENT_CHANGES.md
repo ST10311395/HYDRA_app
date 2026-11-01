@@ -116,56 +116,68 @@ menu derives its owner-only items from it, and each owner screen still renders `
 
 ## 5. Acceptance checklist
 
-- [ ] Login photograph removed; official logo, usable form, guest/register/sign-in and reset paths work.
-- [ ] Blue lightning logo replaced everywhere it stands for PSG company branding.
-- [ ] Call action opens the phone dialer with the verified number on Android; web has a suitable fallback.
-- [ ] The Home "Turnkey high-voltage … 24/7" paragraph is replaced by accurate hazardous-area testing copy.
-- [ ] No 24/7 availability, immediate dispatch, fixed 24-hour quote or unsupported certification claims remain in customer-facing copy.
-- [ ] Highlighted Home promotional quote block and redundant tiles removed; Quote/Contact entry points remain.
-- [ ] Quote picker no longer shows Fiber & Data Cabling; commercial wording omits HVAC.
-- [ ] Urgency selection does not claim 24h/24/7 and still maps to `STANDARD | HIGH | EMERGENCY`.
-- [ ] Technical quote fields reduced where safe; validation, submission and old quotes still work.
-- [ ] Guest, customer, employee and admin/owner interfaces more navigable; every original route still reachable.
-- [ ] Narrow-phone header/tab layouts render without clipped logo/name or overlaps.
-- [ ] Customer quote/job/payment/rewards flows still work.
-- [ ] Employee jobs, check-in, tracking, timesheets and materials still work.
-- [ ] Admin office features and owner-only permissions still work; admin cannot see owner-only data.
-- [ ] Existing tests and builds pass, with results recorded honestly.
+Status key: **✔** done and covered by automated tests · **◑** done, automated tests only — not yet verified by hand on a
+physical device · evidence names the test file(s) under `apps/mobile/src/__tests__/` or `apps/api/tests/`.
+
+| Criterion | Status | Evidence |
+| --- | --- | --- |
+| Login photograph removed; official logo, usable form, guest / register / sign-in and reset paths work | ✔ | `auth-landing`, `runtime-navigation`, `branding` |
+| Blue lightning logo replaced wherever it stands for PSG | ✔ (vector redraw — Q6) | `branding` |
+| Call action opens the dialer with the verified number; web has a fallback | ◑ | `contact-dialer` (Linking stubbed; no real call placed) |
+| Home “Turnkey high-voltage … 24/7” paragraph replaced by hazardous-area testing copy | ✔ | `guest-home` |
+| No 24/7, immediate-dispatch, 24-hour quote or unsupported certification claims in customer-facing copy | ✔ app and seed (see limitations) | `public-claims`, `guest-home`, `quote-scope`, API `content` |
+| Highlighted Home promotional block and tiles removed; Quote / Contact entry points remain | ✔ | `guest-home` |
+| Quote picker without Fiber & Data Cabling; commercial wording without HVAC | ✔ | `quote-sectors` |
+| Urgency labels make no 24h / 24/7 claim and still map to `STANDARD \| HIGH \| EMERGENCY` | ✔ | `quote-scope`, `quote-workflow`, API `quote-compat` |
+| Technical quote fields reduced; validation, submission and old records still work | ✔ | `guest-quote`, `quote-scope`, `quote-sectors`, API `quote-compat` |
+| Every role more navigable; every original route still reachable | ✔ | `part3-baseline` (88 routes), `customer-navigation`, `staff-navigation`, `guest-navigation`, `check:routes` |
+| Narrow phones: header / tabs without clipped name or overlap | ◑ | `header-account`, `responsive-a11y`; 320 px web screenshots |
+| Customer quote / job / payment / rewards flows still work | ◑ | `customer-flows`, `customer-navigation`, `quote-workflow`, API suite |
+| Employee jobs, check-in, tracking, timesheets and materials still work | ◑ | `employee-workflow`, `arrival-qr`, `scan-states`, API `workflow` |
+| Admin office features and owner-only permissions; admin cannot reach owner-only data | ✔ | `owner-guards`, `admin-operations`, `navigation-guards`, API `security` |
+| Existing tests and builds pass, results recorded honestly | ✔ | Section 8 |
 
 ## 6. Progress log
 
 | # | Commit | Status | Checks |
 | --- | --- | --- | --- |
 | 01 | docs: add Part 3 client feedback and acceptance criteria | done | docs only |
-| 02 | test: add baseline navigation and role access checks | pending | |
-| 03 | style: refine shared spacing and typography tokens | pending | |
-| 04 | style: polish shared cards buttons and form controls | pending | |
-| 05 | assets: add PSG logo redraw and app icons | pending | |
-| 06 | feat: replace PSG brand marks across shared UI | pending | |
-| 07 | fix: make header call action open phone dialer | pending | |
-| 08 | fix: improve compact mobile header responsiveness | pending | |
-| 09 | style: redesign sign in and welcome experience | pending | |
-| 10 | test: cover auth and guest landing routes | pending | |
-| 11 | content: align PSG service copy with official website | pending | |
-| 12 | content: replace unsupported emergency availability claims | pending | |
-| 13 | content: update hero with hazardous area testing focus | pending | |
-| 14 | refactor: remove redundant guest home promotions | pending | |
-| 15 | style: simplify guest navigation and service discovery | pending | |
-| 16 | style: streamline customer dashboard navigation | pending | |
-| 17 | style: clarify customer job quote and billing pathways | pending | |
-| 18 | style: streamline employee daily work navigation | pending | |
-| 19 | style: simplify admin dashboard and management menus | pending | |
-| 20 | fix: preserve owner-only navigation and access guards | pending | |
-| 21 | content: correct quotation sector descriptions and options | pending | |
-| 22 | refactor: simplify quotation scope and urgency labels | pending | |
-| 23 | test: protect quotation and role workflow regressions | pending | |
+| 02 | test: add baseline navigation and role access checks | done | |
+| 03 | style: refine shared spacing and typography tokens | done | |
+| 04 | style: polish shared cards buttons and form controls | done | |
+| 05 | assets: add PSG logo redraw and app icons | done | |
+| 06 | feat: replace PSG brand marks across shared UI | done | |
+| 07 | fix: make header call action open phone dialer | done | |
+| 08 | fix: improve compact mobile header responsiveness | done | |
+| 09 | style: redesign sign in and welcome experience | done | |
+| 10 | test: cover auth and guest landing routes | done | |
+| 11 | content: align PSG service copy with official website | done | |
+| 12 | content: replace unsupported emergency availability claims | done | |
+| 13 | content: update hero with hazardous area testing focus | done | |
+| 14 | refactor: remove redundant guest home promotions | done | |
+| 15 | style: simplify guest navigation and service discovery | done | |
+| 16 | style: streamline customer dashboard navigation | done | |
+| 17 | style: clarify customer job quote and billing pathways | done | |
+| 18 | style: streamline employee daily work navigation | done | |
+| 19 | style: simplify admin dashboard and management menus | done | |
+| 20 | fix: preserve owner-only navigation and access guards | done | |
+| 21 | content: correct quotation sector descriptions and options | done | |
+| 22 | refactor: simplify quotation scope and urgency labels | done | |
+| 23 | test: protect quotation and role workflow regressions | done | |
+| 23b | test: report API test failures through the exit code *(optional, outside the client brief)* | done | |
+| 24 | fix: polish responsive screens and accessibility | done | |
+| 25 | docs: record Part 3 validation and final walkthrough | done | |
+
+
+Commit hashes are listed in the final report for the branch (they are created after this file is written).
 
 **Logo source:** `apps/mobile/assets/images/brand/psg-logo.svg` is a vector redraw of the portfolio house
 mark (blue → violet → pink), traced from `Screenshot 2026-11-01 203150.png` because no original artwork was
 supplied. The app icon, Android adaptive icon layers, splash and favicon are rendered from it. Swap in the
 owner's original file when received (Q6); `components/BrandLogo.tsx` mirrors the same paths.
 
-**For commit 25:** add the react-native-svg reference (used by `BrandLogo.tsx`) to the README reference list.
+**References (commit 25):** the README reference list now includes react-native-svg (used by `BrandLogo.tsx` and
+`BrandBackdrop.tsx`) and the PSG website and company portfolio used as content sources.
 
 **Existing databases (commit 12):** the seed only fills an empty database, so a database created before
 Part 3 still holds the old marketing rows. `npm run db:content:refresh -w @hydra/api` shows a dry run of
@@ -177,3 +189,49 @@ team, partners) or demo company content (metrics, accreditations, testimonials) 
 
 The README's Generative AI declaration will be updated in commit 25 to record Claude Code assistance for
 Part 3; it is not removed or shortened.
+
+## 7. Change matrix
+
+| Client issue (screenshot) | Files changed | Behaviour after Part 3 | Test evidence |
+| --- | --- | --- | --- |
+| Logo (WA0003) | `components/BrandLogo.tsx`, `layout.tsx`, `AuthShell.tsx`, `BootSplash.tsx`, `app/welcome.tsx`, `assets/images/*` | PSG gradient house mark in header, sign-in, splash, welcome, app icon | `branding` |
+| Phone icon (WA0003) | `content/company.ts`, `utils/links.ts`, `components/layout.tsx` | Dials 082 603 9283; validates; web also shows the number | `contact-dialer` |
+| Header Emergency / ISO / PRO (WA0003, WA0010) | `components/layout.tsx` | Logo + full name + call + account; no 24/7 or ISO claim | `header-account`, `responsive-a11y` |
+| Hero paragraph & 24/7 Emergency (WA0010) | `(tabs)/home.tsx`, `content/marketing.ts` | Hazardous-area testing copy; Request a quote / Report a fault / Call PSG; safety note | `guest-home` |
+| Quote-within-24h promo, tiles, account promo (WA0009) | `(tabs)/home.tsx`, `components/marketing.tsx` | Removed; About links in footer | `guest-home` |
+| HVAC & Fiber sector (WA0012) | `features/quoteSectors.ts`, `(tabs)/quote.tsx`, `(tabs)/contact.tsx` | Website intake categories + optional site type; legacy keys mapped | `quote-sectors`, API `quote-compat` |
+| Scope step (WA0011) | `(tabs)/quote.tsx`, `utils/format.ts`, request / AI / new-job forms, job & enquiry screens | Standard / Priority / Urgent fault; kVA & supply in Advanced; no turnaround | `quote-scope`, `quote-workflow` |
+| Unsupported claims (brief §2, §6) | `api/seeds/content.ts`, `api/src/ai/policies.ts`, `orchestrator.ts`, public screens | Verified contacts and portfolio copy; demo records hidden; refresh script for existing databases | `public-claims`, API `content` |
+| Navigation for every role (brief §5) | tab layouts, dashboards, Account / More / Manage, `TabBar.tsx`, `admin/_layout.tsx`, `guards.ts` | See “Navigation after Part 3” (section 4) | `customer-navigation`, `staff-navigation`, `owner-guards`, `part3-baseline` |
+| Login / welcome (brief §4) | `app/welcome.tsx`, `AuthShell.tsx`, `(auth)/login.tsx`, `BrandBackdrop.tsx` | Photo-free; logo → welcome → sign in → create / guest | `auth-landing` |
+
+## 8. Validation record (1 November 2026, `feature/part3-client-changes`)
+
+| Check | Result |
+| --- | --- |
+| `npm run lint` | Pass |
+| `npm run typecheck` | Pass |
+| Shared tests (Vitest) | 17 / 17 |
+| API tests (Vitest + real PostgreSQL) | 252 / 252 (245 existing + 7 new). Run with `TEST_PG_DIR=.pgdata-test2 TEST_PG_PORT=5444` because an orphaned test cluster from an earlier interrupted run held the default port/directory. |
+| Mobile tests (Jest + RNTL) | 338 / 338 in 32 suites (221 before Part 3). One pre-existing `act()` warning in `scan-states` also occurs on `main`. |
+| `npm run check:routes -w @hydra/mobile` | 229 navigation targets → 88 routes (all 88 pre-Part 3 routes still exist; fewer targets because duplicate link grids were removed) |
+| Build (`expo export`, Android + iOS; web export) | Pass |
+| `npx expo-doctor` | 20 / 21. The failing check reports 11 Expo SDK 57 packages behind the latest patch release; Part 3 changed no dependencies (upgrades are out of scope). |
+| Visual check | Headless Edge screenshots of welcome, sign-in, register, home, services, work, quote, contact and Why PSG at 320 px and ~500 px width |
+
+**Found during validation:** the API test command exited 0 even when tests failed (embedded-postgres's exit hook
+replaced Vitest's exit code — present on `main` too). Optional commit 23b fixes it in `apps/api/tests/globalSetup.ts`;
+after it, a deliberately failing test exits 1 and the passing suite exits 0.
+
+**Not verified (needs a device / environment):** real phone dialling on Android; signed-in screens on a device
+against a running API with test accounts; GPS / camera / QR on hardware; push notifications; payments. These are
+covered by automated tests with stubs only. Use `docs/MANUAL_TEST_MATRIX.md` for the walkthrough.
+
+## 9. Known limitations and follow-ups
+
+- Owner confirmations Q1–Q12 (section 1) are outstanding; the app uses the conservative choice for each.
+- The logo is a vector redraw from the portfolio slide until the owner supplies original artwork (Q6).
+- Databases created before Part 3 keep their old marketing rows until `npm run db:content:refresh -w @hydra/api
+  -- --apply` is run (owner approval needed for production); service wording can also be edited in Admin → Service types.
+- Admin-editable text (default quote terms, AI policy response windows for levels 1–2) is left for the owner to
+  review (Q11, Q12).
