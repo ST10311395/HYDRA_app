@@ -47,7 +47,7 @@ afterEach(() => {
 });
 
 async function goToLocationStep() {
-  await fireEvent.press(screen.getByRole('radio', { name: /Solar & Energy Storage/ }));
+  await fireEvent.press(screen.getByRole('radio', { name: /Solar & backup/ }));
   await fireEvent.press(screen.getByText('Continue to Scope'));
   await fireEvent.changeText(screen.getByLabelText('Scope brief'), 'Roof-mounted 10 kVA hybrid system with battery');
   await fireEvent.press(screen.getByText('Continue to Location'));

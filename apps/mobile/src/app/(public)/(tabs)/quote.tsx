@@ -10,27 +10,17 @@ import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { email as emailSchema, phone as phoneSchema, type JobUrgency, type ServiceCategory } from '@hydra/shared';
+import { email as emailSchema, phone as phoneSchema, type JobUrgency } from '@hydra/shared';
 import { errorMessage, newIdempotencyKey } from '../../../api/client';
 import { useCreateJob, useFaqs, useServices, useSubmitEnquiry } from '../../../api/queries';
 import { imageFor } from '../../../components/images';
 import { BrandHeader, Screen } from '../../../components/layout';
-import { Accordion, Badge, Button, Card, Checkbox, DateField, Icon, Label, ProgressBar, SelectField, Segmented, Text, TextField, colors, noSelect, radius, spacing, toast, type IconName } from '../../../design-system';
+import { Accordion, Badge, Button, Card, Checkbox, DateField, Icon, Label, ProgressBar, SelectField, Segmented, Text, TextField, colors, noSelect, radius, spacing, toast } from '../../../design-system';
 import { PhotoPicker, type UploadedPhoto } from '../../../features/photos';
 import { useAuth } from '../../../store/auth';
 import { todayIso } from '../../../utils/format';
 import { useSyncFrom } from '../../../hooks/useSyncFrom';
-
-type SectorKey = 'INDUSTRIAL' | 'COMMERCIAL' | 'SOLAR' | 'FIBRE' | 'AUDIT' | 'EMERGENCY';
-
-const SECTORS: { key: SectorKey; title: string; sub: string; icon: IconName; category: ServiceCategory; turnaround: string }[] = [
-  { key: 'INDUSTRIAL', title: 'Industrial & Substation', sub: 'Heavy switchgear, transformers & distribution', icon: 'cpu', category: 'SUBSTATIONS', turnaround: '< 4 Hours' },
-  { key: 'COMMERCIAL', title: 'Commercial Infrastructure', sub: 'Office buildings, malls & HVAC electricals', icon: 'grid', category: 'AUTOMATION', turnaround: '< 4 Hours' },
-  { key: 'SOLAR', title: 'Solar & Energy Storage', sub: 'Commercial rooftop PV, inverter & battery banks', icon: 'sun', category: 'SOLAR', turnaround: '< 24 Hours' },
-  { key: 'FIBRE', title: 'Fiber & Data Cabling', sub: 'High-density fiber optic & structured networks', icon: 'git-merge', category: 'CABLING', turnaround: '< 24 Hours' },
-  { key: 'AUDIT', title: 'SANS High-Voltage Audit', sub: 'Safety compliance, CoC testing & thermal imaging', icon: 'zap', category: 'COMPLIANCE', turnaround: '< 24 Hours' },
-  { key: 'EMERGENCY', title: 'Emergency Fault Repair', sub: 'Breakdowns, tripping, outages & burning smells', icon: 'alert-triangle', category: 'EMERGENCY', turnaround: 'Immediate' },
-];
+import { SECTORS, SITE_LABEL, SITE_TYPES, resolveSector, type SectorKey, type SiteType } from '../../../features/quoteSectors';
 
 const VOLTAGES = [
   'Low Voltage (230V Single-Phase)',
@@ -41,11 +31,12 @@ const VOLTAGES = [
   'Not sure — engineer to confirm',
 ].map((v) => ({ value: v, label: v }));
 
-const STEPS = ['Sector', 'Scope', 'Location', 'Submit'] as const;
+const STEPS = ['Service', 'Scope', 'Location', 'Submit'] as const;
 const DRAFT_KEY = 'hydra.quote-draft.v1';
 
 interface Draft {
   sector: SectorKey;
+  siteType: SiteType;
   voltage: string;
   serviceTypeId: string;
   scope: string;
@@ -60,7 +51,8 @@ interface Draft {
 }
 
 const EMPTY: Draft = {
-  sector: 'INDUSTRIAL',
+  sector: 'INSTALL',
+  siteType: '',
   voltage: VOLTAGES[1]!.value,
   serviceTypeId: '',
   scope: '',
@@ -108,10 +100,16 @@ export default function QuoteScreen() {
         // Corrupt draft: start fresh.
       }
       const saved = { ...EMPTY, ...parsed };
+      // A draft saved before Part 3 may hold a removed sector (e.g. FIBRE): map it, never crash.
+      const savedSector = resolveSector(saved.sector) ?? { sector: EMPTY.sector };
+      // Deep links preselect a sector (legacy keys included); a fault opens exactly as tapping it would.
+      const linked = resolveSector(params.sector);
+      const sectorKey = linked?.sector ?? savedSector.sector;
       setDraft({
         ...saved,
-        // Deep links preselect any listed sector; "Report a fault" opens the fault sector exactly as tapping it would.
-        ...(SECTORS.some((x) => x.key === params.sector) ? { sector: params.sector as SectorKey, ...(params.sector === 'EMERGENCY' ? { urgency: 'EMERGENCY' as const } : {}) } : {}),
+        sector: sectorKey,
+        siteType: linked?.site ?? (linked ? saved.siteType : savedSector.site ?? saved.siteType),
+        ...(linked?.sector === 'FAULT' ? { urgency: 'EMERGENCY' as const } : {}),
         ...(params.kva ? { loadKva: params.kva } : {}),
         ...(params.serviceTypeId ? { serviceTypeId: params.serviceTypeId } : {}),
         name: saved.name || (user ? `${user.firstName} ${user.lastName}`.trim() : ''),
@@ -175,7 +173,8 @@ export default function QuoteScreen() {
   const submit = async () => {
     if (sending.current || !validate(3)) return;
     sending.current = true;
-    const description = [`[${sector.title}] ${draft.scope.trim()}`, `Voltage: ${draft.voltage}`, draft.loadKva ? `Estimated load: ${draft.loadKva} kVA` : null].filter(Boolean).join('\n');
+    const site = draft.siteType ? SITE_LABEL[draft.siteType] : null;
+    const description = [`[${sector.title}] ${draft.scope.trim()}`, site ? `Site type: ${site}` : null, `Voltage: ${draft.voltage}`, draft.loadKva ? `Estimated load: ${draft.loadKva} kVA` : null].filter(Boolean).join('\n');
     try {
       if (user?.role === 'CUSTOMER') {
         const job = await createJob.mutateAsync({
@@ -195,13 +194,13 @@ export default function QuoteScreen() {
           name: draft.name.trim(),
           email: draft.email.trim(),
           phone: draft.phone.trim(),
-          sector: sector.title,
+          sector: site ? `${sector.title} (${site})` : sector.title,
           urgency: draft.urgency,
           message: description.slice(0, 3000),
           source: 'QUOTE_TOOL',
           consent: true,
           details: {
-            sector: sector.title,
+            sector: site ? `${sector.title} (${site})` : sector.title,
             voltageLevel: draft.voltage,
             scope: draft.scope.trim(),
             siteAddress: draft.siteAddress.trim(),
@@ -268,7 +267,7 @@ export default function QuoteScreen() {
             <SubmissionMode />
             <Card style={{ gap: spacing.md }}>
               <View style={styles.between}>
-                <Label style={{ fontSize: 13 }}>{`Step ${step + 1} of 4: ${['Sector & Type', 'Scope & Details', 'Location & Contact', 'Review & Submit'][step]}`}</Label>
+                <Label style={{ fontSize: 13 }}>{`Step ${step + 1} of 4: ${['What you need', 'Scope & details', 'Location & contact', 'Review & submit'][step]}`}</Label>
                 <Text variant="mono" color="primaryBright" style={{ fontSize: 16 }}>{(step + 1) * 25}%</Text>
               </View>
               <ProgressBar value={(step + 1) / 4} />
@@ -285,8 +284,8 @@ export default function QuoteScreen() {
             {step === 0 ? (
               <View style={{ gap: spacing.md }}>
                 <View>
-                  <Text variant="h2">Select Project Sector</Text>
-                  <Text variant="bodySmall" color="textMuted">Choose the primary engineering domain for this quote.</Text>
+                  <Text variant="h2">What do you need?</Text>
+                  <Text variant="bodySmall" color="textMuted">Choose the closest match — you can describe the details in the next step.</Text>
                 </View>
                 {SECTORS.map((s) => {
                   const active = s.key === draft.sector;
@@ -295,7 +294,7 @@ export default function QuoteScreen() {
                       key={s.key}
                       accessibilityRole="radio"
                       accessibilityState={{ checked: active }}
-                      onPress={() => setDraft((d) => ({ ...d, sector: s.key, serviceTypeId: '', urgency: s.key === 'EMERGENCY' ? 'EMERGENCY' : d.urgency }))}
+                      onPress={() => setDraft((d) => ({ ...d, sector: s.key, serviceTypeId: '', urgency: s.key === 'FAULT' ? 'EMERGENCY' : d.urgency }))}
                       style={[styles.sector, noSelect, active ? { borderColor: colors.primaryBright, backgroundColor: '#152037' } : null]}
                     >
                       <View style={[styles.sectorIcon, active ? { backgroundColor: colors.primary } : null]}><Icon name={s.icon} size={20} color={active ? 'white' : 'textSecondary'} /></View>
@@ -308,6 +307,7 @@ export default function QuoteScreen() {
                   );
                 })}
                 <Card style={{ gap: spacing.sm }}>
+                  <SelectField label="Type of site (optional)" value={draft.siteType || undefined} options={[...SITE_TYPES]} onChange={(v) => set('siteType', v as SiteType)} placeholder="Choose a site type" />
                   <SelectField label="Infrastructure Voltage Level" value={draft.voltage} options={VOLTAGES} onChange={(v) => set('voltage', v)} />
                 </Card>
                 <Card style={{ gap: spacing.md }}>
@@ -317,7 +317,7 @@ export default function QuoteScreen() {
                   </View>
                   <View style={{ flexDirection: 'row' }}>
                     <View style={{ flex: 1 }}><Text variant="caption" color="textMuted">Sector:</Text><Text variant="title" weight="bold">{sector.title}</Text></View>
-                    <View style={{ flex: 1 }}><Text variant="caption" color="textMuted">Turnaround:</Text><Text variant="title" weight="bold">{sector.turnaround}</Text></View>
+                    <View style={{ flex: 1 }}><Text variant="caption" color="textMuted">Site:</Text><Text variant="title" weight="bold">{draft.siteType ? SITE_LABEL[draft.siteType] : 'Not specified'}</Text></View>
                   </View>
                 </Card>
               </View>
@@ -358,7 +358,8 @@ export default function QuoteScreen() {
               <Card style={{ gap: spacing.md }}>
                 <Text variant="h3">Review your request</Text>
                 {[
-                  ['Sector', sector.title],
+                  ['Request', sector.title],
+                  ['Site type', draft.siteType ? SITE_LABEL[draft.siteType] : 'Not specified'],
                   ['Service', serviceOptions.find((o) => o.value === draft.serviceTypeId)?.label ?? '—'],
                   ['Voltage', draft.voltage],
                   ['Urgency', draft.urgency === 'EMERGENCY' ? '24/7 Critical' : draft.urgency === 'HIGH' ? 'High Priority' : 'Standard'],
