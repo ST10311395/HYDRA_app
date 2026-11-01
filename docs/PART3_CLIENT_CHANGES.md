@@ -48,6 +48,7 @@ portfolio (`part3-reference/Screenshot 2026-11-01 2031*.png`).
 | "24/7 Hotline Service", "24/7 Operations Hub", "24/7 Hotline" office hours | `home.tsx`, `contact.tsx`, `api/seeds/content.ts` | Published hours 07:00–18:00 |
 | "ISO 9001 Certified", "ISO 9001 & OHSAS 18001 Certified", header ISO chip, "Verified ISO 9001" | `home.tsx`, `contact.tsx`, `layout.tsx` | Remove; state SANS 10142 / CoC adherence instead |
 | "ECA & NSI Accredited", "Master Electricians", team accreditations | `home.tsx`, `team.tsx` | Remove |
+| "EST. 2008" hero badge (founding year unverified) | `home.tsx` | Remove unless owner confirms |
 | "33kV Substation Panel Testing", "LIVE DISPATCH", turnkey HV substations | `home.tsx`, `marketing.tsx`, `services.tsx` | Hazardous-area testing / inspection / fault-diagnosis copy |
 | "Engineer-reviewed quotation within 24 hours", "binding technical proposal" | guest home promo block | Remove block (quote tab remains) |
 | Quote turnaround labels ("< 4 Hours", "Immediate") and "Standard (24h)" / "24/7 Critical" | `quote.tsx`, `contact.tsx` | No turnaround; urgency labels Standard / Priority / Urgent fault (enum values unchanged) |
@@ -118,6 +119,10 @@ although the screen itself is wrapped in `OwnerGate`.
 | 04 | style: polish shared cards buttons and form controls | pending | |
 | 05 | assets: add PSG logo redraw and app icons | pending | |
 | 06 | feat: replace PSG brand marks across shared UI | pending | |
+| 07 | fix: make header call action open phone dialer | pending | |
+| 08 | fix: improve compact mobile header responsiveness | pending | |
+| 09 | style: redesign sign in and welcome experience | pending | |
+| 10 | test: cover auth and guest landing routes | pending | |
 
 **Logo source:** `apps/mobile/assets/images/brand/psg-logo.svg` is a vector redraw of the portfolio house
 mark (blue → violet → pink), traced from `Screenshot 2026-11-01 203150.png` because no original artwork was
