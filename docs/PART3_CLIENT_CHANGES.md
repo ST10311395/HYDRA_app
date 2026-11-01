@@ -114,6 +114,17 @@ although the screen itself is wrapped in `OwnerGate`.
 | --- | --- | --- | --- |
 | 01 | docs: add Part 3 client feedback and acceptance criteria | done | docs only |
 | 02 | test: add baseline navigation and role access checks | pending | |
+| 03 | style: refine shared spacing and typography tokens | pending | |
+| 04 | style: polish shared cards buttons and form controls | pending | |
+| 05 | assets: add PSG logo redraw and app icons | pending | |
+| 06 | feat: replace PSG brand marks across shared UI | pending | |
+
+**Logo source:** `apps/mobile/assets/images/brand/psg-logo.svg` is a vector redraw of the portfolio house
+mark (blue → violet → pink), traced from `Screenshot 2026-11-01 203150.png` because no original artwork was
+supplied. The app icon, Android adaptive icon layers, splash and favicon are rendered from it. Swap in the
+owner's original file when received (Q6); `components/BrandLogo.tsx` mirrors the same paths.
+
+**For commit 25:** add the react-native-svg reference (used by `BrandLogo.tsx`) to the README reference list.
 
 The README's Generative AI declaration will be updated in commit 25 to record Claude Code assistance for
 Part 3; it is not removed or shortened.

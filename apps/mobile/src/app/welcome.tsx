@@ -10,6 +10,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BrandLogo } from '../components/BrandLogo';
 import { imageFor } from '../components/images';
 import { Button, Icon, Label, Text, colors, radius, spacing, type IconName } from '../design-system';
 import { useAuth } from '../store/auth';
@@ -37,9 +38,7 @@ export default function Welcome() {
         <Image source={imageFor('hero-substation')} style={StyleSheet.absoluteFill} contentFit="cover" accessibilityIgnoresInvertColors />
         <LinearGradient colors={['rgba(11,15,22,0.35)', 'rgba(11,15,22,0.7)', colors.background]} style={StyleSheet.absoluteFill} />
         <View style={styles.brandRow}>
-          <View style={styles.logo}>
-            <Icon name="zap" size={26} color="white" />
-          </View>
+          <BrandLogo size={52} decorative />
           <View style={{ flex: 1, minWidth: 0 }}>
             <Text variant="h3">PSG Electrical</Text>
             <Text variant="caption" color="textSecondary">& Cables · Trite Solar</Text>
@@ -99,7 +98,6 @@ const styles = StyleSheet.create({
   column: { width: '100%', maxWidth: 560, alignSelf: 'center' },
   hero: { minHeight: 360, borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl, paddingHorizontal: spacing.xl, paddingBottom: spacing.xl, justifyContent: 'space-between', gap: spacing.xxl, overflow: 'hidden' },
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  logo: { width: 52, height: 52, borderRadius: radius.lg, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
   hydra: { borderWidth: 1, borderColor: colors.primaryBorder, backgroundColor: 'rgba(11,15,22,0.6)', borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 4 },
   body: { flex: 1, paddingHorizontal: spacing.xl, gap: spacing.xxl, justifyContent: 'space-between' },
   highlight: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },

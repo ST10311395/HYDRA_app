@@ -7,9 +7,10 @@
  */
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Icon, Label, Text, colors, radius, spacing } from '../design-system';
+import { Icon, Label, Text, colors, spacing } from '../design-system';
+import { BrandLogo } from './BrandLogo';
 import { KEYBOARD_BEHAVIOR } from './layout';
 
 /** Branded shell for sign-in / registration flows. */
@@ -26,7 +27,7 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
           <Icon name="arrow-left" size={22} />
         </Pressable>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <View style={styles.logo}><Icon name="zap" size={24} color="white" /></View>
+          <BrandLogo size={52} decorative />
           <View style={{ flex: 1 }}>
             <Text variant="h3">PSG Electrical</Text>
             <Label>& Cables · Trite Solar</Label>
@@ -41,7 +42,3 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  logo: { width: 52, height: 52, borderRadius: radius.lg, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-});

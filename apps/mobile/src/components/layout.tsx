@@ -17,6 +17,7 @@ import { Button, Icon, IconButton, Text, colors, confirm, radius, spacing, type 
 import { homeForRole, useAuth } from '../store/auth';
 import { useNetwork } from '../hooks/useNetwork';
 import { callNumber } from '../utils/links';
+import { BrandLogo } from './BrandLogo';
 
 export const TAB_BAR_HEIGHT = 64;
 
@@ -129,10 +130,7 @@ export function BrandHeader({ section, back }: { section: string; back?: boolean
           onPress={() => router.navigate(user ? homeForRole(user.role) : '/home')}
           style={styles.brand}
         >
-          <View style={[styles.logo, compact ? { width: 38, height: 38 } : null]}>
-            <Icon name="zap" size={compact ? 18 : 20} color="white" />
-            <View style={styles.logoDot} />
-          </View>
+          <BrandLogo size={compact ? 36 : 40} decorative />
           <View style={styles.brandText}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Text variant="h3" style={{ fontSize: compact ? 15 : 16, lineHeight: compact ? 19 : 21, flexShrink: 1 }} numberOfLines={2}>PSG Electrical</Text>
@@ -284,8 +282,6 @@ const styles = StyleSheet.create({
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm },
   brand: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 },
   brandText: { flex: 1, minWidth: 0 },
-  logo: { width: 42, height: 42, borderRadius: radius.md, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  logoDot: { position: 'absolute', top: -2, right: -2, width: 10, height: 10, borderRadius: 5, backgroundColor: colors.primaryBright, borderWidth: 2, borderColor: colors.background },
   pro: { borderWidth: 1, borderColor: colors.borderStrong, borderRadius: radius.pill, paddingHorizontal: 5 },
   emergency: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.danger, borderRadius: radius.md, paddingHorizontal: 12, height: 40 },
   emergencyCompact: { paddingHorizontal: 0, width: 38, height: 38, justifyContent: 'center' },

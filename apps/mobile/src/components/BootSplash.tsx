@@ -5,7 +5,8 @@
  * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
  */
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { Icon, colors, radius, spacing } from '../design-system';
+import { colors, spacing } from '../design-system';
+import { BrandLogo } from './BrandLogo';
 
 /**
  * Branded placeholder shown while fonts load and the stored session is restored, so the public
@@ -16,7 +17,7 @@ export function BootSplash() {
   return (
     <View style={styles.root} accessibilityRole="progressbar" accessibilityLabel="Loading PSG Electrical" testID="boot-splash">
       <View style={styles.logo}>
-        <Icon name="zap" size={36} color="white" />
+        <BrandLogo size={84} decorative />
       </View>
       <Text style={styles.title}>PSG Electrical</Text>
       <Text style={styles.subtitle}>& Cables · Trite Solar</Text>
@@ -27,7 +28,7 @@ export function BootSplash() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background, padding: spacing.xl },
-  logo: { width: 76, height: 76, borderRadius: radius.xl, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.lg },
+  logo: { marginBottom: spacing.lg },
   title: { color: colors.text, fontSize: 24, fontWeight: '800', textAlign: 'center' },
   subtitle: { color: colors.textMuted, fontSize: 14, marginTop: 4, textAlign: 'center' },
 });
