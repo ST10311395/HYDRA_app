@@ -42,7 +42,7 @@ const V: Record<ButtonVariant, { bg: string; border: string; fg: ColorToken }> =
 export function Button({ label, onPress, variant = 'primary', size = 'md', icon, iconRight, loading, disabled, fullWidth = true, style, accessibilityHint, haptic, testID }: ButtonProps) {
   const v = V[variant];
   const inactive = disabled || loading;
-  const height = size === 'lg' ? 56 : size === 'sm' ? 40 : 50;
+  const height = size === 'lg' ? 56 : size === 'sm' ? HIT : 50;
   return (
     <Pressable
       testID={testID}

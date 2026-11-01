@@ -27,7 +27,7 @@ export const TextField = forwardRef<TextInput, FieldProps>(function TextField({ 
   return (
     <View style={{ gap: 6 }}>
       {label ? (
-        <Text variant="title" weight="bold">
+        <Text variant="title" weight="bold" accessibilityLabel={required ? `${label}, required` : undefined}>
           {label}
           {required ? <Text variant="title" color="dangerBright"> *</Text> : null}
         </Text>
@@ -274,9 +274,9 @@ export function Checkbox({ checked, onChange, label, error }: { checked: boolean
 const styles = StyleSheet.create({
   field: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 50, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceInset, paddingHorizontal: 14 },
   input: { flex: 1, color: colors.text, fontFamily: fonts.regular, fontSize: 15, paddingVertical: 10 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, paddingHorizontal: 14, minHeight: 40 },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface, paddingHorizontal: 14, minHeight: HIT },
   segment: { flexDirection: 'row', gap: spacing.sm },
-  segmentItem: { flex: 1, minHeight: 40, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceElevated, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
+  segmentItem: { flex: 1, minHeight: HIT, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceElevated, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   backdrop: { flex: 1, backgroundColor: colors.overlay },
   sheet: { backgroundColor: colors.surface, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, padding: spacing.xl, borderTopWidth: 1, borderColor: colors.border },
   grabber: { alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: colors.borderStrong, marginBottom: spacing.lg },

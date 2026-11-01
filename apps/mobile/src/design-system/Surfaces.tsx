@@ -101,7 +101,7 @@ export function SectionHeader({ title, subtitle, actionLabel, onAction, tag, ico
       <View style={{ flex: 1, gap: 2 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           {icon ? <Icon name={icon} size={18} color="primaryBright" /> : null}
-          <Text variant="h3" accessibilityRole="header" uppercase={!icon}>
+          <Text variant="h3" accessibilityRole="header">
             {title}
           </Text>
         </View>
@@ -168,7 +168,7 @@ export function KeyValue({ label, value, valueColor = 'text', mono }: { label: s
 const styles = StyleSheet.create({
   card: { borderRadius: radius.lg, borderWidth: 1 },
   badge: { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 4, alignSelf: 'flex-start', maxWidth: '100%', flexShrink: 1 },
-  badgeText: { fontSize: 11, letterSpacing: 1, flexShrink: 1 },
+  badgeText: { fontSize: 11, letterSpacing: 0.6, flexShrink: 1 },
   section: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   stat: { flex: 1, backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, gap: 4, minHeight: 104 },
   kv: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md, paddingVertical: 6 },
