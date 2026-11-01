@@ -36,3 +36,6 @@ apps/api/.test-uploads/
 
 # Claude Code / AI-tool settings (local only, never committed)
 .claude/
+
+# Part 3 client reference images (local only; contain third-party logos)
+part3-reference/
