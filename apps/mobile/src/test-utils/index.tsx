@@ -210,3 +210,12 @@ export async function pressTwiceSameFrame(target: Parameters<typeof fireEvent.pr
   const unexpected = errors.filter((a) => !String(a[0]).includes('overlapping act()'));
   if (unexpected.length) throw new Error(`Unexpected console.error during double tap: ${unexpected.map((a) => String(a[0])).join(' | ')}`);
 }
+
+/** All rendered text plus accessibility labels, in tree order (safe for trees with circular props). */
+export function renderedText(node: unknown): string {
+  if (node == null) return '';
+  if (typeof node === 'string') return node;
+  if (Array.isArray(node)) return node.map(renderedText).join(' ');
+  const n = node as { children?: unknown; props?: { accessibilityLabel?: unknown } };
+  return `${typeof n.props?.accessibilityLabel === 'string' ? n.props.accessibilityLabel : ''} ${renderedText(n.children)}`;
+}

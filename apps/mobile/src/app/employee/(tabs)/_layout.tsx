@@ -13,7 +13,7 @@ const EmployeeTabBar = makeTabBar([
   { name: 'calendar', label: 'Calendar', icon: 'calendar' },
   { name: 'scan', label: 'Scan', icon: 'maximize' },
   { name: 'timesheet', label: 'Timesheet', icon: 'clock' },
-  { name: 'profile', label: 'Profile', icon: 'user' },
+  { name: 'profile', label: 'More', icon: 'menu' },
 ]);
 
 /** Field-optimised navigation for electricians (spec §9). */

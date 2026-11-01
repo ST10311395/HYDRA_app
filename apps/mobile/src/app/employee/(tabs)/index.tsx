@@ -10,7 +10,6 @@ import { StyleSheet, View } from 'react-native';
 import { useEmployeeToday } from '../../../api/queries';
 import { JobCard } from '../../../components/jobs';
 import { BrandHeader, Screen } from '../../../components/layout';
-import { QuickLinks } from '../../../components/QuickLinks';
 import { Badge, Button, Card, EmptyState, Icon, Label, SectionHeader, Text, colors, spacing } from '../../../design-system';
 import { ShiftCard } from '../../../features/ShiftCard';
 import { fmtDate, fmtRelative, fmtTime } from '../../../utils/format';
@@ -48,20 +47,11 @@ export default function EmployeeToday() {
                 <Text variant="h3">{d.nextJob.serviceType.name}</Text>
                 <View style={{ flexDirection: 'row', gap: 6 }}><Icon name="map-pin" size={14} color="textMuted" /><Text variant="bodySmall" color="textMuted" style={{ flex: 1 }}>{d.nextJob.siteAddress}</Text></View>
                 <Text variant="bodySmall" color="textSecondary">Customer: {d.nextJob.customer.name}</Text>
-                <Button label="Scan customer QR on arrival" icon="maximize" onPress={() => router.navigate('/employee/scan')} />
+                <Button label="Scan customer QR on arrival" icon="maximize" size="lg" onPress={() => router.navigate('/employee/scan')} />
               </Card>
             ) : null}
 
-            {d.pendingTasks.length ? (
-              <Card style={{ gap: spacing.sm }}>
-                <Label color="warning">Pending tasks</Label>
-                {d.pendingTasks.map((t) => (
-                  <Button key={t.jobId} label={`${t.jobReference}: ${t.task}`} variant="secondary" size="sm" icon="alert-circle" onPress={() => router.push(`/employee/job/${t.jobId}`)} />
-                ))}
-              </Card>
-            ) : null}
-
-            <SectionHeader title="Today’s jobs" icon="briefcase" />
+            <SectionHeader title="Today’s jobs" icon="briefcase" actionLabel="All jobs" onAction={() => router.push('/employee/jobs')} />
             {d.todaysJobs.length === 0 ? (
               <EmptyState
                 icon="coffee"
@@ -74,6 +64,15 @@ export default function EmployeeToday() {
             ) : d.todaysJobs.map((j) => (
               <JobCard key={j.id} job={j} showCustomer showElectrician={false} onPress={() => router.push(`/employee/job/${j.id}`)} />
             ))}
+
+            {d.pendingTasks.length ? (
+              <Card style={{ gap: spacing.sm }}>
+                <Label color="warning">Pending tasks</Label>
+                {d.pendingTasks.map((t) => (
+                  <Button key={t.jobId} label={`${t.jobReference}: ${t.task}`} variant="secondary" size="sm" icon="alert-circle" onPress={() => router.push(`/employee/job/${t.jobId}`)} />
+                ))}
+              </Card>
+            ) : null}
 
             {d.upcomingJobs.length ? (
               <>
@@ -89,19 +88,6 @@ export default function EmployeeToday() {
               </Card>
             ) : null}
 
-            <SectionHeader title="My workspace" icon="grid" />
-            <QuickLinks links={[
-              { icon: 'briefcase', label: 'Assigned jobs', route: '/employee/jobs' },
-              { icon: 'calendar', label: 'Calendar', route: '/employee/calendar' },
-              { icon: 'maximize', label: 'Scan QR', route: '/employee/scan' },
-              { icon: 'clock', label: d.openShift ? 'Clock out' : 'Clock in', route: '/employee/timesheet' },
-              { icon: 'file-text', label: 'Timesheets', route: '/employee/timesheet' },
-              { icon: 'package', label: 'Materials', route: '/employee/jobs?focus=materials' },
-              { icon: 'award', label: 'Inspection / CoC', route: '/employee/jobs?focus=inspection' },
-              { icon: 'sun', label: 'Leave requests', route: '/employee/leave' },
-              { icon: 'bell', label: 'Notifications', route: '/employee/notifications' },
-              { icon: 'settings', label: 'Profile & settings', route: '/employee/profile' },
-            ]} />
 
             <SectionHeader title="Recent updates" icon="bell" actionLabel="All" onAction={() => router.push('/employee/notifications')} />
             {d.recentNotifications.map((n) => (
