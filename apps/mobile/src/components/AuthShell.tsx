@@ -9,7 +9,8 @@ import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Icon, Label, Text, colors, spacing } from '../design-system';
+import { Icon, Text, colors, spacing } from '../design-system';
+import { BrandBackdrop } from './BrandBackdrop';
 import { BrandLogo } from './BrandLogo';
 import { KEYBOARD_BEHAVIOR } from './layout';
 
@@ -23,14 +24,15 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
       >
+        <BrandBackdrop />
         <Pressable accessibilityRole="button" accessibilityLabel="Back" hitSlop={12} onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} testID="auth-back" style={{ alignSelf: 'flex-start' }}>
           <Icon name="arrow-left" size={22} />
         </Pressable>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <BrandLogo size={52} decorative />
           <View style={{ flex: 1 }}>
-            <Text variant="h3">PSG Electrical</Text>
-            <Label>& Cables · Trite Solar</Label>
+            <Text variant="h3">PSG Electrical & Cables</Text>
+            <Text variant="caption" color="textMuted">Innovation-driven electrical solutions</Text>
           </View>
         </View>
         <View style={{ gap: 6 }}>
