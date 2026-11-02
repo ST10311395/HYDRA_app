@@ -359,7 +359,8 @@ Part 3 (PSG client change requests, branch `feature/part3-client-changes`, 1 Nov
 build passed; tests shared 17 · API 252 · mobile 338, all passing; route audit 229 navigation targets → 88 routes
 (no route removed); expo-doctor 20/21 (11 Expo SDK 57 packages behind the latest patch release — no dependency
 changes were made in Part 3). After the owner-confirmed follow-up (2 November 2026): tests shared 17 · API 254 ·
-mobile 356, all passing; route audit 232 → 88. The change record, acceptance checklist, owner questions and what still needs a
+mobile 356, all passing; route audit 232 → 88. CI follow-up: the 11 Expo SDK 57 packages were moved to the patch
+versions expo-doctor expects (dependency versions only, no code changes); expo-doctor 21/21. The change record, acceptance checklist, owner questions and what still needs a
 device check are in [docs/PART3_CLIENT_CHANGES.md](docs/PART3_CLIENT_CHANGES.md). Databases seeded before Part 3
 keep the old marketing copy until `npm run db:content:refresh -w @hydra/api` (dry run) / `-- --apply` is run with
 the owner's approval.

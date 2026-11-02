@@ -261,3 +261,13 @@ Applied as new commits after the 26 Part 3 commits (none of which were rewritten
 Validation (2 November 2026): lint and typecheck pass; tests shared 17 · API 254 · mobile 356 (34 suites), all
 passing, with no `act()` warnings; route audit 232 navigation targets → 88 routes; Android/iOS and web exports
 pass; Contact, Welcome, Home, Work, Why PSG and Quote checked visually at 320 px.
+
+**CI follow-up (2 November 2026):** the pull request's mobile job failed at `npx expo-doctor` (“Check that
+packages match versions required by installed Expo SDK”: 11 patch-version mismatches). Expo had published newer
+SDK 57 patch releases since `main` last passed on 5 October, so the check had become time-dependent; Part 3 had not
+changed any dependency. The fix sets `apps/mobile/package.json` to the expected versions (`expo` ~57.0.31,
+`expo-router` ~57.0.29, `@expo/ui`, `expo-constants`, `expo-dev-client`, `expo-linking`, `expo-location`,
+`expo-notifications`, `expo-sharing`, `expo-splash-screen`, `jest-expo`) and updates `package-lock.json`
+(Expo packages and their sub-dependencies only). Verified with a clean `npm ci` replica of the CI job: Jest 356,
+route audit, Expo config checks, expo-doctor 21/21, Android/iOS and web exports; lint, typecheck, shared 17 and
+API 254 also pass.
