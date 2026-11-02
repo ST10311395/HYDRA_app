@@ -13,10 +13,11 @@
 import type { PublicContentDto } from '@hydra/shared';
 
 /**
- * Public company content (Part 3). Contact details are the verified ones from the PSG website and
- * portfolio; metrics, accreditations, certifications and testimonials are empty until the owner
- * supplies evidence for them. `emergencyLine` is kept for the API contract but is the normal business
- * line — the app makes no 24/7 or emergency-dispatch claim.
+ * Public company content (Part 3, owner-confirmed 2 November 2026). Contact details are the owner's;
+ * metrics, accreditations, certifications and testimonials stay empty until the owner supplies evidence
+ * for them. `emergencyLine` is kept for the API contract but is the normal business line — the app makes
+ * no 24/7 or emergency-dispatch claim. `established` is unknown (only “25+ years” is confirmed) and is
+ * not displayed.
  */
 export const PUBLIC_CONTENT: PublicContentDto = {
   company: {
@@ -24,8 +25,8 @@ export const PUBLIC_CONTENT: PublicContentDto = {
     tagline: 'Innovation-driven electrical solutions',
     hotline: '082 603 9283',
     emergencyLine: '082 603 9283',
-    whatsapp: '',
-    email: 'keoran@psgelectrical.co.za',
+    whatsapp: '082 603 9283',
+    email: 'info@psgelectrical.co.za',
     established: 0,
   },
   metrics: [],
@@ -159,12 +160,13 @@ export const DEPARTMENTS: readonly { name: string; email: string; phone: string;
 export const FAQS = [
   { category: 'QUOTATION', q: 'How long does a quotation take?', a: 'We review each request and contact you to confirm the scope. Where needed we arrange an on-site assessment before issuing a clear quotation, so timing depends on the size of the job.' },
   { category: 'QUOTATION', q: 'Is a site assessment included?', a: 'Where the scope cannot be confirmed from photos or a description, we arrange an on-site assessment before the quotation is issued.' },
+  { category: 'QUOTATION', q: 'Is your workmanship covered by a warranty?', a: 'Our workmanship carries a 12-month warranty. It covers workmanship only, not supplied equipment or materials; any terms are set out in your quotation.' },
   { category: 'QUOTATION', q: 'Can I accept or decline a quote in the app?', a: 'Yes. Your quote shows labour, materials, VAT and validity. Accepting it lets us schedule the work; declining lets you request an alternative.' },
   { category: 'COMPLIANCE', q: 'Do you issue Certificates of Compliance?', a: 'Yes. Where required, installations are tested and a Certificate of Compliance (CoC) is issued in line with SANS 10142-1.' },
   { category: 'COMPLIANCE', q: 'What should I do if there is a fire, smoke or someone has been shocked?', a: 'Move to safety and contact your local emergency services first. PSG Electrical is not an emergency service. Once everyone is safe, report the fault in the app or call us during office hours.' },
-  { category: 'CONTACT', q: 'When can I contact PSG?', a: 'Our published office hours are 07:00–18:00. You can send a request or report a fault in the app at any time, and we respond during office hours.' },
+  { category: 'CONTACT', q: 'When can I contact PSG?', a: 'Our office hours are Monday to Friday, 07:00–18:00. You can send a request or report a fault in the app at any time, and we respond during office hours. There is no weekend or after-hours service.' },
   { category: 'CONTACT', q: 'How do I request a CoC inspection?', a: 'Choose “Compliance (CoC)” when you request a service or a quote.' },
-  { category: 'CONTACT', q: 'How do I request work for a large commercial or industrial site?', a: 'Use the quote form with as much detail as you can, or email keoran@psgelectrical.co.za.' },
+  { category: 'CONTACT', q: 'How do I request work for a large commercial or industrial site?', a: 'Use the quote form with as much detail as you can, or email info@psgelectrical.co.za. For solar and backup power, email trite@polka.co.za.' },
   { category: 'GENERAL', q: 'Do I need an account to browse services?', a: 'No. Services and company information are available without signing in. An account is only needed to request and track jobs.' },
   { category: 'GENERAL', q: 'How do reward points work?', a: 'You earn 1 point for every R10 of a fully paid invoice. Redeem points for discounts on eligible future invoices from the Rewards tab.' },
 ] as const;

@@ -81,7 +81,7 @@ export const DEFAULT_SEVERITY_POLICY: SeverityPolicy = {
       'Safety escalation — our team has been alerted. If anyone is in danger, move to safety and contact your local emergency services now.', true, true, 'EMERGENCY'),
   ],
   additionalSafetyRules: [],
-  // Published PSG hours are 07:00–18:00; working days still to be confirmed by the owner (Part 3, Q3).
+  // Owner-confirmed office hours: Monday to Friday, 07:00–18:00 (2 November 2026).
   businessHours: { timezone: 'Africa/Johannesburg', days: [1, 2, 3, 4, 5], start: '07:00', end: '18:00' },
   outOfHoursNotice:
     'It is currently outside office hours. Our team will review this at the start of the next business day. If anyone is in danger, contact your local emergency services.',

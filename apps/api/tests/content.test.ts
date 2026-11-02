@@ -35,9 +35,10 @@ describe('Part 3 seed content', () => {
     }
   });
 
-  it('uses the verified PSG contact details and publishes no unverified metrics', () => {
+  it('uses the owner-confirmed contact details and publishes no unverified metrics', () => {
     expect(PUBLIC_CONTENT.company.hotline).toBe('082 603 9283');
-    expect(PUBLIC_CONTENT.company.email).toBe('keoran@psgelectrical.co.za');
+    expect(PUBLIC_CONTENT.company.whatsapp).toBe('082 603 9283');
+    expect(PUBLIC_CONTENT.company.email).toBe('info@psgelectrical.co.za');
     expect(PUBLIC_CONTENT.metrics).toEqual([]);
     expect(PUBLIC_CONTENT.accreditations).toEqual([]);
     expect(PUBLIC_CONTENT.testimonial).toBeNull();
@@ -52,6 +53,19 @@ describe('Part 3 seed content', () => {
       'coc-audits:COMPLIANCE',
       'smart-energy-automation:AUTOMATION',
     ]);
+  });
+
+  it('FAQs give the owner-confirmed hours, both emails and a workmanship-only warranty', () => {
+    const text = allText(FAQS);
+    expect(text).toContain('Monday to Friday, 07:00–18:00');
+    expect(text).toContain('info@psgelectrical.co.za');
+    expect(text).toContain('trite@polka.co.za');
+    expect(text).toMatch(/12-month warranty\. It covers workmanship only, not supplied equipment or materials/);
+    expect(text).not.toMatch(/keoran@|tritesolar/);
+  });
+
+  it('AI triage uses Monday–Friday 07:00–18:00 office hours', () => {
+    expect(DEFAULT_SEVERITY_POLICY.businessHours).toMatchObject({ days: [1, 2, 3, 4, 5], start: '07:00', end: '18:00' });
   });
 
   it('AI triage wording no longer promises 24-hour or 24/7 responses', () => {
