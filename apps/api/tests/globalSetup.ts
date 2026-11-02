@@ -8,8 +8,14 @@
  * TEST_DATABASE_URL points at an existing server (e.g. the CI service container).
  */
 import { rmSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import EmbeddedPostgres from 'embedded-postgres';
+
+// embedded-postgres registers async-exit-hook, whose `beforeExit` handler calls process.exit(0). That
+// replaced Vitest's failure exit code, so a run with failing tests still exited 0 (locally and in CI).
+// Teardown below stops the cluster explicitly; signal handling (Ctrl+C) is left in place.
+(createRequire(__filename)('async-exit-hook') as { unhookEvent: (event: string) => void }).unhookEvent('beforeExit');
 import { runMigrations } from '../src/db/migrate';
 
 // TEST_PG_PORT / TEST_PG_DIR let a run avoid a cluster left behind by an interrupted run.

@@ -17,7 +17,7 @@ import { JobAiSection } from '../../../features/ai/JobAiSection';
 import { BrandHeader, Screen } from '../../../components/layout';
 import { Badge, Button, Card, Divider, KeyValue, Label, Text, TextField, colors, confirm, radius, spacing, toast } from '../../../design-system';
 import { useJobSubscription } from '../../../hooks/useRealtime';
-import { fmtDate, fmtDateTime, invoiceTone, money } from '../../../utils/format';
+import { fmtDate, fmtDateTime, invoiceTone, money, urgencyLabel } from '../../../utils/format';
 import { mapPinUrl, openDirections, openExternal } from '../../../utils/links';
 import { QueryFallback } from '../../../components/QueryState';
 
@@ -64,7 +64,7 @@ export default function AdminJobDetail() {
               <KeyValue label="Requested" value={fmtDateTime(j.createdAt)} />
               {j.preferredDate ? <KeyValue label="Preferred" value={`${fmtDate(j.preferredDate)} · ${WINDOW[j.preferredTimeWindow] ?? j.preferredTimeWindow}`} /> : null}
               {j.scheduledStart ? <KeyValue label="Scheduled" value={`${fmtDateTime(j.scheduledStart)} – ${fmtDateTime(j.scheduledEnd)}`} /> : null}
-              {j.urgency !== 'STANDARD' ? <Badge label={j.urgency} tone={j.urgency === 'EMERGENCY' ? 'danger' : 'warning'} icon="alert-octagon" /> : null}
+              {j.urgency !== 'STANDARD' ? <Badge label={urgencyLabel(j.urgency)} tone={j.urgency === 'EMERGENCY' ? 'danger' : 'warning'} icon="alert-octagon" /> : null}
               {j.cancelledReason ? <Text variant="bodySmall" color="dangerBright">Cancelled: {j.cancelledReason}</Text> : null}
               <View style={{ flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xs }}>
                 <Button label="Directions" icon="navigation" size="sm" variant="secondary" style={{ flex: 1 }} onPress={() => void openDirections({ latitude: j.siteLatitude, longitude: j.siteLongitude, address: j.siteAddress })} />

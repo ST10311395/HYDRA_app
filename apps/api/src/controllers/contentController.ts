@@ -29,7 +29,7 @@ import { paymentMode } from '../integrations/payments';
 const repo = () => new PostgresContentRepository(db());
 
 const FALLBACK_CONTENT: PublicContentDto = {
-  company: { name: 'PSG Electrical & Cables', tagline: 'Electrical & Solar', hotline: '', emergencyLine: '', whatsapp: '', email: '', established: 2008 },
+  company: { name: 'PSG Electrical & Cables', tagline: 'Innovation-driven electrical solutions', hotline: '', emergencyLine: '', whatsapp: '', email: '', established: 0 },
   metrics: [],
   accreditations: [],
   certifications: [],

@@ -62,7 +62,7 @@ function fieldErrorsOf(changes: UpdateProfileInput): Record<string, string> {
 }
 
 /** Shared profile & privacy screen for every role (profile correction, password, Google link, POPIA rights). */
-export function ProfileScreen({ extra, back = false }: { extra?: ReactNode; back?: boolean }) {
+export function ProfileScreen({ extra, top, back = false }: { extra?: ReactNode; top?: ReactNode; back?: boolean }) {
   const sessionUser = useAuth((s) => s.user)!;
   const profile = useProfile();
   // Server copy once loaded; the session copy (same server origin) while the first fetch runs.
@@ -101,6 +101,8 @@ export function ProfileScreen({ extra, back = false }: { extra?: ReactNode; back
           <KeyValue label="Google sign-in" value={me.hasGoogleLink ? 'Linked' : 'Not linked'} valueColor={me.hasGoogleLink ? 'success' : 'textMuted'} />
           {profile.isError ? <Text variant="caption" color="warning">Showing the details from sign-in — {errorMessage(profile.error)}</Text> : null}
         </Card>
+
+        {top}
 
         <EditDetails me={me} ready={!!profile.data} onRetry={() => void profile.refetch()} />
 

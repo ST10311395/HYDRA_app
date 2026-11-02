@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="PSG Electrical &amp; Cables">
+  <!-- Vector redraw of the PSG Electrical & Cables house mark from the owner's company portfolio.
+       Replace with the owner's original artwork when supplied (see docs/PART3_CLIENT_CHANGES.md, Q6). -->
+  <defs>
+    <linearGradient id="psg" x1="0" y1="8" x2="0" y2="94" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#58AEEC"/>
+      <stop offset="0.5" stop-color="#8C6DBB"/>
+      <stop offset="1" stop-color="#DB3A78"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#psg)">
+    <path d="M83.5 94V34.2L49.3 14.7L15 34.2V88H49.4V60" stroke-width="12.2" stroke-linejoin="miter" stroke-miterlimit="4"/>
+    <circle cx="49.3" cy="52.4" r="8.9" stroke-width="8.2"/>
+  </g>
+</svg>

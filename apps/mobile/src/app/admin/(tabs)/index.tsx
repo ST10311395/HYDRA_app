@@ -23,6 +23,8 @@ interface Kpi {
   color: ColorToken;
   route: string;
   alert?: boolean;
+  /** Work waiting on the office (shown first) vs. a status figure. */
+  attention?: boolean;
 }
 
 /** Owner-only modules (hidden from office admins; the API enforces ADMIN_OWNER on each). */
@@ -63,15 +65,15 @@ export default function AdminDashboard() {
   const k = d?.kpis;
   const kpis: Kpi[] = k
     ? [
+        { label: 'New requests', value: String(k.requestedJobs), icon: 'plus-circle', color: 'warning', route: '/admin/jobs?filter=REQUESTED', alert: k.requestedJobs > 0, attention: true },
+        { label: 'New enquiries', value: String(k.newEnquiries), icon: 'inbox', color: 'primaryBright', route: '/admin/enquiries', alert: k.newEnquiries > 0, attention: true },
+        { label: 'Quotes awaiting', value: String(k.quotesAwaiting), icon: 'file-text', color: 'secondaryBright', route: '/admin/jobs?filter=QUOTED', attention: true },
+        { label: 'Missed calls to review', value: String(k.missedCallsToReview), icon: 'phone-missed', color: k.missedCallsToReview ? 'dangerBright' : 'textSecondary', route: '/admin/missed-calls', alert: k.missedCallsToReview > 0, attention: true },
+        { label: 'Pending leave', value: String(k.pendingLeave), icon: 'sun', color: 'warning', route: '/admin/workforce?tab=LEAVE', alert: k.pendingLeave > 0, attention: true },
+        { label: 'Low stock items', value: String(k.lowStockCount), icon: 'package', color: k.lowStockCount ? 'dangerBright' : 'success', route: '/admin/inventory', alert: k.lowStockCount > 0, attention: true },
         { label: 'Active jobs', value: String(k.activeJobs), icon: 'activity', color: 'primaryBright', route: '/admin/jobs?filter=ACTIVE' },
-        { label: 'New requests', value: String(k.requestedJobs), icon: 'plus-circle', color: 'warning', route: '/admin/jobs?filter=REQUESTED', alert: k.requestedJobs > 0 },
-        { label: 'Quotes awaiting', value: String(k.quotesAwaiting), icon: 'file-text', color: 'secondaryBright', route: '/admin/jobs?filter=QUOTED' },
-        { label: 'Invoices outstanding', value: `${k.invoicesOutstanding} · ${money(k.outstandingAmount)}`, icon: 'credit-card', color: 'warning', route: '/admin/invoices' },
-        { label: 'Low stock items', value: String(k.lowStockCount), icon: 'package', color: k.lowStockCount ? 'dangerBright' : 'success', route: '/admin/inventory', alert: k.lowStockCount > 0 },
         { label: 'Staff clocked in', value: String(k.staffClockedIn), icon: 'clock', color: 'success', route: '/admin/workforce' },
-        { label: 'Pending leave', value: String(k.pendingLeave), icon: 'sun', color: 'warning', route: '/admin/workforce?tab=LEAVE', alert: k.pendingLeave > 0 },
-        { label: 'New enquiries', value: String(k.newEnquiries), icon: 'inbox', color: 'primaryBright', route: '/admin/enquiries', alert: k.newEnquiries > 0 },
-        { label: 'Missed calls to review', value: String(k.missedCallsToReview), icon: 'phone-missed', color: k.missedCallsToReview ? 'dangerBright' : 'textSecondary', route: '/admin/missed-calls', alert: k.missedCallsToReview > 0 },
+        { label: 'Invoices outstanding', value: `${k.invoicesOutstanding} · ${money(k.outstandingAmount)}`, icon: 'credit-card', color: 'warning', route: '/admin/invoices' },
         { label: 'Revenue this month', value: money(k.revenueThisMonth), icon: 'trending-up', color: 'success', route: role === 'ADMIN_OWNER' ? '/admin/reports' : '/admin/invoices' },
       ]
     : [];
@@ -87,18 +89,23 @@ export default function AdminDashboard() {
               <Text variant="h1">Operations Center</Text>
             </View>
             <SmartQuoteCard />
-            <View style={styles.grid}>
-              {kpis.map((x) => (
-                <Card key={x.label} style={styles.kpi} onPress={() => router.push(x.route as never)} accessibilityLabel={`${x.label}: ${x.value}`} accent={x.alert ? 'primary' : 'none'}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Icon name={x.icon} size={18} color={x.color} />
-                    {x.alert ? <View style={styles.alert} /> : null}
-                  </View>
-                  <Text variant="h2" color={x.color} numberOfLines={1} adjustsFontSizeToFit>{x.value}</Text>
-                  <Text variant="caption" color="textMuted">{x.label}</Text>
-                </Card>
-              ))}
-            </View>
+            {([['Needs attention', true], ['At a glance', false]] as const).map(([title, attention]) => (
+              <View key={title} style={{ gap: spacing.sm }} testID={attention ? 'kpis-attention' : 'kpis-glance'}>
+                <Label>{title}</Label>
+                <View style={styles.grid}>
+                  {kpis.filter((x) => !!x.attention === attention).map((x) => (
+                    <Card key={x.label} style={styles.kpi} onPress={() => router.push(x.route as never)} accessibilityLabel={`${x.label}: ${x.value}`} accent={x.alert ? 'primary' : 'none'}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Icon name={x.icon} size={18} color={x.color} />
+                        {x.alert ? <View style={styles.alert} /> : null}
+                      </View>
+                      <Text variant="h2" color={x.color} numberOfLines={1} adjustsFontSizeToFit>{x.value}</Text>
+                      <Text variant="caption" color="textMuted">{x.label}</Text>
+                    </Card>
+                  ))}
+                </View>
+              </View>
+            ))}
 
             {role === 'ADMIN_OWNER' ? (
               <Card accent="secondary" style={{ gap: spacing.md }} testID="owner-tools">
@@ -117,8 +124,8 @@ export default function AdminDashboard() {
               </Card>
             ) : null}
 
-            <SectionHeader title="Urgent / emergency" icon="alert-octagon" />
-            {d.urgentJobs.length === 0 ? <Text variant="bodySmall" color="textMuted">No open emergency jobs.</Text> : d.urgentJobs.map((j) => (
+            <SectionHeader title="Urgent faults" icon="alert-octagon" />
+            {d.urgentJobs.length === 0 ? <Text variant="bodySmall" color="textMuted">No urgent faults open.</Text> : d.urgentJobs.map((j) => (
               <JobCard key={j.id} job={j} showCustomer onPress={() => router.push(`/admin/job/${j.id}`)} />
             ))}
 

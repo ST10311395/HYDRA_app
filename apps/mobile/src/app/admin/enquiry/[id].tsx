@@ -13,7 +13,7 @@ import { api, errorMessage } from '../../../api/client';
 import { useEnquiry, useServices, useSimpleMutation } from '../../../api/queries';
 import { BrandHeader, Screen } from '../../../components/layout';
 import { Badge, Button, Card, Checkbox, KeyValue, Label, SelectField, Text, TextField, colors, spacing, toast } from '../../../design-system';
-import { fmtDateTime } from '../../../utils/format';
+import { fmtDateTime, urgencyLabel } from '../../../utils/format';
 import { useSyncFrom } from '../../../hooks/useSyncFrom';
 import { callNumber, sendEmail } from '../../../utils/links';
 import { QueryFallback } from '../../../components/QueryState';
@@ -49,7 +49,7 @@ export default function EnquiryDetail() {
               <KeyValue label="Email" value={e.email} />
               <KeyValue label="Phone" value={e.phone} />
               <KeyValue label="Sector" value={e.sector ?? '—'} />
-              <KeyValue label="Urgency" value={e.urgency} valueColor={e.urgency === 'EMERGENCY' ? 'dangerBright' : 'text'} />
+              <KeyValue label="Urgency" value={urgencyLabel(e.urgency)} valueColor={e.urgency === 'EMERGENCY' ? 'dangerBright' : 'text'} />
               <KeyValue label="Received" value={fmtDateTime(e.submittedAt)} />
               <KeyValue label="Assigned to" value={e.assignedAdminName ?? 'Unassigned'} />
               <View style={{ flexDirection: 'row', gap: spacing.sm }}>

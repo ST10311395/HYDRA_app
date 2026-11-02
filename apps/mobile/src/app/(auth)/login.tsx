@@ -85,6 +85,16 @@ export default function LoginScreen() {
         <Link href="/forgot-password" style={{ alignSelf: 'center' }}><Text variant="bodySmall" color="primaryBright">Forgot password?</Text></Link>
       </View>
 
+      <View style={{ gap: spacing.sm }}>
+        {audience === 'customer' ? (
+          <Button label="Create an account" icon="user-plus" variant="secondary" onPress={() => router.push('/register')} testID="login-register" />
+        ) : null}
+        <Button label="Continue as guest" iconRight="arrow-right" variant="ghost" size="sm" testID="login-guest" onPress={() => {
+          useAuth.getState().continueAsGuest();
+          router.replace('/home');
+        }} />
+      </View>
+
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
         <Divider style={{ flex: 1 }} />
         <Text variant="caption" color="textMuted">OR</Text>
@@ -105,21 +115,11 @@ export default function LoginScreen() {
         </View>
       )}
 
-      {audience === 'customer' ? (
-        <View style={{ flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 6 }}>
-          <Text variant="bodySmall" color="textMuted">New customer?</Text>
-          <Link href="/register"><Text variant="bodySmall" color="primaryBright" weight="bold">Create an account</Text></Link>
-        </View>
-      ) : null}
       <Text variant="caption" color="textFaint" align="center">
         {audience === 'staff'
           ? 'Staff accounts are created by the office. Your electrician, office or owner workspace opens automatically after sign-in. Google sign-in works for staff only after linking it from your profile.'
           : 'One sign-in for everyone — staff are taken to their workspace automatically.'}
       </Text>
-      <Button label="Continue as guest" variant="ghost" size="sm" onPress={() => {
-        useAuth.getState().continueAsGuest();
-        router.replace('/home');
-      }} />
     </AuthShell>
   );
 }

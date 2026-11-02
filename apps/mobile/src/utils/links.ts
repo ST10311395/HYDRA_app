@@ -11,9 +11,14 @@ import { toast } from '../design-system';
  * launcher. Each action opens its specific handler — never a generic share sheet.
  */
 
-/** `tel:` URL with only digits and a leading +; null when there is nothing dialable. */
+/** `tel:` URL with only digits and a leading +. Check `isDialable` first. */
 export function telUrl(phone: string): string {
   return `tel:${phone.replace(/[^\d+]/g, '')}`;
+}
+
+/** At least a full local number (e.g. 082 603 9283); rejects blanks and fragments such as an extension. */
+export function isDialable(phone: string | null | undefined): phone is string {
+  return !!phone && phone.replace(/\D/g, '').length >= 9;
 }
 
 export function mailtoUrl(email: string, subject?: string): string {
@@ -71,8 +76,16 @@ export async function openExternal(url: string | null | undefined, fallback?: st
   }
 }
 
-export const callNumber = (phone: string | null | undefined) =>
-  openExternal(phone ? telUrl(phone) : null, phone ? `Calling isn’t available on this device. Dial ${phone}.` : 'No phone number on record.');
+/**
+ * Opens the phone dialer. Desktop browsers often accept `tel:` without any handler, so on the web the
+ * number is also shown, ensuring the user can always dial it manually.
+ */
+export async function callNumber(phone: string | null | undefined, os: string = Platform.OS): Promise<boolean> {
+  if (!isDialable(phone)) return openExternal(null, 'No phone number on record.');
+  const opened = await openExternal(telUrl(phone), `Calling isn’t available on this device. Dial ${phone}.`);
+  if (opened && os === 'web') toast.info(`Call ${phone}`);
+  return opened;
+}
 
 export const sendEmail = (email: string | null | undefined, subject?: string) =>
   openExternal(email ? mailtoUrl(email, subject) : null, email ? `No email app found. Write to ${email}.` : 'No email address on record.');

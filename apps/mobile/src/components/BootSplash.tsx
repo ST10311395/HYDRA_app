@@ -4,22 +4,19 @@
  * Meta Platforms, Inc. 2026. React Native documentation. Available at: https://reactnative.dev/docs/getting-started [Accessed 21 August 2026].
  * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
  */
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { Icon, colors, radius, spacing } from '../design-system';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { colors, spacing } from '../design-system';
+import { LogoLockup } from './LogoLockup';
 
 /**
  * Branded placeholder shown while fonts load and the stored session is restored, so the public
- * home page never flashes before the user's role is known. Uses system fonts on purpose: the
- * brand fonts may not be loaded yet.
+ * home page never flashes before the user's role is known. Image only (no text), so it never
+ * depends on the brand fonts having loaded.
  */
 export function BootSplash() {
   return (
     <View style={styles.root} accessibilityRole="progressbar" accessibilityLabel="Loading PSG Electrical" testID="boot-splash">
-      <View style={styles.logo}>
-        <Icon name="zap" size={36} color="white" />
-      </View>
-      <Text style={styles.title}>PSG Electrical</Text>
-      <Text style={styles.subtitle}>& Cables · Trite Solar</Text>
+      <LogoLockup maxWidth={300} />
       <ActivityIndicator color={colors.primaryBright} style={{ marginTop: spacing.xl }} />
     </View>
   );
@@ -27,7 +24,4 @@ export function BootSplash() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background, padding: spacing.xl },
-  logo: { width: 76, height: 76, borderRadius: radius.xl, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.lg },
-  title: { color: colors.text, fontSize: 24, fontWeight: '800', textAlign: 'center' },
-  subtitle: { color: colors.textMuted, fontSize: 14, marginTop: 4, textAlign: 'center' },
 });

@@ -76,8 +76,12 @@ export function canAccessPath(path: string, status: SessionStatus, role: Role | 
   return true;
 }
 
-/** Owner-only admin modules; the API enforces ADMIN_OWNER on the matching endpoints. */
-export const OWNER_ONLY_PATHS = ['/admin/reports', '/admin/exports', '/admin/audit', '/admin/staff', '/admin/data-requests'] as const;
+/**
+ * Owner-only admin modules — the single source of truth for the admin stack guard, the Manage menu
+ * and the owner tools. The API independently enforces ADMIN_OWNER on the matching endpoints (AI settings:
+ * office admins may read the configuration, only the owner may change it).
+ */
+export const OWNER_ONLY_PATHS = ['/admin/reports', '/admin/exports', '/admin/audit', '/admin/staff', '/admin/data-requests', '/admin/ai-settings'] as const;
 
 export function isOwnerOnlyPath(path: string): boolean {
   const p = path.split('?')[0]!;

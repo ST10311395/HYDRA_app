@@ -6,26 +6,34 @@
  * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
  */
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { View } from 'react-native';
 import { useAiSummary } from '../../../api/ai';
 import { useAdminDashboard } from '../../../api/queries';
 import { useIsOwner } from '../../../components/admin';
 import { SegmentLink } from '../../../components/jobs';
 import { BrandHeader, Screen } from '../../../components/layout';
-import { Badge, Button, Label, Text, colors, confirm, spacing, type IconName } from '../../../design-system';
+import { Badge, Button, EmptyState, Label, SearchField, Text, colors, confirm, spacing, type IconName } from '../../../design-system';
+import { isOwnerOnlyPath } from '../../../navigation/guards';
 import { useAuth } from '../../../store/auth';
+
+/** Case-insensitive match on the item label or its group name. */
+const matches = (i: { label: string }, group: string, q: string) => !q.trim() || `${i.label} ${group}`.toLowerCase().includes(q.trim().toLowerCase());
 
 interface Item {
   icon: IconName;
   label: string;
   route: string;
-  owner?: boolean;
   badge?: string;
 }
 
-/** “More” drawer for the smaller-device tab pattern (spec §10): finance, inventory, comms, reports and settings. */
+/**
+ * “Manage” (formerly More): every office and owner module in labelled groups, with a search box so
+ * nothing needs menu hunting (Part 3). Owner-only modules are listed for owners only.
+ */
 export default function More() {
   const owner = useIsOwner();
+  const [search, setSearch] = useState('');
   const user = useAuth((s) => s.user);
   const dash = useAdminDashboard();
   const ai = useAiSummary();
@@ -37,7 +45,7 @@ export default function More() {
         { icon: 'cpu', label: 'AI Review', route: '/admin/ai-review', badge: ai.data?.critical ? `${ai.data.critical} CRITICAL` : ai.data?.needsReview ? String(ai.data.needsReview) : undefined },
         { icon: 'book-open', label: 'AI Knowledge', route: '/admin/ai-knowledge' },
         { icon: 'bar-chart-2', label: 'AI analytics', route: '/admin/ai-analytics' },
-        { icon: 'sliders', label: 'AI Assistant settings', route: '/admin/ai-settings', owner: true },
+        { icon: 'sliders', label: 'AI Assistant settings', route: '/admin/ai-settings' },
       ],
     },
     {
@@ -63,16 +71,16 @@ export default function More() {
       items: [
         { icon: 'users', label: 'Customers', route: '/admin/customers' },
         { icon: 'grid', label: 'Service types', route: '/admin/services' },
-        { icon: 'user-check', label: 'Staff accounts', route: '/admin/staff', owner: true },
+        { icon: 'user-check', label: 'Staff accounts', route: '/admin/staff' },
       ],
     },
     {
       title: 'Owner / manager',
       items: [
-        { icon: 'bar-chart-2', label: 'Reports', route: '/admin/reports', owner: true },
-        { icon: 'download', label: 'Data exports', route: '/admin/exports', owner: true },
-        { icon: 'list', label: 'Audit log', route: '/admin/audit', owner: true },
-        { icon: 'shield', label: 'POPIA data requests', route: '/admin/data-requests', owner: true },
+        { icon: 'bar-chart-2', label: 'Reports', route: '/admin/reports' },
+        { icon: 'download', label: 'Data exports', route: '/admin/exports' },
+        { icon: 'list', label: 'Audit log', route: '/admin/audit' },
+        { icon: 'shield', label: 'POPIA data requests', route: '/admin/data-requests' },
       ],
     },
     {
@@ -88,7 +96,7 @@ export default function More() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <BrandHeader section="More" />
+      <BrandHeader section="Manage" />
       <Screen onRefresh={() => void dash.refetch()} refreshing={dash.isRefetching}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.sm, flexWrap: 'wrap' }}>
           <View style={{ flexShrink: 1 }}>
@@ -97,8 +105,12 @@ export default function More() {
           </View>
           {owner ? <Badge label="Owner privileges" icon="key" tone="secondary" mono={false} /> : null}
         </View>
+        <SearchField value={search} onChangeText={setSearch} placeholder="Search, e.g. invoices, payroll, stock" />
+        {search.trim() && !groups.some((g) => g.items.some((i) => (owner || !isOwnerOnlyPath(i.route)) && matches(i, g.title, search))) ? (
+          <EmptyState icon="search" title="Nothing matches" message="Try another word, such as “quote”, “staff” or “CoC”." />
+        ) : null}
         {groups.map((g) => {
-          const items = g.items.filter((i) => !i.owner || owner);
+          const items = g.items.filter((i) => (owner || !isOwnerOnlyPath(i.route)) && matches(i, g.title, search));
           if (!items.length) return null;
           return (
             <View key={g.title} style={{ gap: spacing.sm }}>

@@ -12,11 +12,12 @@ import { KeyboardAvoidingView, Modal, Platform, Pressable, RefreshControl, Scrol
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ROLE_LABELS, type Paginated } from '@hydra/shared';
 import { api } from '../api/client';
-import { usePublicContent } from '../api/queries';
-import { Button, Icon, IconButton, Text, colors, confirm, radius, spacing, type IconName } from '../design-system';
+import { Button, Icon, IconButton, Text, colors, confirm, layout, radius, spacing, type IconName } from '../design-system';
 import { homeForRole, useAuth } from '../store/auth';
 import { useNetwork } from '../hooks/useNetwork';
+import { PSG_CONTACT } from '../content/company';
 import { callNumber } from '../utils/links';
+import { BrandLogo } from './BrandLogo';
 
 export const TAB_BAR_HEIGHT = 64;
 
@@ -101,25 +102,21 @@ const ROLE_AREA = {
   ADMIN_OWNER: { base: '/admin', dashboard: 'Operations centre (owner)' },
 } as const;
 
-/** Below this width the Emergency action collapses to its icon so the brand never truncates. */
-const COMPACT_HEADER_WIDTH = 410;
 
 const initialsOf = (u: { firstName: string; lastName: string }) => `${u.firstName[0] ?? ''}${u.lastName[0] ?? ''}`.toUpperCase();
 
 /**
- * Brand header from the wireframes: PSG Electrical mark, Emergency CTA, call and the account /
- * notifications action, then a “Portal › Section” breadcrumb with the ISO 9001 chip and a blue rule.
+ * Brand header: PSG logo and name, a call button that dials the verified business line, and the
+ * account / notifications action, then a “Portal › Section” breadcrumb and a blue rule. Kept to
+ * three elements so the full company name fits on small Android phones (Part 3 client request).
  */
 export function BrandHeader({ section, back }: { section: string; back?: boolean }) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const compact = width < COMPACT_HEADER_WIDTH;
-  const content = usePublicContent();
+  const compact = width < layout.compactWidth;
   const user = useAuth((s) => s.user);
   const unread = useUnreadCount();
   const [menuOpen, setMenuOpen] = useState(false);
-  const hotline = content.data?.company.hotline;
-  const emergency = content.data?.company.emergencyLine ?? hotline;
   return (
     <View style={{ backgroundColor: colors.background, paddingTop: insets.top }}>
       <View style={[styles.brandRow, compact ? { paddingHorizontal: spacing.md, gap: 6 } : null]}>
@@ -129,30 +126,13 @@ export function BrandHeader({ section, back }: { section: string; back?: boolean
           onPress={() => router.navigate(user ? homeForRole(user.role) : '/home')}
           style={styles.brand}
         >
-          <View style={[styles.logo, compact ? { width: 38, height: 38 } : null]}>
-            <Icon name="zap" size={compact ? 18 : 20} color="white" />
-            <View style={styles.logoDot} />
-          </View>
+          <BrandLogo size={compact ? 36 : 40} decorative />
           <View style={styles.brandText}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Text variant="h3" style={{ fontSize: compact ? 15 : 16, lineHeight: compact ? 19 : 21, flexShrink: 1 }} numberOfLines={2}>PSG Electrical</Text>
-              {!compact ? <View style={styles.pro}><Text variant="caption" color="textMuted" style={{ fontSize: 10 }}>PRO</Text></View> : null}
-            </View>
-            <Text variant="caption" color="textMuted" style={{ fontSize: compact ? 11 : 12, lineHeight: compact ? 14 : 16 }} numberOfLines={2}>& Cables · South Africa</Text>
+            <Text variant="h3" style={{ fontSize: compact ? 15 : 16, lineHeight: compact ? 19 : 21 }} numberOfLines={2}>PSG Electrical</Text>
+            <Text variant="caption" color="textMuted" style={{ fontSize: compact ? 11 : 12, lineHeight: compact ? 14 : 16 }} numberOfLines={2}>& Cables</Text>
           </View>
         </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Emergency: call the 24/7 line"
-          disabled={!emergency}
-          onPress={() => emergency && void callNumber(emergency)}
-          style={({ pressed }) => [styles.emergency, compact ? styles.emergencyCompact : null, { opacity: pressed ? 0.85 : 1 }]}
-          testID="header-emergency"
-        >
-          <Icon name="shield" size={compact ? 17 : 15} color="white" />
-          {!compact ? <Text variant="caption" weight="bold" color="white" style={{ fontSize: 13 }}>Emergency</Text> : null}
-        </Pressable>
-        <IconButton icon="phone-call" label="Call PSG Electrical" size={compact ? 38 : 40} onPress={() => hotline && void callNumber(hotline)} />
+        <IconButton icon="phone-call" label={`Call PSG Electrical on ${PSG_CONTACT.primaryPhone}`} size={compact ? 38 : 40} onPress={() => void callNumber(PSG_CONTACT.primaryPhone)} />
         <AccountButton size={compact ? 38 : 40} unread={unread} onPress={() => setMenuOpen(true)} />
       </View>
       <View style={[styles.crumbRow, compact ? { paddingHorizontal: spacing.md } : null]}>
@@ -164,10 +144,6 @@ export function BrandHeader({ section, back }: { section: string; back?: boolean
         <Text variant="bodySmall" color="textMuted">Portal</Text>
         <Icon name="chevron-right" size={14} color="textMuted" />
         <Text variant="title" weight="bold" numberOfLines={2} style={{ flex: 1 }} accessibilityRole="header">{section}</Text>
-        <View style={styles.iso}>
-          <Icon name="check-circle" size={12} color="secondaryBright" />
-          <Text variant="caption" weight="bold" style={{ fontSize: 12 }}>ISO 9001</Text>
-        </View>
       </View>
       <View style={styles.rule} />
       <AccountMenu visible={menuOpen} unread={unread} onClose={() => setMenuOpen(false)} />
@@ -284,11 +260,6 @@ const styles = StyleSheet.create({
   brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm },
   brand: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 },
   brandText: { flex: 1, minWidth: 0 },
-  logo: { width: 42, height: 42, borderRadius: radius.md, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  logoDot: { position: 'absolute', top: -2, right: -2, width: 10, height: 10, borderRadius: 5, backgroundColor: colors.primaryBright, borderWidth: 2, borderColor: colors.background },
-  pro: { borderWidth: 1, borderColor: colors.borderStrong, borderRadius: radius.pill, paddingHorizontal: 5 },
-  emergency: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.danger, borderRadius: radius.md, paddingHorizontal: 12, height: 40 },
-  emergencyCompact: { paddingHorizontal: 0, width: 38, height: 38, justifyContent: 'center' },
   account: { alignItems: 'center', justifyContent: 'center', borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface },
   avatar: { borderRadius: radius.pill, backgroundColor: colors.primary, borderColor: colors.primaryBorder, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   unreadDot: { position: 'absolute', top: -1, right: -1, width: 11, height: 11, borderRadius: 6, backgroundColor: colors.dangerBright, borderWidth: 2, borderColor: colors.background },
@@ -298,7 +269,6 @@ const styles = StyleSheet.create({
   menuItem: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: 50, paddingHorizontal: spacing.md, borderRadius: radius.md, backgroundColor: colors.surfaceElevated },
   menuBadge: { minWidth: 22, height: 22, borderRadius: 11, paddingHorizontal: 6, backgroundColor: colors.danger, alignItems: 'center', justifyContent: 'center' },
   crumbRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: spacing.lg, paddingVertical: 10, backgroundColor: colors.surface },
-  iso: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.backgroundDeep, borderRadius: radius.sm, paddingHorizontal: 8, paddingVertical: 4 },
   rule: { height: 2, backgroundColor: colors.primary, opacity: 0.85 },
   footer: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing.lg, paddingTop: spacing.md, backgroundColor: colors.background, borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.border },
   offline: { flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', paddingVertical: 6, backgroundColor: colors.warningMuted },

@@ -65,20 +65,19 @@ describe('responsive brand header', () => {
     signOutState();
     await renderScreen(<BrandHeader section="Home" />);
     expect(screen.getByText('PSG Electrical')).toBeOnTheScreen();
-    expect(screen.getByText('& Cables · South Africa')).toBeOnTheScreen();
-    // Emergency collapses to its icon but stays a labelled, tappable action.
-    expect(screen.getByLabelText('Emergency: call the 24/7 line')).toBeOnTheScreen();
-    expect(screen.queryByText('Emergency')).toBeNull();
-    expect(screen.getByLabelText('Call PSG Electrical')).toBeOnTheScreen();
+    expect(screen.getByText('& Cables')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Call PSG Electrical on 082 603 9283')).toBeOnTheScreen();
     expect(screen.getByTestId('header-account')).toBeOnTheScreen();
   });
 
-  it('shows the Emergency label and PRO mark when there is room', async () => {
+  it('carries no 24/7 emergency button or unverified certification chip (Part 3 client request)', async () => {
     setWidth(430);
     signOutState();
     await renderScreen(<BrandHeader section="Home" />);
-    expect(screen.getByText('Emergency')).toBeOnTheScreen();
-    expect(screen.getByText('PRO')).toBeOnTheScreen();
+    expect(screen.queryByText('Emergency')).toBeNull();
+    expect(screen.queryByLabelText(/24\/7/)).toBeNull();
+    expect(screen.queryByText('ISO 9001')).toBeNull();
+    expect(screen.queryByText('PRO')).toBeNull();
   });
 
   it('never ellipsises the brand name to a single line', async () => {
@@ -86,18 +85,17 @@ describe('responsive brand header', () => {
     signOutState();
     await renderScreen(<BrandHeader section="A very long section title for a narrow phone" />);
     expect(screen.getByText('PSG Electrical').props.numberOfLines).toBeGreaterThan(1);
-    expect(screen.getByText('& Cables · South Africa').props.numberOfLines).toBeGreaterThan(1);
+    expect(screen.getByText('& Cables').props.numberOfLines).toBeGreaterThan(1);
   });
 });
 
 describe('header at every common phone width', () => {
-  it.each([320, 360, 390, 412, 430])('%ddp: brand, emergency, call and account are all present and labelled (signed in)', async (width) => {
+  it.each([320, 360, 390, 412, 430])('%ddp: brand, call and account are all present and labelled (signed in)', async (width) => {
     setWidth(width);
     signInAs('CUSTOMER', { firstName: 'Lerato', lastName: 'Khumalo' });
     await renderScreen(<BrandHeader section="My Dashboard" />);
     expect(screen.getByText('PSG Electrical')).toBeOnTheScreen();
-    expect(screen.getByLabelText('Emergency: call the 24/7 line')).toBeOnTheScreen();
-    expect(screen.getByLabelText('Call PSG Electrical')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Call PSG Electrical on 082 603 9283')).toBeOnTheScreen();
     expect(await screen.findByLabelText(/^Account menu for Lerato/)).toBeOnTheScreen();
     expect(screen.getByText('LK')).toBeOnTheScreen();
   });

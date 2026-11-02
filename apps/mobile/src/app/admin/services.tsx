@@ -13,13 +13,8 @@ import { useServices, useSimpleMutation } from '../../api/queries';
 import { parseAmount } from '../../components/admin';
 import { BrandHeader } from '../../components/layout';
 import { Badge, Button, Card, Checkbox, EmptyState, Icon, Label, SelectField, Text, TextField, colors, spacing, toast } from '../../design-system';
-import { SERVICE_ICON, money } from '../../utils/format';
+import { SERVICE_CATEGORY_LABEL as CATEGORY_LABEL, SERVICE_ICON, money } from '../../utils/format';
 import { QueryFallback, notReady } from '../../components/QueryState';
-
-const CATEGORY_LABEL: Record<ServiceCategory, string> = {
-  SOLAR: 'Solar & renewables', CABLING: 'Industrial cabling & fibre', SUBSTATIONS: 'High-voltage & substations',
-  EMERGENCY: 'Emergency repairs', COMPLIANCE: 'Compliance & CoC', AUTOMATION: 'Smart energy & automation',
-};
 
 /** Structured service types (spec §5.4) — the catalogue customers choose from when requesting work. */
 export default function ServiceTypes() {
@@ -79,7 +74,7 @@ function ServiceForm({ service, onDone }: { service?: ServiceTypeDto; onDone: ()
         <View style={{ flex: 1 }}><TextField label="Display order" value={f.displayOrder} onChangeText={(v) => setF({ ...f, displayOrder: v })} keyboardType="number-pad" /></View>
       </View>
       <TextField label="SLA text (optional)" value={f.slaText} onChangeText={(v) => setF({ ...f, slaText: v })} maxLength={80} placeholder="e.g. 4-hour response" />
-      <TextField label="Badge (optional)" value={f.badge} onChangeText={(v) => setF({ ...f, badge: v })} maxLength={40} placeholder="e.g. 24/7" />
+      <TextField label="Badge (optional)" value={f.badge} onChangeText={(v) => setF({ ...f, badge: v })} maxLength={40} placeholder="e.g. Trite Solar" />
       <Checkbox checked={f.isActive} onChange={(v) => setF({ ...f, isActive: v })} label="Visible to customers" />
       <View style={{ flexDirection: 'row', gap: spacing.sm }}>
         <Button label="Cancel" variant="secondary" style={{ flex: 1 }} onPress={onDone} />

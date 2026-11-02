@@ -14,6 +14,7 @@ import { useAiStatus } from '../../../api/ai';
 import { api, ApiError, errorMessage, newIdempotencyKey } from '../../../api/client';
 import { BrandHeader, Screen } from '../../../components/layout';
 import { Button, Card, Label, Segmented, Text, TextField, colors, spacing, toast } from '../../../design-system';
+import { URGENCY_OPTIONS } from '../../../utils/format';
 import { SimulationBanner } from '../../../features/ai/components';
 import { PhotoPicker, type UploadedPhoto } from '../../../features/photos';
 
@@ -76,7 +77,7 @@ export default function NewAssessment() {
           <TextField label="Suburb / town (optional)" value={siteArea} onChangeText={setSiteArea} placeholder="e.g. Umhlanga" icon="map-pin" helper="We only ask for the full address if you accept a proposal." />
           <View style={{ gap: 6 }}>
             <Text variant="title" weight="bold">How urgent does it feel?</Text>
-            <Segmented tone="danger" value={urgency} onChange={setUrgency} options={[{ value: 'STANDARD', label: 'Not urgent' }, { value: 'HIGH', label: 'Soon' }, { value: 'EMERGENCY', label: 'Emergency' }]} />
+            <Segmented tone="danger" value={urgency} onChange={setUrgency} options={URGENCY_OPTIONS} />
           </View>
         </Card>
         <Text variant="caption" color="textMuted">{status.data?.disclaimer}</Text>

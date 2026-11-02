@@ -4,7 +4,7 @@
  */
 /**
  * Indicative project scope estimator (Our Services wireframe). It gives a planning guide only —
- * the binding figure is always the engineer-reviewed quotation.
+ * the final figure is always the quotation issued after the scope is assessed.
  */
 export type Sector = 'industrial' | 'commercial' | 'residential';
 

@@ -2,7 +2,7 @@
  * Code Attribution
  * Microsoft. 2026. TypeScript documentation. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
  */
-import { JOB_STATUS_LABELS, formatZar, type InvoiceStatus, type JobStatus, type MissedCallStatus } from '@hydra/shared';
+import { JOB_STATUS_LABELS, formatZar, type InvoiceStatus, type JobStatus, type MissedCallStatus, type ServiceCategory } from '@hydra/shared';
 import type { IconName } from '../design-system/Icon';
 
 export const money = formatZar;
@@ -100,10 +100,36 @@ export const MISSED_TONE: Record<MissedCallStatus, 'primary' | 'success' | 'warn
 export const SERVICE_ICON: Record<string, IconName> = {
   SOLAR: 'sun',
   CABLING: 'git-merge',
-  SUBSTATIONS: 'zap',
-  EMERGENCY: 'alert-triangle',
+  SUBSTATIONS: 'grid',
+  EMERGENCY: 'search',
   COMPLIANCE: 'shield',
-  AUTOMATION: 'cpu',
+  AUTOMATION: 'tool',
+};
+
+/**
+ * Customer-facing names for the stored service categories, aligned with the PSG website (Part 3).
+ * The enum values themselves are unchanged so existing jobs and quotes still resolve.
+ */
+/**
+ * Customer-facing urgency labels (Part 3 brief §6). The stored values STANDARD | HIGH | EMERGENCY and
+ * all triage logic are unchanged; only the wording is neutral, with no turnaround promise.
+ */
+export const URGENCY_OPTIONS: { value: 'STANDARD' | 'HIGH' | 'EMERGENCY'; label: string }[] = [
+  { value: 'STANDARD', label: 'Standard' },
+  { value: 'HIGH', label: 'Priority' },
+  { value: 'EMERGENCY', label: 'Urgent fault' },
+];
+
+/** Customer-facing label for a stored urgency value (never the raw enum). */
+export const urgencyLabel = (u: string): string => URGENCY_OPTIONS.find((o) => o.value === u)?.label ?? u;
+
+export const SERVICE_CATEGORY_LABEL: Record<ServiceCategory, string> = {
+  CABLING: 'Electrical installations',
+  EMERGENCY: 'Fault finding',
+  SUBSTATIONS: 'Distribution boards',
+  COMPLIANCE: 'Compliance (CoC)',
+  AUTOMATION: 'Maintenance & repairs',
+  SOLAR: 'Solar & backup power',
 };
 
 export const initials = (name: string) =>

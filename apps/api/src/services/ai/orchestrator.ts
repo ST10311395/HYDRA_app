@@ -168,7 +168,7 @@ function assistantMessage(outcome: AiOutcome, severity: number, cfg: AiConfig, o
     default: {
       const base = opts.providerFailed ? AI_PROVIDER_FAILURE_MESSAGE : AI_ESCALATION_MESSAGE;
       const urgent = severity >= 4
-        ? ` ${level.customerWording} If the situation gets worse — smoke, sparking or a burning smell — keep away from the equipment and call our 24/7 emergency line.`
+        ? ` ${level.customerWording} If the situation gets worse — smoke, sparking or a burning smell — keep away from the equipment and contact your local emergency services.`
         : '';
       return { kind: 'ESCALATION_NOTICE', body: `${base}${urgent}${oh}` };
     }

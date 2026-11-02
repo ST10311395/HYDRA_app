@@ -12,10 +12,20 @@ import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import type { PartnerDto, PortfolioItemDto, ServiceTypeDto, TeamMemberDto } from '@hydra/shared';
 import { usePublicContent } from '../api/queries';
-import { Badge, Button, Card, Icon, Label, Text, colors, radius, spacing, type IconName } from '../design-system';
-import { SERVICE_ICON, initials, monthYear } from '../utils/format';
+import { Badge, Button, Card, HIT, Icon, Label, Text, colors, radius, spacing, type IconName } from '../design-system';
+import { SERVICE_CATEGORY_LABEL as CATEGORY_LABEL, SERVICE_ICON, initials, monthYear } from '../utils/format';
 import { imageFor } from './images';
+import { PSG_CONTACT, PSG_FACTS } from '../content/company';
+import { CLIENTS, PROCESS, QUALITY, SAFETY_NOTE, SECTORS, SERVICES } from '../content/marketing';
 import { callNumber } from '../utils/links';
+
+/**
+ * Seeded / illustrative records (`isDemo`) are never presented to the public as real PSG work, people
+ * or partners (Part 3 brief §2). Owner-approved records added through the API are shown.
+ */
+export function published<T extends { isDemo: boolean }>(items: T[] | undefined): T[] {
+  return (items ?? []).filter((i) => !i.isDemo);
+}
 
 export function TagPill({ label, icon, tone = 'primary' }: { label: string; icon?: IconName; tone?: 'primary' | 'secondary' }) {
   return <Badge label={label} icon={icon} tone={tone} />;
@@ -32,22 +42,13 @@ export function PhotoHeader({ imageKey, height = 170, children, fallback }: { im
   );
 }
 
-const CATEGORY_LABEL: Record<string, string> = {
-  SOLAR: 'SOLAR & RENEWABLES',
-  CABLING: 'CABLING & FIBER',
-  SUBSTATIONS: 'SUBSTATIONS & HV',
-  EMERGENCY: '24/7 MAINTENANCE',
-  COMPLIANCE: 'COC & AUDITING',
-  AUTOMATION: 'LIGHTING & AUTOMATION',
-};
-
 /** Full service card (Our Services page). */
 export function ServiceCard({ service, onQuote }: { service: ServiceTypeDto; onQuote: () => void }) {
   return (
     <Card padded={false} testID={`service-${service.slug}`}>
       <PhotoHeader imageKey={service.imageKey} height={150}>
         <View style={styles.rowBetween}>
-          <Badge label={CATEGORY_LABEL[service.category] ?? service.category} tone="neutral" solid />
+          <Badge label={CATEGORY_LABEL[service.category] ?? service.category} tone="neutral" solid mono={false} />
           {service.badge ? <Badge label={service.badge} tone="primary" solid mono={false} /> : null}
         </View>
         {service.slaText ? <Badge label={service.slaText} icon="clock" tone="neutral" solid mono={false} /> : null}
@@ -64,12 +65,12 @@ export function ServiceCard({ service, onQuote }: { service: ServiceTypeDto; onQ
           ))}
         </View>
         <Pressable accessibilityRole="button" onPress={() => router.push(`/service/${service.id}`)} style={[styles.rowBetween, { minHeight: 36 }]}>
-          <Text variant="title" color="primaryBright">Technical Scope & Features</Text>
+          <Text variant="title" color="primaryBright">What’s included</Text>
           <Icon name="chevron-down" size={18} color="primaryBright" />
         </Pressable>
         <View style={{ flexDirection: 'row', gap: spacing.sm }}>
           <Button label="Request Quote" iconRight="arrow-right" onPress={onQuote} style={{ flex: 1 }} />
-          <Button label="Full Specs" variant="outline" fullWidth={false} onPress={() => router.push(`/service/${service.id}`)} />
+          <Button label="Details" variant="outline" fullWidth={false} onPress={() => router.push(`/service/${service.id}`)} />
         </View>
       </View>
     </Card>
@@ -82,7 +83,7 @@ export function ServiceMiniCard({ service, width }: { service: ServiceTypeDto; w
   return (
     <Card padded={false} style={{ width }} onPress={() => router.push(`/service/${service.id}`)} accessibilityLabel={service.name}>
       <PhotoHeader imageKey={service.imageKey} height={120}>
-        <Badge label={service.badge ?? CATEGORY_LABEL[service.category] ?? ''} tone={violet ? 'secondary' : 'neutral'} solid={!violet} />
+        <Badge label={service.badge ?? CATEGORY_LABEL[service.category] ?? ''} tone={violet ? 'secondary' : 'neutral'} solid={!violet} mono={false} />
       </PhotoHeader>
       <View style={{ padding: spacing.md, gap: 6 }}>
         <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
@@ -91,7 +92,7 @@ export function ServiceMiniCard({ service, width }: { service: ServiceTypeDto; w
         </View>
         <Text variant="bodySmall" color="textMuted" numberOfLines={2}>{service.description}</Text>
         <View style={[styles.rowBetween, { marginTop: 6 }]}>
-          <Text variant="bodySmall" color={violet ? 'secondaryBright' : 'primaryBright'} weight="semibold">{violet ? 'Solar Calculator' : 'Scope Specifications'}</Text>
+          <Text variant="bodySmall" color={violet ? 'secondaryBright' : 'primaryBright'} weight="semibold">View service</Text>
           <Icon name="arrow-right" size={15} color={violet ? 'secondaryBright' : 'primaryBright'} />
         </View>
       </View>
@@ -168,7 +169,8 @@ export function ProjectMiniCard({ project }: { project: PortfolioItemDto }) {
 export function TestimonialCard() {
   const content = usePublicContent();
   const t = content.data?.testimonial;
-  if (!t) return null;
+  // Only a real, owner-approved testimonial is shown; seeded demo content never is.
+  if (!t || content.data?.isDemoContent !== false) return null;
   return (
     <Card>
       <View style={[styles.rowBetween, { marginBottom: spacing.md }]}>
@@ -187,55 +189,190 @@ export function TestimonialCard() {
           <Text variant="title" weight="bold">{t.author}</Text>
           <Text variant="caption" color="textMuted">{t.role}</Text>
         </View>
-        <Badge label="VERIFIED CLIENT" tone="primary" />
+        <Badge label="Client" tone="primary" mono={false} />
       </View>
     </Card>
   );
 }
 
 /** Closing quotation CTA block used across marketing pages. */
-export function QuoteCta({ eyebrow = '// READY TO START YOUR PROJECT?', title = 'GET AN ENGINEER-REVIEWED QUOTATION WITHIN 24 HOURS', body = 'Select your sector, specify your electrical scope, and receive a binding technical proposal.', primary = 'Launch Multi-Step Quote Tool', secondary = 'Contact Engineering Desk' }: { eyebrow?: string; title?: string; body?: string; primary?: string; secondary?: string }) {
+/**
+ * Fault reporting call-to-action (replaces the former 24/7 emergency panel, Part 3 brief §6): routes to
+ * the existing fault request flow or the verified business line, with neutral safety guidance and no
+ * availability or response-time promise.
+ */
+export function FaultCta({ title = 'Electrical fault?', body = 'Report it with as much detail as you can and we will contact you to arrange diagnosis and repair.' }: { title?: string; body?: string }) {
   return (
-    <Card accent="primary" style={{ gap: spacing.md, backgroundColor: '#121A2B' }}>
-      <Label color="primaryBright">{eyebrow}</Label>
-      <Text variant="h2" style={{ fontSize: 19 }}>{title}</Text>
-      <Text variant="bodySmall" color="textMuted">{body}</Text>
-      <Button label={primary} icon="file-text" iconRight="arrow-right" onPress={() => router.navigate('/quote')} />
-      <Button label={secondary} icon="phone-call" variant="secondary" onPress={() => router.navigate('/contact')} />
-    </Card>
-  );
-}
-
-export function EmergencyCta({ title = 'Unplanned Power Failure?', body = 'Our high-voltage field team dispatches within 60 minutes across Gauteng for critical cable faults & generator panel failure.' }: { title?: string; body?: string }) {
-  const content = usePublicContent();
-  const line = content.data?.company.emergencyLine;
-  return (
-    <Card accent="danger" style={{ gap: spacing.md, backgroundColor: '#1E1418' }}>
+    <Card accent="danger" style={{ gap: spacing.md, backgroundColor: '#1E1418' }} testID="fault-cta">
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <Icon name="alert-octagon" size={20} color="dangerBright" />
+        <Icon name="alert-triangle" size={20} color="dangerBright" />
         <Text variant="h3" style={{ flex: 1 }}>{title}</Text>
-        <Badge label="24/7 STANDBY" tone="danger" solid mono={false} />
       </View>
       <Text variant="bodySmall" color="textSecondary">{body}</Text>
+      <Text variant="caption" color="textMuted">{SAFETY_NOTE}</Text>
       <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-        <Button label="Call Emergency Hotline" icon="phone-call" variant="danger" size="sm" style={{ flex: 1.3 }} onPress={() => line && void callNumber(line)} />
-        <Button label="Contact Dispatch" variant="outline" size="sm" style={{ flex: 1 }} onPress={() => router.navigate('/contact')} />
+        <Button label="Report a fault" icon="alert-triangle" variant="dangerOutline" size="sm" style={{ flex: 1.2 }} onPress={() => router.navigate({ pathname: '/quote', params: { sector: 'EMERGENCY' } })} />
+        <Button label="Call PSG" icon="phone-call" variant="secondary" size="sm" style={{ flex: 1 }} onPress={() => void callNumber(PSG_CONTACT.primaryPhone)} />
+      </View>
+      <Text variant="caption" color="textMuted">Office hours {PSG_CONTACT.hoursShort}</Text>
+    </Card>
+  );
+}
+
+/**
+ * The six services published on the PSG website. Shown when the live service catalogue is empty or
+ * cannot be loaded, so guests always see what PSG does; each row opens the Services tab.
+ */
+export function ServiceOverview() {
+  return (
+    <Card style={{ gap: spacing.md }} testID="service-overview">
+      {SERVICES.map((s) => (
+        <Pressable key={s.title} accessibilityRole="link" accessibilityLabel={s.title} onPress={() => router.navigate('/services')} style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' }}>
+          <View style={styles.sectorIcon}><Icon name={s.icon} size={16} color="primaryBright" /></View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="title" weight="bold">{s.title}</Text>
+            <Text variant="bodySmall" color="textMuted">{s.body}</Text>
+          </View>
+        </Pressable>
+      ))}
+    </Card>
+  );
+}
+
+/** Portfolio clients with their logos and the work done (owner-approved, from the company portfolio). */
+export function ClientList() {
+  return (
+    <Card style={{ gap: spacing.md }} testID="client-list">
+      <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+        <Icon name="briefcase" size={18} color="primaryBright" />
+        <Text variant="h3">Clients we’ve worked with</Text>
+      </View>
+      {CLIENTS.map((c) => (
+        <View key={c.name} style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'center' }} accessible accessibilityLabel={`${c.name}. ${c.body}`}>
+          <Image source={c.logo} style={styles.clientLogo} contentFit="cover" accessibilityIgnoresInvertColors />
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="title" weight="bold">{c.name}</Text>
+            <Text variant="bodySmall" color="textMuted">{c.body}</Text>
+          </View>
+        </View>
+      ))}
+    </Card>
+  );
+}
+
+/** Compact row of client logos for the home page; opens the Work tab. */
+export function ClientStrip() {
+  return (
+    <Card onPress={() => router.navigate('/work')} accessibilityLabel={`Clients include ${CLIENTS.map((c) => c.name).join(', ')}. View our work`} style={{ gap: spacing.sm }} testID="client-strip">
+      <View style={styles.rowBetween}>
+        <Label>Clients include</Label>
+        <Icon name="chevron-right" size={16} color="textMuted" />
+      </View>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
+        {CLIENTS.map((c) => <Image key={c.name} source={c.logo} style={styles.clientLogo} contentFit="cover" accessibilityIgnoresInvertColors />)}
       </View>
     </Card>
   );
 }
 
+/** Owner-confirmed experience and workmanship warranty, as two small facts. */
+export function TrustFacts() {
+  return (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }} testID="trust-facts">
+      <Badge label={`${PSG_FACTS.experience} experience`} icon="award" tone="primary" mono={false} />
+      <Badge label={PSG_FACTS.warranty} icon="shield" tone="secondary" mono={false} />
+    </View>
+  );
+}
+
+/** Industries served, from the PSG company portfolio. */
+export function SectorList() {
+  return (
+    <Card style={{ gap: spacing.md }} testID="sector-list">
+      <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+        <Icon name="briefcase" size={18} color="primaryBright" />
+        <Text variant="h3">Industries we serve</Text>
+      </View>
+      {SECTORS.map((s) => (
+        <View key={s.title} style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' }}>
+          <View style={styles.sectorIcon}><Icon name={s.icon} size={16} color="primaryBright" /></View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="title" weight="bold">{s.title}</Text>
+            <Text variant="bodySmall" color="textMuted">{s.body}</Text>
+          </View>
+        </View>
+      ))}
+    </Card>
+  );
+}
+
+/** How a job runs, in four plain steps (PSG website). */
+export function ProcessSteps() {
+  return (
+    <Card style={{ gap: spacing.md }} testID="process-steps">
+      <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+        <Icon name="list" size={18} color="primaryBright" />
+        <Text variant="h3">How it works</Text>
+      </View>
+      {PROCESS.map((p, i) => (
+        <View key={p.title} style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' }}>
+          <View style={styles.step}><Text variant="caption" weight="bold" color="white">{i + 1}</Text></View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="title" weight="bold">{p.title}</Text>
+            <Text variant="bodySmall" color="textMuted">{p.body}</Text>
+          </View>
+        </View>
+      ))}
+    </Card>
+  );
+}
+
+/** Quality & compliance statement from the PSG company portfolio. No certification claims. */
+export function QualityCard() {
+  return (
+    <Card style={{ gap: spacing.md }} testID="quality-card">
+      <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+        <Icon name="shield" size={18} color="secondaryBright" />
+        <Text variant="h3">Quality & compliance</Text>
+      </View>
+      <Text variant="bodySmall" color="textMuted">All work carried out by PSG Electrical & Cables adheres to:</Text>
+      {QUALITY.standards.map((s) => (
+        <View key={s} style={{ flexDirection: 'row', gap: 10 }}>
+          <Icon name="check-circle" size={16} color="primaryBright" />
+          <Text variant="bodySmall" style={{ flex: 1 }}>{s}</Text>
+        </View>
+      ))}
+      <Text variant="caption" color="textMuted">We prioritise {QUALITY.priorities.join(', ').toLowerCase()}.</Text>
+    </Card>
+  );
+}
+
+const ABOUT_LINKS = [
+  { label: 'Why PSG', route: '/why-psg' },
+  { label: 'Our team', route: '/team' },
+  { label: 'Partners', route: '/partners' },
+  { label: 'FAQ', route: '/faq' },
+] as const;
+
+/** Site footer: hours, main line, About links and the privacy notice. */
 export function MarketingFooter() {
   return (
-    <View style={{ alignItems: 'center', gap: 6, paddingVertical: spacing.lg, borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.border }}>
-      <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-        <Icon name="map" size={14} color="primaryBright" />
-        <Text variant="bodySmall" color="textSecondary">Johannesburg · Durban · Cape Town</Text>
-        <Text variant="bodySmall" color="textMuted">·</Text>
-        <Icon name="radio" size={14} color="secondaryBright" />
-        <Text variant="bodySmall" color="textSecondary">24/7 Hotline</Text>
+    <View style={{ alignItems: 'center', gap: 6, paddingVertical: spacing.lg, borderTopWidth: StyleSheet.hairlineWidth, borderColor: colors.border }} testID="marketing-footer">
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: spacing.lg, rowGap: spacing.xs, marginBottom: spacing.sm }} accessibilityRole="menu">
+        {ABOUT_LINKS.map((l) => (
+          <Pressable key={l.route} accessibilityRole="link" onPress={() => router.push(l.route)} style={{ minHeight: HIT, justifyContent: 'center' }}>
+            <Text variant="bodySmall" color="primaryBright" weight="semibold">{l.label}</Text>
+          </Pressable>
+        ))}
       </View>
-      <Text variant="mono" color="textMuted" align="center" style={{ fontSize: 11 }}>© {new Date().getFullYear()} PSG Electrical and Cables (Pty) Ltd. All Rights Reserved.</Text>
+      <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <Icon name="clock" size={14} color="primaryBright" />
+        <Text variant="bodySmall" color="textSecondary">{PSG_CONTACT.hoursShort}</Text>
+        <Text variant="bodySmall" color="textMuted">·</Text>
+        <Icon name="phone" size={14} color="secondaryBright" />
+        <Text variant="bodySmall" color="textSecondary">{PSG_CONTACT.primaryPhone}</Text>
+      </View>
+      <Text variant="mono" color="textMuted" align="center" style={{ fontSize: 11 }}>© {new Date().getFullYear()} PSG Electrical & Cables. All rights reserved.</Text>
       <Pressable accessibilityRole="link" onPress={() => router.push('/privacy')} hitSlop={8}>
         <Text variant="caption" color="primaryBright">Privacy notice (POPIA)</Text>
       </Pressable>
@@ -321,6 +458,9 @@ export function TeamCard({ member, onCall, onCredentials }: { member: TeamMember
 }
 
 const styles = StyleSheet.create({
+  clientLogo: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white },
+  sectorIcon: { width: 32, height: 32, borderRadius: radius.sm, backgroundColor: colors.primaryMuted, alignItems: 'center', justifyContent: 'center' },
+  step: { width: 26, height: 26, borderRadius: 13, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.sm },
   specGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   spec: { width: '48.5%', backgroundColor: colors.surfaceElevated, borderRadius: radius.sm, borderWidth: 1, borderColor: colors.border, padding: 10, gap: 4 },

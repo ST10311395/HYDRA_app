@@ -355,6 +355,16 @@ build passed; tests shared 17 · API 245 · mobile 203, all passing; route audit
 expo-doctor 21/21. Record actual results again for the version being submitted. The phone walkthrough checklist
 (with what to retest first) is [docs/MANUAL_TEST_MATRIX.md](docs/MANUAL_TEST_MATRIX.md).
 
+Part 3 (PSG client change requests, branch `feature/part3-client-changes`, 1 November 2026): lint, typecheck and
+build passed; tests shared 17 · API 252 · mobile 338, all passing; route audit 229 navigation targets → 88 routes
+(no route removed); expo-doctor 20/21 (11 Expo SDK 57 packages behind the latest patch release — no dependency
+changes were made in Part 3). After the owner-confirmed follow-up (2 November 2026): tests shared 17 · API 254 ·
+mobile 356, all passing; route audit 232 → 88. CI follow-up: the 11 Expo SDK 57 packages were moved to the patch
+versions expo-doctor expects (dependency versions only, no code changes); expo-doctor 21/21. The change record, acceptance checklist, owner questions and what still needs a
+device check are in [docs/PART3_CLIENT_CHANGES.md](docs/PART3_CLIENT_CHANGES.md). Databases seeded before Part 3
+keep the old marketing copy until `npm run db:content:refresh -w @hydra/api` (dry run) / `-- --apply` is run with
+the owner's approval.
+
 Security review should consider request validation, ownership checks, authentication, rate limits, secret
 management and private file access against OWASP guidance (OWASP Foundation, 2021; 2023). These references are
 review criteria, not a certification of security compliance.
@@ -433,6 +443,15 @@ Freedom Conservancy, 2026; GitHub, 2026b).
 
 The submitting team remains responsible for the final code, accuracy of claims, source attribution, test results and compliance with the assessment’s AI-use requirements. This README includes an AI-assisted disclosure and does not create signatures or certify that every team member has reviewed it. Each member should confirm that the final disclosure accurately reflects their actual use of AI tools and that all relevant supporting evidence has been included.
 
+For Part 3 (PSG client change requests, 1 November 2026), Claude Code (Anthropic) assisted with inspecting the
+repository, planning the work against the client brief, implementing the branding, content, navigation and
+quotation changes, writing tests and preparing the Part 3 documentation (Anthropic, 2026b). The work was presented
+phase by phase for the team member's review before it was committed. On 2 November 2026 Claude Code also applied
+the owner-confirmed company details (contact details, hours, experience, portfolio clients, warranty and the
+recreated logo supplied by the team) as follow-up commits, reviewed before committing. The Part 3 brief
+(`HYDRA_PART3_CLIENT_CHANGE_REQUIREMENTS.md`) notes that client screenshots were first attached to ChatGPT; if the
+brief itself was prepared with AI assistance, record that in the disclosure evidence as well.
+
 This declaration covers assistance in producing the assessment and project. The runtime Smart Quote feature
 described above is a separate application capability; a configured provider does not imply that it was used to
 author submitted work. Claude is not a runtime dependency of HYDRA.
@@ -444,7 +463,7 @@ author submitted work. Claude is not a runtime dependency of HYDRA.
 | Assessment sections/work | HYDRA requirements and planning; supporting documentation and diagrams; code implementation/refinement; debugging and checks; README and reference presentation. |
 | Tools | Claude/Claude Code by Anthropic; ChatGPT by OpenAI. Exact model/version information should be taken from the retained interaction records rather than inferred. |
 | Purpose | Brainstorming, interpreting requirements, structuring explanations, implementation assistance, investigating errors, suggesting checks and improving clarity. |
-| Documented dates | The supplied annexure records Claude interactions on 10 August 2026 (Screenshots 1–23) and 17 August 2026 (Screenshots 24–32), with a declaration dated 11 September 2026. This README was prepared with ChatGPT assistance on 5 October 2026. Those annexure dates do not represent the complete development-assistance period. |
+| Documented dates | The supplied annexure records Claude interactions on 10 August 2026 (Screenshots 1–23) and 17 August 2026 (Screenshots 24–32), with a declaration dated 11 September 2026. This README was prepared with ChatGPT assistance on 5 October 2026. Part 3 changes were implemented with Claude Code assistance on 1–2 November 2026. Those dates do not represent the complete development-assistance period. |
 | Existing evidence | HYDRA_AI_Usage_Disclosure_Annexure.pdf contains 32 interaction screenshots. Its summary states that screenshots were supplied because a shareable chat link was unavailable. |
 | Additional evidence required for complete disclosure | Retain relevant Claude Code implementation/debugging records and this ChatGPT interaction with the submission. The annexure's documentation/planning evidence alone does not document every subsequent coding interaction. |
 
@@ -513,4 +532,7 @@ publication dates.
 - OWASP Foundation 2021. OWASP Top Ten Web Application Security Risks. [Online]. Available at: https://owasp.org/www-project-top-ten/ [Accessed 5 September 2026].
 - OWASP Foundation 2023. OWASP API Security Top 10. [Online]. Available at: https://owasp.org/API-Security/ [Accessed 2 September 2026].
 - PostgreSQL Global Development Group 2026. PostgreSQL documentation. [Online]. Available at: https://www.postgresql.org/docs/ [Accessed 26 August 2026].
+- PSG Electrical & Cables 2026a. Company portfolio (presented by K. Govender). Unpublished client document supplied for Part 3.
+- PSG Electrical & Cables 2026b. PSG Electrical and Cables. [Online]. Available at: https://psg-electrical-site.axiomcompute.workers.dev/ [Accessed 1 November 2026].
 - Software Freedom Conservancy 2026. Git documentation. [Online]. Available at: https://git-scm.com/doc [Accessed 28 September 2026].
+- Software Mansion 2026. react-native-svg documentation. [Online]. Available at: https://github.com/software-mansion/react-native-svg [Accessed 1 November 2026].

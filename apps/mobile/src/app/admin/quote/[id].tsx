@@ -29,7 +29,7 @@ interface Line {
 let seq = 0;
 const newLine = (kind: QuoteItemKind, description = '', unitPrice = '', quantity = '1'): Line => ({ key: `l${++seq}`, kind, description, quantity, unitPrice });
 
-const DEFAULT_TERMS = 'Quote valid for the period shown. 50% of materials may be requested before procurement. Workmanship guaranteed for 12 months. Prices include labour and listed materials only; additional work will be quoted separately.';
+const DEFAULT_TERMS = 'Quote valid for the period shown. 50% of materials may be requested before procurement. Workmanship is covered by a 12-month warranty (workmanship only; supplied equipment and materials are not included in this warranty). Prices include labour and listed materials only; additional work will be quoted separately.';
 
 /** Quote builder (spec §10.3, PDF Story 7): structured line items, discount, validity, terms; VAT from settings. */
 export default function QuoteBuilder() {

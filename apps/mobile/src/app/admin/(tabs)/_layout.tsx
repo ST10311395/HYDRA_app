@@ -13,7 +13,7 @@ const AdminTabBar = makeTabBar([
   { name: 'enquiries', label: 'Enquiries', icon: 'inbox' },
   { name: 'jobs', label: 'Jobs', icon: 'briefcase' },
   { name: 'workforce', label: 'Workforce', icon: 'users' },
-  { name: 'more', label: 'More', icon: 'menu' },
+  { name: 'more', label: 'Manage', icon: 'grid' },
 ]);
 
 /** Operations centre navigation (spec §10): tabs + a “More” menu for finance, inventory, reports and settings. */

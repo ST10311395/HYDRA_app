@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { flatten, useInvoices, usePayments } from '../../../api/queries';
 import { BrandHeader, Screen } from '../../../components/layout';
-import { Badge, Button, Card, EmptyState, FilterChips, Label, Text, colors, spacing } from '../../../design-system';
+import { Badge, Button, Card, EmptyState, FilterChips, Icon, Label, Text, colors, spacing } from '../../../design-system';
 import { fmtDate, invoiceTone, money } from '../../../utils/format';
 import { QueryFallback, notReady } from '../../../components/QueryState';
 
@@ -27,12 +27,17 @@ export default function BillingScreen() {
         <Card accent={outstanding > 0 ? 'primary' : 'success'} style={{ gap: 4 }}>
           <Label>Outstanding balance</Label>
           <Text variant="stat" color={outstanding > 0 ? 'warning' : 'success'}>{money(outstanding)}</Text>
-          <Text variant="caption" color="textMuted">Card details are entered on the secure payment gateway — never stored by HYDRA.</Text>
+          <Text variant="caption" color="textMuted">Open an invoice to pay it. Card details are entered on the secure payment gateway — never stored by HYDRA.</Text>
+        </Card>
+        <Card onPress={() => router.navigate('/customer/rewards')} accessibilityLabel="Rewards: use points on eligible invoices" style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }} testID="billing-rewards">
+          <Icon name="gift" size={18} color="secondaryBright" />
+          <Text variant="bodySmall" style={{ flex: 1 }}>Reward points can be used on eligible invoices.</Text>
+          <Icon name="chevron-right" size={16} color="textMuted" />
         </Card>
         <FilterChips value={tab} onChange={setTab} options={[{ value: 'INVOICES', label: 'Invoices', icon: 'file-text' }, { value: 'PAYMENTS', label: 'Payment history', icon: 'clock' }]} />
         {tab === 'INVOICES' ? (
           notReady(invoices) ? <QueryFallback query={invoices} /> : list.length === 0 ? (
-            <EmptyState icon="file-text" title="No invoices yet" message="Invoices appear once a job is completed and certified." />
+            <EmptyState icon="file-text" title="No invoices yet" message="Invoices appear here once a job is completed and certified. Accepted quotes are in My jobs." />
           ) : (
             list.map((i) => (
               <Card key={i.id} onPress={() => router.push(`/customer/invoice/${i.id}`)} accent={i.status === 'OVERDUE' ? 'danger' : 'none'} accessibilityLabel={`Invoice ${i.number}`} style={{ gap: 6 }}>

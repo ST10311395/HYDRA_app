@@ -10,7 +10,6 @@ import { StyleSheet, View } from 'react-native';
 import { useCustomerDashboard } from '../../../api/queries';
 import { JobStatusBadge } from '../../../components/jobs';
 import { BrandHeader, Screen } from '../../../components/layout';
-import { QuickLinks } from '../../../components/QuickLinks';
 import { Badge, Button, Card, Icon, IconTile, Label, ProgressBar, SectionHeader, Text, colors, radius, spacing, type IconName } from '../../../design-system';
 import { fmtDate, fmtDateTime, fmtRelative, money, tierProgress } from '../../../utils/format';
 import { QueryFallback } from '../../../components/QueryState';
@@ -29,15 +28,15 @@ export default function CustomerDashboard() {
   const active = d?.activeJob;
   const tip = TIPS[new Date().getDate() % TIPS.length];
 
-  const actions: { icon: IconName; label: string; onPress: () => void; tone?: 'primary' | 'secondary' | 'danger' }[] = [
+  const actions: { icon: IconName; label: string; onPress: () => void; tone?: 'primary' | 'secondary' | 'danger'; badge?: number }[] = [
     { icon: 'plus-circle', label: 'Request service', onPress: () => router.push('/customer/request'), tone: 'primary' },
-    { icon: 'activity', label: 'Track job', onPress: () => (active ? router.push(`/customer/job/${active.id}`) : router.navigate('/customer/jobs')) },
+    { icon: 'file-text', label: 'Quotes to review', onPress: () => router.navigate('/customer/jobs?filter=QUOTES'), badge: d?.quotesAwaiting.length },
     { icon: 'maximize', label: 'Show QR', onPress: () => {
       const scheduled = d?.activeJobs.find((j) => j.status === 'SCHEDULED');
       if (scheduled) router.push(`/customer/qr/${scheduled.id}`);
       else router.navigate('/customer/jobs');
     }, tone: 'secondary' },
-    { icon: 'credit-card', label: 'Pay invoice', onPress: () => (d?.invoicesDue[0] ? router.push(`/customer/invoice/${d.invoicesDue[0].id}`) : router.navigate('/customer/billing')) },
+    { icon: 'credit-card', label: 'Pay invoice', onPress: () => (d?.invoicesDue[0] ? router.push(`/customer/invoice/${d.invoicesDue[0].id}`) : router.navigate('/customer/billing')), badge: d?.invoicesDue.length },
   ];
 
   return (
@@ -50,32 +49,6 @@ export default function CustomerDashboard() {
               <Label color="primaryBright">Customer portal</Label>
               <Text variant="h1">Hello, {d.firstName}</Text>
             </View>
-
-            <Card accent="primary" style={{ gap: spacing.sm }} onPress={() => router.push('/customer/ai')} accessibilityLabel="HYDRA Smart Quote — AI quote assistant" testID="dashboard-smart-quote">
-              <View style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'center' }}>
-                <IconTile icon="cpu" tone="primary" />
-                <View style={{ flex: 1 }}>
-                  <Label color="primaryBright">New · HYDRA Smart Quote</Label>
-                  <Text variant="h3">Get an instant preliminary quote</Text>
-                </View>
-                <Icon name="chevron-right" color="textMuted" />
-              </View>
-              <Text variant="bodySmall" color="textMuted">Describe the problem and add photos — see how serious it looks, a price range and our target response time.</Text>
-            </Card>
-
-            <Card accent="secondary" style={{ gap: spacing.md, backgroundColor: '#18152A' }} onPress={() => router.navigate('/customer/rewards')} accessibilityLabel="Rewards balance">
-              <View style={styles.between}>
-                <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="gift" size={18} color="secondaryBright" /><Text variant="title" weight="bold">Rewards balance</Text></View>
-                <Badge label={d.rewards.tier} tone="secondary" />
-              </View>
-              <Text variant="stat" color="secondaryBright">{d.rewards.pointsBalance.toLocaleString('en-ZA')} <Text variant="title" color="textMuted">pts</Text></Text>
-              {d.rewards.nextTier ? (
-                <>
-                  <ProgressBar tone="secondary" value={tierProgress(d.rewards)} />
-                  <Text variant="caption" color="textMuted">{d.rewards.pointsToNextTier} lifetime points to {d.rewards.nextTier}</Text>
-                </>
-              ) : null}
-            </Card>
 
             {active ? (
               <Card accent="primary" onPress={() => router.push(`/customer/job/${active.id}`)} accessibilityLabel={`Active job ${active.reference}`} style={{ gap: spacing.sm }}>
@@ -98,10 +71,14 @@ export default function CustomerDashboard() {
               </Card>
             )}
 
+            <SectionHeader title="What would you like to do?" />
             <View style={styles.actions}>
               {actions.map((a) => (
-                <Card key={a.label} style={styles.action} onPress={a.onPress} accessibilityLabel={a.label}>
-                  <IconTile icon={a.icon} tone={a.tone ?? 'neutral'} />
+                <Card key={a.label} style={styles.action} onPress={a.onPress} accessibilityLabel={a.badge ? `${a.label}, ${a.badge}` : a.label}>
+                  <View style={styles.between}>
+                    <IconTile icon={a.icon} tone={a.tone ?? 'neutral'} />
+                    {a.badge ? <Badge label={String(a.badge)} tone="primary" /> : null}
+                  </View>
                   <Text variant="title" weight="bold">{a.label}</Text>
                 </Card>
               ))}
@@ -154,6 +131,32 @@ export default function CustomerDashboard() {
               </View>
             ))}
 
+            <Card style={{ gap: spacing.sm }} onPress={() => router.push('/customer/ai')} accessibilityLabel="Smart Quote, AI-assisted preliminary estimate" testID="dashboard-smart-quote">
+              <View style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'center' }}>
+                <IconTile icon="cpu" tone="primary" />
+                <View style={{ flex: 1 }}>
+                  <Label color="primaryBright">Smart Quote (AI)</Label>
+                  <Text variant="title" weight="bold">Get a preliminary estimate</Text>
+                </View>
+                <Icon name="chevron-right" color="textMuted" />
+              </View>
+              <Text variant="bodySmall" color="textMuted">Describe the problem and add photos for an AI-assisted first look and price range. Our team reviews it before any formal quotation.</Text>
+            </Card>
+
+            <Card accent="secondary" style={{ gap: spacing.sm, backgroundColor: '#18152A' }} onPress={() => router.navigate('/customer/rewards')} accessibilityLabel="Rewards balance">
+              <View style={styles.between}>
+                <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="gift" size={18} color="secondaryBright" /><Text variant="title" weight="bold">Rewards</Text></View>
+                <Badge label={d.rewards.tier} tone="secondary" />
+              </View>
+              <Text variant="h2" color="secondaryBright">{d.rewards.pointsBalance.toLocaleString('en-ZA')} <Text variant="title" color="textMuted">pts</Text></Text>
+              {d.rewards.nextTier ? (
+                <>
+                  <ProgressBar tone="secondary" value={tierProgress(d.rewards)} />
+                  <Text variant="caption" color="textMuted">{d.rewards.pointsToNextTier} lifetime points to {d.rewards.nextTier}</Text>
+                </>
+              ) : null}
+            </Card>
+
             <Card style={{ flexDirection: 'row', gap: spacing.md }}>
               <IconTile icon="shield" tone="secondary" />
               <View style={{ flex: 1 }}>
@@ -161,27 +164,6 @@ export default function CustomerDashboard() {
                 <Text variant="bodySmall" color="textSecondary">{tip}</Text>
               </View>
             </Card>
-
-            <SectionHeader title="Everything in your account" icon="grid" />
-            <QuickLinks links={[
-              { icon: 'briefcase', label: 'My jobs', route: '/customer/jobs' },
-              { icon: 'plus-circle', label: 'Request service', route: '/customer/request' },
-              { icon: 'cpu', label: 'Smart Quote (AI assessments)', route: '/customer/ai' },
-              { icon: 'file-text', label: 'Quotes', route: '/customer/jobs?filter=QUOTES', badge: d.quotesAwaiting.length ? String(d.quotesAwaiting.length) : undefined },
-              { icon: 'activity', label: 'Live job timeline', route: active ? `/customer/job/${active.id}` : '/customer/jobs' },
-              { icon: 'credit-card', label: 'Invoices & payments', route: '/customer/billing', badge: d.invoicesDue.length ? String(d.invoicesDue.length) : undefined },
-              { icon: 'gift', label: 'Rewards', route: '/customer/rewards' },
-              { icon: 'award', label: 'Compliance reports', route: '/customer/jobs?filter=CERTIFICATES' },
-              { icon: 'bell', label: 'Notifications', route: '/customer/notifications' },
-              { icon: 'settings', label: 'Profile & settings', route: '/customer/profile' },
-            ]} />
-
-            <SectionHeader title="Explore PSG Electrical" icon="compass" />
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
-              {([['Services', '/services'], ['Recent Work', '/work'], ['Why PSG', '/why-psg'], ['Our Team', '/team'], ['Partners', '/partners'], ['Contact', '/contact']] as const).map(([l, h]) => (
-                <Button key={l} label={l} variant="outline" size="sm" fullWidth={false} onPress={() => router.push(h)} />
-              ))}
-            </View>
           </>
         )}
       </Screen>
