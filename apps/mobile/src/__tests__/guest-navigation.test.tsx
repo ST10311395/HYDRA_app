@@ -58,10 +58,10 @@ describe('guest navigation', () => {
     }
   });
 
-  it('the Work tab shows industries and capabilities instead of an empty page until case studies are approved', async () => {
+  it('the Work tab shows portfolio clients, industries and capabilities when no project case studies are published', async () => {
     const { client } = await renderScreen(<WorkScreen />);
     await settle(client);
-    expect(screen.getByText('Case studies coming soon')).toBeOnTheScreen();
+    expect(screen.getByTestId('client-list')).toBeOnTheScreen();
     expect(screen.getByTestId('sector-list')).toBeOnTheScreen();
     expect(screen.getByTestId('capabilities')).toBeOnTheScreen();
   });

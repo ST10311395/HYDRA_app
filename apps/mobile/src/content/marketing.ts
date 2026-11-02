@@ -53,5 +53,19 @@ export const QUALITY = {
   priorities: ['Safety', 'Compliance', 'Long-term system reliability'],
 } as const;
 
+/**
+ * Portfolio clients, published with the owner's permission (owner confirmations, 2 November 2026).
+ * Names, descriptions and logos come only from the PSG company portfolio. The portfolio repeats the
+ * African Logistics Services description for UKZN, so UKZN uses the portfolio's institutional sector
+ * wording instead until the owner supplies its own description.
+ */
+export const CLIENTS: { name: string; body: string; logo: number }[] = [
+  { name: 'African Logistics Services', body: 'Electrical installation and maintenance within large-scale logistics and warehousing facilities.', logo: require('../../assets/images/clients/african-logistics-services.png') },
+  { name: 'Swift Chemicals', body: 'Electrical work conducted in a hazardous chemical processing environment requiring strict compliance.', logo: require('../../assets/images/clients/swift-chemicals.png') },
+  { name: 'Fashion Fusion', body: 'Multi-branch retail electrical installations, maintenance and rollout support.', logo: require('../../assets/images/clients/fashion-fusion.png') },
+  { name: 'Hi-Tap Bolt & Tool', body: 'Electrical infrastructure support within an industrial supply and distribution environment.', logo: require('../../assets/images/clients/hi-tap-bolt-and-tool.png') },
+  { name: 'UKZN', body: 'Institutional and educational facilities.', logo: require('../../assets/images/clients/ukzn.png') },
+];
+
 /** Neutral safety guidance: PSG is not a public emergency service (brief §6). */
 export const SAFETY_NOTE = 'If there is immediate danger to life, fire or smoke, move to safety and contact your local emergency services first.';

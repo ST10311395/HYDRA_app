@@ -10,7 +10,7 @@ import { useWindowDimensions, View } from 'react-native';
 import { usePortfolio, usePublicContent, useServices } from '../../../api/queries';
 import { BrandBackdrop } from '../../../components/BrandBackdrop';
 import { BrandHeader, Screen } from '../../../components/layout';
-import { MarketingFooter, ProcessSteps, ProjectMiniCard, QualityCard, SectorList, ServiceMiniCard, ServiceOverview, TestimonialCard, published } from '../../../components/marketing';
+import { ClientStrip, MarketingFooter, ProcessSteps, ProjectMiniCard, QualityCard, SectorList, ServiceMiniCard, ServiceOverview, TestimonialCard, TrustFacts, published } from '../../../components/marketing';
 import { PSG_CONTACT } from '../../../content/company';
 import { HERO, SAFETY_NOTE } from '../../../content/marketing';
 import { Button, Card, HorizontalScroller, Icon, IconTile, Label, LoadingCards, SectionHeader, Text, colors, spacing } from '../../../design-system';
@@ -51,6 +51,7 @@ export default function HomeScreen() {
             <Label color="primaryBright" style={{ fontSize: 12 }}>{HERO.eyebrow}</Label>
             <Text variant="display" accessibilityRole="header">{HERO.title}</Text>
             <Text variant="body" color="textSecondary">{HERO.body}</Text>
+            <TrustFacts />
             <Button label="Request a quote" icon="file-text" iconRight="arrow-right" size="lg" onPress={() => router.navigate('/quote')} haptic testID="home-quote" />
             <View style={{ flexDirection: 'row', gap: spacing.sm }}>
               <Button label="Report a fault" icon="alert-triangle" variant="dangerOutline" style={{ flex: 1 }} onPress={() => router.navigate({ pathname: '/quote', params: { sector: 'EMERGENCY' } })} testID="home-fault" />
@@ -75,6 +76,7 @@ export default function HomeScreen() {
         {/* 4 · How it works, industries and quality (website + portfolio) */}
         <ProcessSteps />
         <SectorList />
+        <ClientStrip />
         <QualityCard />
 
         {/* 5 · Recent projects + testimonial */}

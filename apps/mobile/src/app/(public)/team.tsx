@@ -12,7 +12,7 @@ import type { TeamCategory, TeamMemberDto } from '@hydra/shared';
 import { useTeam } from '../../api/queries';
 import { BrandHeader, Screen } from '../../components/layout';
 import { TeamCard, published } from '../../components/marketing';
-import { PSG_CONTACT } from '../../content/company';
+import { PSG_CONTACT, PSG_FACTS } from '../../content/company';
 import { Button, Card, EmptyState, FilterChips, KeyValue, LoadingCards, SearchField, Text, colors, radius, spacing } from '../../design-system';
 import { callNumber } from '../../utils/links';
 
@@ -34,7 +34,7 @@ export default function TeamScreen() {
         <Card style={{ gap: spacing.md }}>
           <Text variant="h1">Our team</Text>
           <Text variant="body" color="textMuted">
-            Our team is experienced in executing projects within live operational facilities, completing work efficiently while minimising disruption to ongoing operations.
+            With {PSG_FACTS.experience} of industry experience, our team executes projects within live operational facilities, completing work efficiently while minimising disruption to ongoing operations.
           </Text>
         </Card>
         {members.length || filtering ? (

@@ -228,7 +228,7 @@ export default function QuoteScreen() {
           <Label color="primaryBright">Request a quote</Label>
           <Text variant="h1">Tell us what you need</Text>
           <Text variant="bodySmall" color="textMuted">
-            We review every request and contact you during office hours ({PSG_CONTACT.hours}) to confirm the scope. You decide whether to accept the quotation.
+            We review every request and contact you during office hours ({PSG_CONTACT.hours}) to confirm the scope. You decide whether to accept the quotation. Our workmanship carries a 12-month warranty.
           </Text>
         </Card>
 

@@ -11,7 +11,8 @@ import { View } from 'react-native';
 import type { PortfolioCategory } from '@hydra/shared';
 import { usePortfolio } from '../../../api/queries';
 import { BrandHeader, Screen } from '../../../components/layout';
-import { ProjectCard, SectorList, TestimonialCard, published } from '../../../components/marketing';
+import { ClientList, ProjectCard, SectorList, TestimonialCard, published } from '../../../components/marketing';
+import { PSG_FACTS } from '../../../content/company';
 import { Button, Card, EmptyState, ErrorState, FilterChips, Icon, IconTile, LoadingCards, SearchField, Text, colors, spacing } from '../../../design-system';
 
 /** Core capability areas, from the PSG company portfolio. */
@@ -39,8 +40,9 @@ export default function WorkScreen() {
       <Screen onRefresh={() => void projects.refetch()} refreshing={projects.isRefetching}>
         <View style={{ gap: spacing.sm }}>
           <Text variant="h1">Our work</Text>
-          <Text variant="body" color="textMuted">PSG has established itself as a dependable service provider across multiple sectors, offering both project-based installations and long-term maintenance support.</Text>
+          <Text variant="body" color="textMuted">With {PSG_FACTS.experience} of industry experience, PSG has established itself as a dependable service provider across multiple sectors, offering both project-based installations and long-term maintenance support.</Text>
         </View>
+        <ClientList />
 
         {list.length || filtering ? (
           <>
@@ -69,7 +71,6 @@ export default function WorkScreen() {
             <EmptyState icon="briefcase" title="No projects found" message="Try another filter or search term." />
           ) : (
             <>
-              <EmptyState icon="briefcase" title="Case studies coming soon" message="Project case studies will be published here once approved by PSG Electrical & Cables." />
               <SectorList />
               <Card style={{ gap: spacing.md }} testID="capabilities">
                 <Text variant="h3">Core capability areas</Text>

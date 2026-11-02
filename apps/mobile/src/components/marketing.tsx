@@ -15,8 +15,8 @@ import { usePublicContent } from '../api/queries';
 import { Badge, Button, Card, HIT, Icon, Label, Text, colors, radius, spacing, type IconName } from '../design-system';
 import { SERVICE_CATEGORY_LABEL as CATEGORY_LABEL, SERVICE_ICON, initials, monthYear } from '../utils/format';
 import { imageFor } from './images';
-import { PSG_CONTACT } from '../content/company';
-import { PROCESS, QUALITY, SAFETY_NOTE, SECTORS, SERVICES } from '../content/marketing';
+import { PSG_CONTACT, PSG_FACTS } from '../content/company';
+import { CLIENTS, PROCESS, QUALITY, SAFETY_NOTE, SECTORS, SERVICES } from '../content/marketing';
 import { callNumber } from '../utils/links';
 
 /**
@@ -239,6 +239,52 @@ export function ServiceOverview() {
   );
 }
 
+/** Portfolio clients with their logos and the work done (owner-approved, from the company portfolio). */
+export function ClientList() {
+  return (
+    <Card style={{ gap: spacing.md }} testID="client-list">
+      <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+        <Icon name="briefcase" size={18} color="primaryBright" />
+        <Text variant="h3">Clients we’ve worked with</Text>
+      </View>
+      {CLIENTS.map((c) => (
+        <View key={c.name} style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'center' }} accessible accessibilityLabel={`${c.name}. ${c.body}`}>
+          <Image source={c.logo} style={styles.clientLogo} contentFit="cover" accessibilityIgnoresInvertColors />
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="title" weight="bold">{c.name}</Text>
+            <Text variant="bodySmall" color="textMuted">{c.body}</Text>
+          </View>
+        </View>
+      ))}
+    </Card>
+  );
+}
+
+/** Compact row of client logos for the home page; opens the Work tab. */
+export function ClientStrip() {
+  return (
+    <Card onPress={() => router.navigate('/work')} accessibilityLabel={`Clients include ${CLIENTS.map((c) => c.name).join(', ')}. View our work`} style={{ gap: spacing.sm }} testID="client-strip">
+      <View style={styles.rowBetween}>
+        <Label>Clients include</Label>
+        <Icon name="chevron-right" size={16} color="textMuted" />
+      </View>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
+        {CLIENTS.map((c) => <Image key={c.name} source={c.logo} style={styles.clientLogo} contentFit="cover" accessibilityIgnoresInvertColors />)}
+      </View>
+    </Card>
+  );
+}
+
+/** Owner-confirmed experience and workmanship warranty, as two small facts. */
+export function TrustFacts() {
+  return (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }} testID="trust-facts">
+      <Badge label={`${PSG_FACTS.experience} experience`} icon="award" tone="primary" mono={false} />
+      <Badge label={PSG_FACTS.warranty} icon="shield" tone="secondary" mono={false} />
+    </View>
+  );
+}
+
 /** Industries served, from the PSG company portfolio. */
 export function SectorList() {
   return (
@@ -412,6 +458,7 @@ export function TeamCard({ member, onCall, onCredentials }: { member: TeamMember
 }
 
 const styles = StyleSheet.create({
+  clientLogo: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white },
   sectorIcon: { width: 32, height: 32, borderRadius: radius.sm, backgroundColor: colors.primaryMuted, alignItems: 'center', justifyContent: 'center' },
   step: { width: 26, height: 26, borderRadius: 13, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.sm },

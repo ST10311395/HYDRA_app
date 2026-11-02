@@ -10,17 +10,19 @@ import { StyleSheet, View } from 'react-native';
 import { useFaqs, usePublicContent } from '../../api/queries';
 import { BrandHeader, Screen } from '../../components/layout';
 import { QualityCard } from '../../components/marketing';
-import { PSG_CONTACT } from '../../content/company';
+import { PSG_CONTACT, PSG_FACTS } from '../../content/company';
 import { Accordion, Badge, Button, Card, Icon, Label, Text, colors, radius, spacing } from '../../design-system';
 import { callNumber } from '../../utils/links';
 
 /** “Why pick us?” and vision / mission, taken from the PSG company portfolio (Part 3). */
 const REASONS = [
+  `${PSG_FACTS.experience} of industry experience`,
   'Proven experience in commercial and industrial environments',
   'Strong focus on safety and compliance',
   'Reliable maintenance and fault response services',
   'Experience in hazardous and high-risk installations',
   'Scalable solutions for multi-site and growing businesses',
+  `A ${PSG_FACTS.warranty}`,
 ];
 
 const VISION = 'To be a leading provider of electrical and cable management solutions, recognised for reliability, quality workmanship, and consistent delivery across the commercial and industrial sectors.';
@@ -65,6 +67,11 @@ export default function WhyPsgScreen() {
         </View>
 
         <QualityCard />
+
+        <Card style={{ gap: spacing.sm }} testID="warranty">
+          <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="shield" size={18} color="secondaryBright" /><Text variant="h3">Workmanship warranty</Text></View>
+          <Text variant="bodySmall" color="textSecondary">{PSG_FACTS.warrantyDetail}</Text>
+        </Card>
 
         {accreditations.length ? (
           <Card style={{ gap: spacing.sm }}>
