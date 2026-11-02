@@ -73,7 +73,7 @@ describe('touch targets', () => {
   it('contact phone and email rows are at least 44pt tall', async () => {
     const { client } = await renderScreen(<ContactScreen />);
     await settle(client);
-    for (const name of ['Call main line 082 603 9283', 'Call second line 072 752 0848']) {
+    for (const name of ['Call Ricky on 082 603 9283', 'Call Keoran on 072 752 0848']) {
       expect(minHeightOf(screen.getByRole('link', { name }))).toBeGreaterThanOrEqual(HIT);
     }
   });

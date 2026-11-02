@@ -117,8 +117,8 @@ describe('contact screen', () => {
   it('lists both verified numbers with labels and the published hours', async () => {
     const { client } = await renderScreen(<ContactScreen />);
     await settle(client);
-    expect(screen.getByLabelText('Call main line 082 603 9283')).toBeOnTheScreen();
-    expect(screen.getByLabelText('Call second line 072 752 0848')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Call Ricky on 082 603 9283')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Call Keoran on 072 752 0848')).toBeOnTheScreen();
     expect(screen.getAllByText(/07:00–18:00/).length).toBeGreaterThan(0);
   });
 

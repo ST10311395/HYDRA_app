@@ -56,7 +56,7 @@ export default function HomeScreen() {
               <Button label="Report a fault" icon="alert-triangle" variant="dangerOutline" style={{ flex: 1 }} onPress={() => router.navigate({ pathname: '/quote', params: { sector: 'EMERGENCY' } })} testID="home-fault" />
               <Button label="Call PSG" icon="phone-call" variant="secondary" style={{ flex: 1 }} onPress={() => void callNumber(PSG_CONTACT.primaryPhone)} testID="home-call" />
             </View>
-            <Text variant="caption" color="textMuted">Office hours {PSG_CONTACT.hours}. {SAFETY_NOTE}</Text>
+            <Text variant="caption" color="textMuted">Office hours {PSG_CONTACT.hoursShort}. {SAFETY_NOTE}</Text>
           </View>
         </Card>
 

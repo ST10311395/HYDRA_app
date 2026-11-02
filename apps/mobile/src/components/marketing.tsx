@@ -214,7 +214,7 @@ export function FaultCta({ title = 'Electrical fault?', body = 'Report it with a
         <Button label="Report a fault" icon="alert-triangle" variant="dangerOutline" size="sm" style={{ flex: 1.2 }} onPress={() => router.navigate({ pathname: '/quote', params: { sector: 'EMERGENCY' } })} />
         <Button label="Call PSG" icon="phone-call" variant="secondary" size="sm" style={{ flex: 1 }} onPress={() => void callNumber(PSG_CONTACT.primaryPhone)} />
       </View>
-      <Text variant="caption" color="textMuted">Office hours {PSG_CONTACT.hours}</Text>
+      <Text variant="caption" color="textMuted">Office hours {PSG_CONTACT.hoursShort}</Text>
     </Card>
   );
 }
@@ -321,7 +321,7 @@ export function MarketingFooter() {
       </View>
       <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
         <Icon name="clock" size={14} color="primaryBright" />
-        <Text variant="bodySmall" color="textSecondary">Hours {PSG_CONTACT.hours}</Text>
+        <Text variant="bodySmall" color="textSecondary">{PSG_CONTACT.hoursShort}</Text>
         <Text variant="bodySmall" color="textMuted">·</Text>
         <Icon name="phone" size={14} color="secondaryBright" />
         <Text variant="bodySmall" color="textSecondary">{PSG_CONTACT.primaryPhone}</Text>

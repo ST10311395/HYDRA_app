@@ -10,37 +10,26 @@ import { useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { email as emailSchema, phone as phoneSchema, type JobUrgency } from '@hydra/shared';
 import { ApiError, errorMessage } from '../../../api/client';
-import { useDepartments, useFaqs, useOffices, usePublicContent, useSubmitEnquiry } from '../../../api/queries';
+import { useFaqs, useSubmitEnquiry } from '../../../api/queries';
 import { BrandHeader, Screen } from '../../../components/layout';
 import { PSG_CONTACT } from '../../../content/company';
 import { SAFETY_NOTE } from '../../../content/marketing';
-import { Accordion, Button, Card, Checkbox, FilterChips, Icon, Label, SelectField, Segmented, Text, TextField, HIT, colors, radius, spacing, toast, type IconName } from '../../../design-system';
+import { Accordion, Button, Card, Checkbox, Icon, Label, SelectField, Segmented, Text, TextField, HIT, colors, radius, spacing, toast, type IconName } from '../../../design-system';
 import { useAuth } from '../../../store/auth';
 import { URGENCY_OPTIONS } from '../../../utils/format';
-import { callNumber, openDirections, openWhatsApp, sendEmail } from '../../../utils/links';
+import { callNumber, openWhatsApp, sendEmail } from '../../../utils/links';
 
 /** Quick-intake categories published on the PSG website (Part 3). Stored as free text on the enquiry. */
 const SECTORS = ['New installation', 'Fault or repair', 'DB board', 'Compliance (CoC)', 'Solar & backup', 'Maintenance', 'Other'].map((v) => ({ value: v, label: v }));
-const DEPT_ICON: Record<string, IconName> = { zap: 'zap', sparkles: 'star', 'shield-check': 'shield', siren: 'alert-octagon' };
 
 export default function ContactScreen() {
-  const content = usePublicContent();
-  const offices = useOffices();
-  const departments = useDepartments();
   const faqs = useFaqs('CONTACT');
   const submit = useSubmitEnquiry();
   const user = useAuth((s) => s.user);
-  const [region, setRegion] = useState<string>('');
   const [form, setForm] = useState({ name: user ? `${user.firstName} ${user.lastName}` : '', email: user?.email ?? '', phone: user?.phone ?? '', sector: SECTORS[0]!.value, urgency: 'STANDARD' as JobUrgency, message: '' });
   const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sentRef, setSentRef] = useState<string | null>(null);
-
-  const whatsapp = content.data?.company.whatsapp?.trim();
-  // Offices and department desks are shown only when the business has configured them.
-  const officeList = offices.data ?? [];
-  const office = officeList.find((o) => o.region === region) ?? officeList[0];
-  const officeDirections = () => office && void openDirections({ latitude: office.latitude, longitude: office.longitude, address: office.address });
 
   // Blocks a second tap before the pending state re-renders the button.
   const sending = useRef(false);
@@ -72,30 +61,37 @@ export default function ContactScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <BrandHeader section="Contact Us" />
-      <Screen onRefresh={() => void Promise.all([offices.refetch(), departments.refetch(), content.refetch()])} refreshing={offices.isRefetching}>
+      <Screen onRefresh={() => void faqs.refetch()} refreshing={faqs.isRefetching}>
         <Card style={{ gap: spacing.md }} testID="contact-details">
           <View style={{ gap: 4 }}>
             <Text variant="h1">Contact {PSG_CONTACT.name}</Text>
             <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
               <Icon name="clock" size={14} color="primaryBright" />
-              <Text variant="bodySmall" color="textSecondary">Office hours {PSG_CONTACT.hours}</Text>
+              <Text variant="bodySmall" color="textSecondary" testID="contact-hours">Office hours: {PSG_CONTACT.hours}</Text>
             </View>
           </View>
+
+          <Label>Phone</Label>
           {PSG_CONTACT.phones.map((p) => (
             <View key={p.number} style={styles.between}>
-              <Row icon="phone" text={`${p.label}: ${p.number}`} bold onPress={() => void callNumber(p.number)} label={`Call ${p.label.toLowerCase()} ${p.number}`} />
+              <Row icon="phone" text={`${p.label}: ${p.number}`} bold onPress={() => void callNumber(p.number)} label={`Call ${p.label} on ${p.number}`} />
               <Pressable accessibilityRole="button" accessibilityLabel={`Copy ${p.number}`} hitSlop={10} onPress={() => void Clipboard.setStringAsync(p.number).then(() => toast.success('Number copied'))}>
                 <Text variant="bodySmall" color="primaryBright">Copy</Text>
               </Pressable>
             </View>
           ))}
-          <Row icon="mail" text={PSG_CONTACT.email} mono onPress={() => void sendEmail(PSG_CONTACT.email, 'Enquiry from the PSG app')} />
-          <Row icon="sun" text={`Solar (Trite Solar): ${PSG_CONTACT.solarEmail}`} mono onPress={() => void sendEmail(PSG_CONTACT.solarEmail, 'Solar enquiry from the PSG app')} />
+
+          <Label>Email</Label>
+          {PSG_CONTACT.emails.map((e) => (
+            <Row key={e.address} icon={e.label.startsWith('Solar') ? 'sun' : 'mail'} text={`${e.label}: ${e.address}`} mono onPress={() => void sendEmail(e.address, 'Enquiry from the PSG app')} label={`Email ${e.label} at ${e.address}`} />
+          ))}
+
           <View style={{ flexDirection: 'row', gap: spacing.sm }}>
             <QuickAction icon="phone-call" label="Call PSG" color={colors.primary} onPress={() => void callNumber(PSG_CONTACT.primaryPhone)} />
-            {whatsapp ? <QuickAction icon="message-square" label="WhatsApp" color={colors.surfaceElevated} onPress={() => void openWhatsApp(whatsapp, 'Hello PSG Electrical, I would like assistance with…')} /> : null}
+            <QuickAction icon="message-square" label="WhatsApp" color={colors.surfaceElevated} onPress={() => void openWhatsApp(PSG_CONTACT.whatsapp, 'Hello PSG Electrical, I would like assistance with…')} />
+            <QuickAction icon="mail" label="Email" color={colors.surfaceElevated} onPress={() => void sendEmail(PSG_CONTACT.emails[0].address, 'Enquiry from the PSG app')} />
           </View>
-          <Text variant="caption" color="textMuted">You can send a request at any time; we respond during office hours.</Text>
+          <Text variant="caption" color="textMuted">You can send a request or message at any time; we respond during office hours. There is no weekend or after-hours service.</Text>
         </Card>
 
         <Card accent="danger" style={{ flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' }}>
@@ -103,33 +99,12 @@ export default function ContactScreen() {
           <Text variant="bodySmall" color="textSecondary" style={{ flex: 1 }}>{SAFETY_NOTE}</Text>
         </Card>
 
-        {officeList.length ? (
-          <>
-            <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="navigation" size={16} color="primaryBright" /><Label color="primaryBright" style={{ fontSize: 13 }}>Offices</Label></View>
-            {officeList.length > 1 ? <FilterChips value={office?.region ?? ''} onChange={setRegion} options={officeList.map((o) => ({ value: o.region, label: o.region }))} /> : null}
-            {office ? (
-              <Card style={{ gap: spacing.md }}>
-                <View>
-                  <Text variant="h3">{office.name}</Text>
-                  <Text variant="mono" color="primaryBright" style={{ fontSize: 12 }}>{office.area}</Text>
-                </View>
-                <Row icon="map-pin" text={office.address} />
-                <Row icon="phone" text={office.phone} bold onPress={() => void callNumber(office.phone)} />
-                <Row icon="mail" text={office.email} mono onPress={() => void sendEmail(office.email)} />
-                {office.manager ? <Row icon="user" text={office.manager} /> : null}
-                <Row icon="clock" text={office.hours} />
-                <Button label="Open directions" icon="external-link" variant="secondary" onPress={officeDirections} />
-              </Card>
-            ) : null}
-          </>
-        ) : null}
-
         <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="file-text" size={16} color="primaryBright" /><Label color="primaryBright" style={{ fontSize: 13 }}>Send us a message</Label></View>
         <Card style={{ gap: spacing.lg }}>
           {sentRef ? (
             <View style={styles.sent}>
               <Icon name="check-circle" size={20} color="success" />
-              <Text variant="bodySmall" style={{ flex: 1 }}>Enquiry <Text variant="mono" color="primaryBright">{sentRef}</Text> received. We will respond during office hours ({PSG_CONTACT.hours}).</Text>
+              <Text variant="bodySmall" style={{ flex: 1 }}>Enquiry <Text variant="mono" color="primaryBright">{sentRef}</Text> received. We will respond during office hours ({PSG_CONTACT.hoursShort}).</Text>
             </View>
           ) : null}
           <TextField label="Full Name" required value={form.name} onChangeText={(v) => setForm({ ...form, name: v })} placeholder="e.g. David Nkosi" error={errors.name} autoComplete="name" />
@@ -147,24 +122,6 @@ export default function ContactScreen() {
             {user?.role === 'CUSTOMER' ? 'This sends a message to the office. To book work you can track, use Request service in your dashboard.' : 'This sends an enquiry to the office — no account needed. We reply by your preferred method.'}
           </Text>
         </Card>
-
-        {(departments.data ?? []).length ? (
-          <>
-            <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}><Icon name="headphones" size={16} color="primaryBright" /><Label color="primaryBright" style={{ fontSize: 13 }}>Department contacts</Label></View>
-            {(departments.data ?? []).map((d) => (
-              <Card key={d.id} onPress={() => void callNumber(d.phone)} accessibilityLabel={`Call ${d.name}`}>
-                <View style={{ flexDirection: 'row', gap: spacing.md }}>
-                  <View style={styles.deptIcon}><Icon name={DEPT_ICON[d.icon] ?? 'phone'} size={18} color="primaryBright" /></View>
-                  <View style={{ flex: 1, gap: 2 }}>
-                    <Text variant="title" weight="bold">{d.name}</Text>
-                    <Text variant="mono" color="textMuted" style={{ fontSize: 12 }}>{d.email}</Text>
-                    <Text variant="mono" style={{ fontSize: 13 }}>{d.phone}</Text>
-                  </View>
-                </View>
-              </Card>
-            ))}
-          </>
-        ) : null}
 
         {(faqs.data ?? []).length ? (
           <>

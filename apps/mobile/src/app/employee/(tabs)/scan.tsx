@@ -13,10 +13,10 @@ import { useRef, useState } from 'react';
 import { Linking, Platform, StyleSheet, View } from 'react-native';
 import type { JobDetailDto } from '@hydra/shared';
 import { api, errorMessage } from '../../../api/client';
-import { usePublicContent } from '../../../api/queries';
 import { BrandHeader, Screen } from '../../../components/layout';
 import { Button, Card, Icon, Label, Text, colors, radius, spacing, toast } from '../../../design-system';
 import { cameraSupport, captureArrivalLocation, describeCheckinError, parseHydraQr } from '../../../features/checkin';
+import { PSG_CONTACT } from '../../../content/company';
 import { callNumber } from '../../../utils/links';
 
 type Phase = { kind: 'scanning' } | { kind: 'locating'; jobId: string } | { kind: 'submitting'; jobId: string } | { kind: 'done'; job: JobDetailDto; shiftStarted: boolean } | { kind: 'error'; message: string; code?: string };
@@ -31,7 +31,6 @@ export default function ScanScreen() {
   const [support] = useState(cameraSupport);
   const locked = useRef(false);
   const qc = useQueryClient();
-  const content = usePublicContent();
 
   const onScan = async (data: string) => {
     if (locked.current) return;
@@ -85,7 +84,7 @@ export default function ScanScreen() {
                 : 'This browser does not provide camera access. Use the PSG Electrical phone app to scan the customer’s arrival QR.'}
             </Text>
             <Text variant="caption" color="textMuted">If you are on site without the app, the office can confirm your arrival manually.</Text>
-            <Button label="Call the office for manual confirmation" icon="phone-call" variant="secondary" onPress={() => content.data && void callNumber(content.data.company.hotline)} />
+            <Button label="Call the office for manual confirmation" icon="phone-call" variant="secondary" onPress={() => void callNumber(PSG_CONTACT.primaryPhone)} />
           </Card>
         ) : !permission ? (
           <Card style={{ gap: spacing.sm }} testID="scan-permission-loading">
@@ -111,7 +110,7 @@ export default function ScanScreen() {
             <Text variant="h3">Camera unavailable</Text>
             <Text variant="bodySmall" color="textMuted">{cameraError}</Text>
             <Button label="Try the camera again" icon="refresh-cw" onPress={() => setCameraError(null)} />
-            <Button label="Call the office for manual confirmation" icon="phone-call" variant="secondary" onPress={() => content.data && void callNumber(content.data.company.hotline)} />
+            <Button label="Call the office for manual confirmation" icon="phone-call" variant="secondary" onPress={() => void callNumber(PSG_CONTACT.primaryPhone)} />
           </Card>
         ) : phase.kind === 'done' ? (
           <Card accent="success" style={{ gap: spacing.md, alignItems: 'center' }}>
@@ -148,7 +147,7 @@ export default function ScanScreen() {
                 <Text variant="bodySmall" color="textSecondary">Ask the customer to open their job in the PSG Electrical app and tap “Show arrival QR code”. Point your camera at it.</Text>
               </Card>
             ) : null}
-            {phase.kind === 'error' ? <ScanProblem phase={phase} failures={failures} onRetry={reset} hotline={content.data?.company.hotline} /> : null}
+            {phase.kind === 'error' ? <ScanProblem phase={phase} failures={failures} onRetry={reset} hotline={PSG_CONTACT.primaryPhone} /> : null}
           </>
         )}
       </Screen>

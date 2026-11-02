@@ -22,6 +22,7 @@ export default function EmployeeProfile() {
             { icon: 'award', label: 'Inspection / CoC', route: '/employee/jobs?focus=inspection' },
             { icon: 'sun', label: 'My leave requests', route: '/employee/leave' },
             { icon: 'bell', label: 'Notifications', route: '/employee/notifications' },
+            { icon: 'phone', label: 'Contact the office', route: '/contact' },
           ]} />
         </View>
       }

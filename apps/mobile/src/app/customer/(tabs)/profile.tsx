@@ -21,6 +21,7 @@ export default function CustomerProfile() {
             { icon: 'bell', label: 'Notifications', route: '/customer/notifications' },
             { icon: 'award', label: 'Compliance certificates', route: '/customer/jobs?filter=CERTIFICATES' },
             { icon: 'cpu', label: 'Smart Quote assessments', route: '/customer/ai' },
+            { icon: 'phone', label: 'Contact PSG', route: '/contact' },
             { icon: 'globe', label: 'About PSG & services', route: '/home' },
           ]} />
         </View>
