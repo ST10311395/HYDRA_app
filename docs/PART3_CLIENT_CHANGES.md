@@ -12,38 +12,44 @@ it onto the actual code, tracks progress and records anything that still needs o
 
 ## 1. Approved business facts
 
-Sources: PSG website (<https://psg-electrical-site.axiomcompute.workers.dev/>) and the owner's company
-portfolio (`part3-reference/Screenshot 2026-11-01 2031*.png`).
+Sources: PSG website (<https://psg-electrical-site.axiomcompute.workers.dev/>), the owner's company
+portfolio (`part3-reference/Screenshot 2026-11-01 2031*.png`) and the owner confirmations of 2 November 2026
+([`HYDRA_PART3_OWNER_CONFIRMED_DETAILS.md`](../HYDRA_PART3_OWNER_CONFIRMED_DETAILS.md)), which take precedence.
 
 | Fact | Value used in the app | Source |
 | --- | --- | --- |
 | Trading name | PSG Electrical & Cables (solar division: Trite Solar) | Website, portfolio |
 | Strapline | Innovation-driven electrical solutions | Website, portfolio cover |
-| Primary phone | 082 603 9283 | Website; portfolio lists it as Ricky |
-| Second phone | 072 752 0848 | Website; portfolio lists it as Keoran |
-| Published hours | 07:00–18:00 (no response-time promise) | Website |
+| Phone numbers | Ricky: 082 603 9283 (primary, header call button) · Keoran: 072 752 0848 | Owner confirmed |
+| Email addresses | General enquiries: info@psgelectrical.co.za · Solar (Trite Solar): trite@polka.co.za | Owner confirmed |
+| WhatsApp | 082 603 9283 (`https://wa.me/27826039283`) | Owner confirmed |
+| Office hours | Monday–Friday, 07:00–18:00 (no weekend, after-hours or response-time promise) | Owner confirmed |
+| Experience | 25+ years (no founding year is stated) | Owner confirmed |
+| Warranty | 12-month warranty on workmanship only (not supplied equipment or materials) | Owner confirmed |
+| Clients | African Logistics Services, Swift Chemicals, Fashion Fusion, Hi-Tap Bolt & Tool, UKZN — names, portfolio descriptions and logos | Owner permission; portfolio |
+| Offices | None besides the business itself; no regional offices or branch managers | Owner confirmed |
 | Services | Electrical installations · Fault finding · Distribution boards · Compliance (CoC, SANS 10142-1) · Maintenance & repairs · Solar & backup power | Website |
 | Capability areas | Industrial installations and upgrades · cable management · DB installation/reconfiguration · fault finding and diagnostics · maintenance in operational environments · solar integration support · hazardous-area compliance and installations | Portfolio |
 | Sectors | Industrial & manufacturing · retail & commercial · logistics & warehousing · institutional facilities · chemical & hazardous environments | Portfolio |
 | Quality statement | Work adheres to SANS 10142 wiring standards, CoC requirements and industry best practice; priorities are safety, compliance and long-term reliability | Portfolio |
 | Quote intake categories | New installation · Fault or repair · DB board · Compliance (CoC) · Solar & backup · Maintenance | Website |
 
-### Needs owner confirmation (do not state until confirmed)
+### Owner questions and how they were resolved (2 November 2026)
 
-| # | Question | Current handling |
+| # | Question | Resolution |
 | --- | --- | --- |
-| Q1 | **Email addresses conflict.** Website: `keoran@psgelectrical.co.za`, `keoran@tritesolar.co.za`. Portfolio: `info@psgelectrical.co.za`, `trite@polka.co.za`. Which are current? | Use the website addresses (newer, client-specified source of public contact data); flag here. |
-| Q2 | Which number is the primary business line, and may personal names (Ricky / Keoran) be shown? | 082 603 9283 primary, as the brief specifies; numbers labelled without personal names. |
-| Q3 | Days of operation for the 07:00–18:00 hours. | Show the hours only, no weekdays. |
-| Q4 | "25+ years" industry experience. | Not displayed prominently until confirmed. |
-| Q5 | Permission to show portfolio client names/logos (African Logistics Services, Swift Chemicals, Fashion Fusion, Hi-Tap Bolt & Tool, UKZN). | Not shown as named projects until permission is confirmed. |
-| Q6 | Original logo artwork (SVG or high-resolution transparent PNG). | Needed for commit 05; a screenshot crop is not production quality. |
-| Q7 | Website address: portfolio says `www.psgelectrical.co.za`, live site is the workers.dev URL. | Use the domain only where the brief allows; flag. |
-| Q8 | WhatsApp number for the business. | WhatsApp action hidden until a number is configured in public content. |
-| Q9 | Office address(es) and department desks to publish. | None shown; the contact screen lists the verified phones, emails and hours. |
-| Q10 | Service “starting from” prices (seeded: e.g. DB boards R45 000, fault finding R1 450). | Unchanged (business data); owner to review in Admin → Service types. |
-| Q11 | AI triage response windows for levels 1–2 (“3–5 business days”, “1–3 business days”) and working days (Mon–Fri assumed). | Unchanged defaults, editable by the owner in AI settings; only 24-hour/24-7/“immediately” wording removed. |
-| Q12 | Default quote terms say “Workmanship guaranteed for 12 months” (Admin → quote builder). | Unchanged: editable business terms, not app marketing; owner to confirm the warranty period. |
+| Q1 | Which email addresses are current? | **Resolved:** info@psgelectrical.co.za and trite@polka.co.za (Trite Solar), both shown. |
+| Q2 | Primary number; may personal names be shown? | **Resolved:** both shown as Ricky / Keoran; header dials 082 603 9283 (owner may still name a different primary). |
+| Q3 | Days of operation. | **Resolved:** Monday–Friday, 07:00–18:00. |
+| Q4 | “25+ years” experience. | **Resolved:** confirmed; shown on Home, Work, Why PSG and Team. |
+| Q5 | Permission to show portfolio client names and logos. | **Resolved:** confirmed; the five portfolio clients are shown on Work and Home with their portfolio logos. |
+| Q6 | Original logo artwork. | **Partly resolved:** a recreated PNG lockup was supplied (not an original vector). Used on welcome and loading screens; vector mark kept for header and icons. Owner approval of the recreation still pending. |
+| Q7 | Website address (`www.psgelectrical.co.za` vs the workers.dev URL). | **Open:** no website link is shown in the app. |
+| Q8 | WhatsApp number. | **Resolved:** 082 603 9283. |
+| Q9 | Offices and department desks. | **Resolved:** no additional offices; none are shown, even if an older database still returns seeded ones. |
+| Q10 | Service “starting from” prices (seeded: e.g. DB boards R45 000, fault finding R1 450). | **Open:** unchanged business data; owner to review in Admin → Service types. Not advertised as quoted prices. |
+| Q11 | AI triage response windows for levels 1–2 (“3–5 business days”, “1–3 business days”). | **Open:** unchanged owner-editable defaults; business hours set to Mon–Fri 07:00–18:00. |
+| Q12 | Warranty period in the default quote terms. | **Resolved:** 12-month warranty on workmanship only; default terms and the FAQ say so explicitly. |
 
 ## 2. Claims to remove or reword
 
@@ -229,9 +235,29 @@ covered by automated tests with stubs only. Use `docs/MANUAL_TEST_MATRIX.md` for
 
 ## 9. Known limitations and follow-ups
 
-- Owner confirmations Q1–Q12 (section 1) are outstanding; the app uses the conservative choice for each.
-- The logo is a vector redraw from the portfolio slide until the owner supplies original artwork (Q6).
+- Still open with the owner: approval of the recreated logo (Q6), the website address (Q7), seeded service
+  prices (Q10) and AI response windows for levels 1–2 (Q11). The portfolio repeats the African Logistics
+  Services description for UKZN, so UKZN is described with the portfolio’s institutional-sector wording until
+  the owner supplies its own.
+- The recreated lockup’s tagline is small on 320 px phones (about 6–7 px high); a higher-resolution or
+  vector original would help. Client logos are cropped from the portfolio slide (about 74 px) and shown at
+  44 pt; originals would render more sharply.
 - Databases created before Part 3 keep their old marketing rows until `npm run db:content:refresh -w @hydra/api
-  -- --apply` is run (owner approval needed for production); service wording can also be edited in Admin → Service types.
-- Admin-editable text (default quote terms, AI policy response windows for levels 1–2) is left for the owner to
-  review (Q11, Q12).
+  -- --apply` is run (owner approval needed for production). That refresh also applies the owner-confirmed company
+  details and FAQs (including the invoice PDF header, which reads them from the database). Service wording can
+  also be edited in Admin → Service types.
+
+## 10. Owner-confirmed follow-up (2 November 2026)
+
+Applied as new commits after the 26 Part 3 commits (none of which were rewritten):
+
+| Change | Files | Tests |
+| --- | --- | --- |
+| Confirmed contact details in all four interfaces: both numbers (Ricky, Keoran) and both emails with working `tel:` / `mailto:`; WhatsApp to `wa.me/27826039283`; Monday–Friday 07:00–18:00; no office or department listings; electricians’ “call the office” and customer / electrician links to Contact | `content/company.ts`, `(tabs)/contact.tsx`, `employee/(tabs)/scan.tsx`, customer Account, employee More, footer / home hours | `owner-contact` |
+| Owner-supplied recreated logo lockup on welcome and loading screens | `assets/images/brand/psg-logo-lockup.png`, `components/LogoLockup.tsx`, `app/welcome.tsx`, `BootSplash.tsx` | `branding`, `auth-landing` |
+| 25+ years, portfolio clients with logos, 12-month workmanship warranty | `content/marketing.ts`, `components/marketing.tsx`, Home, Work, Why PSG, Team, Quote, admin quote default terms, `assets/images/clients/*` | `owner-facts`, `guest-navigation` |
+| Seeded company details, FAQs (hours, emails, warranty) and AI office hours | `api/seeds/content.ts`, `api/src/ai/policies.ts` | API `content` |
+
+Validation (2 November 2026): lint and typecheck pass; tests shared 17 · API 254 · mobile 356 (34 suites), all
+passing, with no `act()` warnings; route audit 232 navigation targets → 88 routes; Android/iOS and web exports
+pass; Contact, Welcome, Home, Work, Why PSG and Quote checked visually at 320 px.
