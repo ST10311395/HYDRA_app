@@ -9,7 +9,7 @@ import { router } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BrandBackdrop } from '../components/BrandBackdrop';
-import { BrandLogo } from '../components/BrandLogo';
+import { LogoLockup } from '../components/LogoLockup';
 import { Button, Icon, Text, colors, radius, spacing } from '../design-system';
 import { useAuth } from '../store/auth';
 
@@ -30,11 +30,7 @@ export default function Welcome() {
       <BrandBackdrop height={260} />
       <View style={[styles.column, styles.body]}>
         <View style={styles.brand}>
-          <BrandLogo size={88} decorative />
-          <View style={{ alignItems: 'center', gap: 2 }}>
-            <Text variant="h2" align="center">PSG Electrical & Cables</Text>
-            <Text variant="bodySmall" color="textMuted" align="center">Innovation-driven electrical solutions</Text>
-          </View>
+          <LogoLockup />
         </View>
 
         <View style={{ gap: spacing.sm }}>

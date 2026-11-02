@@ -32,11 +32,11 @@ describe('welcome gateway', () => {
   it('has no photograph; brand, welcome and actions appear in that order', async () => {
     expect(readFileSync(join(__dirname, '../app/welcome.tsx'), 'utf8')).not.toMatch(/imageFor|expo-image/);
     await renderScreen(<Welcome />);
-    expect(screen.getByTestId('brand-logo')).toBeOnTheScreen();
+    expect(screen.getByTestId('brand-lockup')).toBeOnTheScreen();
     // Decorative: hidden from screen readers, so it is only found when hidden elements are included.
     expect(screen.getByTestId('brand-backdrop', { includeHiddenElements: true })).toBeOnTheScreen();
     expect(screen.queryByTestId('brand-backdrop')).toBeNull();
-    const positions = ['"PSG Electrical & Cables"', '"Welcome"', '"welcome-sign-in"', '"welcome-register"', '"welcome-guest"'].map(positionOf);
+    const positions = ['"brand-lockup"', '"Welcome"', '"welcome-sign-in"', '"welcome-register"', '"welcome-guest"'].map(positionOf);
     expect(positions.every((p) => p >= 0)).toBe(true);
     expect([...positions].sort((a, b) => a - b)).toEqual(positions);
   });

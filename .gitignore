@@ -39,3 +39,7 @@ apps/api/.test-uploads/
 
 # Part 3 client reference images (local only; contain third-party logos)
 part3-reference/
+
+# Owner-supplied original logo: kept locally for reference only; the app uses the optimised
+# apps/mobile/assets/images/brand/psg-logo-lockup.png
+/PSG_Electrical_Cables_Recreated_Logo.png

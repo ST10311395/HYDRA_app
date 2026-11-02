@@ -28,7 +28,18 @@ describe('PSG brand mark', () => {
     ['welcome', <Welcome key="w" />],
   ])('the %s shows the PSG logo', async (_name, ui) => {
     await renderScreen(ui);
-    expect(screen.getAllByTestId('brand-logo').length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryAllByTestId('brand-logo').length + screen.queryAllByTestId('brand-lockup').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('the welcome and loading screens use the owner-supplied lockup; compact places keep the vector mark', async () => {
+    await renderScreen(<Welcome />);
+    expect(screen.getByTestId('brand-lockup')).toBeOnTheScreen();
+    expect(screen.getByLabelText('PSG Electrical & Cables — Innovation driven electrical solutions')).toBeOnTheScreen();
+    await renderScreen(<BootSplash />);
+    expect(screen.getByTestId('brand-lockup')).toBeOnTheScreen();
+    await renderScreen(<BrandHeader section="Home" />);
+    expect(screen.getByTestId('brand-logo')).toBeOnTheScreen();
+    expect(screen.queryByTestId('brand-lockup')).toBeNull();
   });
 
   it('is announced once as the company logo when it is not decorative', async () => {
