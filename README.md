@@ -13,15 +13,25 @@ reporting — plus **HYDRA Smart Quote**, an AI quotation & triage assistant wit
 
 Repository: [ST10311395/HYDRA_app](https://github.com/ST10311395/HYDRA_app)
 
-This README describes the repository as of 5 October 2026. Local demonstration features run without any cloud
-credentials. The production API is hosted on Azure App Service (see
-[Build and deployment](#build-and-deployment)); other integration adapters (payments, SMS, email, AI providers)
-are only live once their credentials are configured — their presence in the code does not establish that those
-services are live.
+> **Final submitted application — 5 November 2026.** This repository contains the complete HYDRA source code
+> submitted for assessment: the mobile application, REST API, shared contracts, database migrations, automated
+> tests, CI/CD workflows and documentation. It includes the Part 3 PSG Electrical & Cables client changes, merged
+> into `main` through pull request #1 (`ccfff4b`), with all CI checks passing.
+
+This README describes the repository as of 5 November 2026. HYDRA implements its third-party integrations in
+code — Google Sign-In, Firebase Cloud Messaging through Expo push notifications, Paystack payments, SMTP email,
+Twilio SMS/WhatsApp, Azure Blob Storage and Google Gemini, Anthropic or OpenAI-compatible AI providers. Each
+deployment switches these on by supplying its own credentials and configuration, so the configuration of an
+environment — not the presence of the integration code — determines which external services are live there (see
+[Integrations and external services](#integrations-and-external-services)). The API is hosted on Azure App
+Service, and a separate Azure staging deployment was used for client acceptance testing (see
+[Deployment environments](#deployment-environments)). Local development runs without any cloud credentials,
+using clearly labelled development fallbacks.
 
 ## Contents
 
 - [Features and user roles](#features-and-user-roles)
+- [User guide](#user-guide)
 - [Technology and architecture](#technology-and-architecture)
 - [Project structure](#project-structure)
 - [Local setup](#local-setup)
@@ -31,7 +41,9 @@ services are live.
 - [HYDRA Smart Quote](#hydra-smart-quote-ai-quotation--triage-assistant)
 - [Permissions and platform notes](#permissions-and-platform-notes)
 - [Testing and quality checks](#testing-and-quality-checks)
+- [Final testing and validation](#final-testing-and-validation)
 - [Build and deployment](#build-and-deployment)
+- [Deployment environments](#deployment-environments)
 - [Troubleshooting](#troubleshooting)
 - [Team workflow](#team-workflow)
 - [Generative AI declaration](#generative-ai-declaration)
@@ -45,23 +57,38 @@ services are live.
 | Customer | Register and sign in; request electrical or solar services; track jobs; accept or decline quotations; view invoices and payments; manage notification preferences; use Smart Quote. |
 | Employee / electrician | View assigned work; use QR and GPS attendance/check-in features; clock in and out; update work progress and materials; complete jobs and view relevant job information. |
 | Office administrator | Manage customers, service requests, quotations, assignments, invoices, payments, inventory, missed-call follow-up and AI review cases. |
-| Owner | Administration plus restricted settings, workforce/payroll, reports and exports, audit records, staff accounts, POPIA requests and AI policy controls. |
+| Owner | Administration plus restricted settings, workforce/payroll approval, reports and exports, audit records, staff accounts, POPIA requests and AI policy controls. |
 
 Additional workflows include a Certificate of Compliance register, staff records, service types, discounts,
 rewards, leave and customer data requests. API permissions enforce access to records and restricted operations;
 hiding a screen alone is insufficient protection.
 
+Navigation by role (bottom tabs): guests — Home · Services · Work · Quote · Contact; customers — Home · My jobs ·
+Request · Billing · Account; electricians — Today · Calendar · Scan · Timesheet · More; office administrators and
+the owner — Dashboard · Enquiries · Jobs · Workforce · Manage. The **Manage** tab groups every office module and
+lists owner-only modules (Reports, Data exports, Audit log, POPIA data requests, Staff accounts and AI Assistant
+settings) for the owner only.
+
+## User guide
+
+A non-technical user guide for PSG Electrical & Cables customers, electricians, office administrators and the
+owner accompanies this submission as a Microsoft Word document, `PSG_Electrical_HYDRA_User_Guide.docx`
+(version 1.0, 5 November 2026). It covers Android installation, signing in, step-by-step instructions for every
+role, navigation and job statuses, troubleshooting (including the verified camera-permission fix for the QR
+scanner), frequently asked questions and quick-reference guides. The document is submitted separately and is not
+stored in this repository.
+
 ## Technology and architecture
 
 | Component | Technology and purpose |
 | --- | --- |
-| Mobile application (`apps/mobile`) | Expo SDK 57 · React Native 0.86 · React 19.2 · TypeScript (strict) · Expo Router · TanStack Query · Zustand · React Hook Form + Zod · SecureStore · Camera · Location · Notifications — screens, navigation and device capabilities (Meta Platforms, Inc., 2026a; 2026b; Expo, 2026). |
-| Backend (`apps/api`) | Node.js 24 · Express 5 · TypeScript · Zod validation · repository pattern over `pg` · JWT (jose) + rotating refresh tokens · Socket.IO · pino · OpenAPI 3 (Swagger UI) (OpenJS Foundation, 2026). |
+| Mobile application (`apps/mobile`) | Expo SDK 57 (57.0.31) · React Native 0.86.3 · React 19.2.3 · TypeScript 6.0 (strict) · Expo Router · TanStack Query 5 · Zustand 5 · React Hook Form + Zod 4 · SecureStore · Camera · Location · Notifications · Google Sign-In (`@react-native-google-signin/google-signin` 16) · Socket.IO client — screens, navigation and device capabilities (Meta Platforms, Inc., 2026a; 2026b; Expo, 2026). |
+| Backend (`apps/api`) | Node.js ≥ 20.19 (Node.js 24 in CI and deployment) · Express 5.2 · TypeScript 6.0 · Zod 4 validation · repository pattern over `pg` 8 · JWT (jose 6) + rotating refresh tokens · bcrypt password hashing (bcryptjs) · Helmet · Socket.IO 4 · pino · OpenAPI 3 (Swagger UI) · PDFKit invoices · node-cron scheduled jobs (OpenJS Foundation, 2026). |
 | Shared contracts (`packages/shared`) | Domain enums, lifecycle state machines, money/payroll maths and Zod DTO schemas used by both apps (Microsoft, 2026e). |
-| Database | PostgreSQL 17/18 (Azure Database for PostgreSQL Flexible Server in production) · SQL migrations · seed (PostgreSQL Global Development Group, 2026). |
+| Database | PostgreSQL — production: Azure Database for PostgreSQL Flexible Server running **PostgreSQL 16** (16.15, Burstable B1ms); local development: embedded **PostgreSQL 18** (18.4, `embedded-postgres`); Docker Compose and CI: **PostgreSQL 17** · six SQL migrations · seed (PostgreSQL Global Development Group, 2026; Microsoft, 2026c). |
 | Package management | npm workspaces for the shared, API and mobile packages (npm, Inc., 2026). |
-| Quality tools | ESLint, TypeScript, Jest for mobile tests and Vitest for API/shared tests (ESLint, 2026; Microsoft, 2026e; Meta Open Source, 2026). |
-| Cloud | Azure App Service · PostgreSQL Flexible Server · Blob Storage · Key Vault · Application Insights · EAS Build (Microsoft, 2026a; 2026b; 2026c; 2026d; Expo, 2026). |
+| Quality tools | ESLint 9, TypeScript, Jest 29 + React Native Testing Library for mobile tests and Vitest 5 + Supertest for API/shared tests (ESLint, 2026; Microsoft, 2026e; Meta Open Source, 2026). |
+| Cloud | Azure App Service · Azure Database for PostgreSQL Flexible Server · Blob Storage · Key Vault and Application Insights (configured at App Service level) · EAS Build (Microsoft, 2026a; 2026b; 2026c; 2026d; Expo, 2026). |
 | Version control and automation | Git, GitHub and GitHub Actions (Software Freedom Conservancy, 2026; GitHub, 2026a; 2026b). |
 | Development editor | Visual Studio Code is a suitable editor for the monorepo (Microsoft, 2026f). |
 
@@ -223,9 +250,9 @@ the `db:reset` output. All demo accounts share that password:
 | Role | Sign in with | Opens |
 | --- | --- | --- |
 | Customer | `customer@hydra.demo` (also `ayanda@hydra.demo`) | Customer app (first sign-in shows the guided onboarding) |
-| Employee / electrician | `sipho@hydra.demo` **or** staff number `PSG-E-0003` (also `anele@` = `PSG-E-0004`, `ruan@hydra.demo` = `PSG-E-0005`) | Electrician app (Today · Calendar · Scan · Timesheet · Profile) |
-| Office admin | `office@hydra.demo` or `PSG-A-0002` | Operations Center without owner modules |
-| Owner / manager | `owner@hydra.demo` or `PSG-A-0001` | Operations Center **plus** Owner tools (reports, exports, audit, staff, POPIA requests, payroll approval) |
+| Employee / electrician | `sipho@hydra.demo` **or** staff number `PSG-E-0003` (also `anele@` = `PSG-E-0004`, `ruan@hydra.demo` = `PSG-E-0005`) | Electrician app (Today · Calendar · Scan · Timesheet · More) |
+| Office admin | `office@hydra.demo` or `PSG-A-0002` | Operations centre (Dashboard · Enquiries · Jobs · Workforce · Manage) without owner modules |
+| Owner / manager | `owner@hydra.demo` or `PSG-A-0001` | Operations centre **plus** owner tools (reports, exports, audit, staff, POPIA requests, AI Assistant settings, business settings and payroll approval) |
 
 Everyone uses the same **Sign In** screen (the “Customer / Staff” tabs only change the wording). The
 API returns the account's role and the app opens that role's workspace — the client never chooses it.
@@ -277,35 +304,40 @@ with `503 GOOGLE_NOT_CONFIGURED`. Email/password sign-in covers every role.
 
 ## Integrations and external services
 
-| Service | Purpose | Guide | Development behaviour |
-| --- | --- | --- | --- |
-| Azure App Service | API hosting (production: `hydra-psg-api`) (Microsoft, 2026a) | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | `npm run api` on localhost:4000 |
-| Azure Database for PostgreSQL | Managed production database; requires secure connection settings (Microsoft, 2026c) | [docs/AZURE_SETUP.md](docs/AZURE_SETUP.md) | Embedded PostgreSQL on :5433 |
-| Azure Blob Storage | Private file storage, selected with `STORAGE_PROVIDER=azure` (Microsoft, 2026b) | [docs/AZURE_SETUP.md](docs/AZURE_SETUP.md) | Local disk storage with HMAC-signed expiring URLs |
-| Azure Key Vault / Application Insights | Secret management and telemetry (Microsoft, 2026d) | [docs/AZURE_SETUP.md](docs/AZURE_SETUP.md) | Not used |
-| Google Sign-In | OAuth sign-in; requires client IDs and platform configuration | [docs/GOOGLE_AUTH.md](docs/GOOGLE_AUTH.md) | Button explains it is not configured — never fakes a login |
-| Payments (Paystack, ZAR) | Real card/EFT payments | [docs/PAYMENTS.md](docs/PAYMENTS.md) | Signed-webhook sandbox checkout page (`PAYMENT_PROVIDER=simulated`), refused in production |
-| SMS / WhatsApp (Twilio) | Optional customer messaging | [docs/SMS_TWILIO.md](docs/SMS_TWILIO.md) | Messages logged with delivery status `NOT_CONFIGURED`, never marked sent |
-| Push notifications (Expo) | Job and account notifications | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#push-notifications) | Expo push tokens (works in dev builds); in-app notifications always available |
-| Email (SMTP) | Password resets and invitations | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#email) | Console outbox |
-| AI provider (Smart Quote) | Preliminary quotation & triage | [docs/AI_ASSISTANT.md](docs/AI_ASSISTANT.md#10-configuration) | `AI_PROVIDER=mock` deterministic simulation; see below |
+Every integration below is implemented in the HYDRA source code. The **configuration** column lists what each
+deployment must supply to activate it; without that configuration the application uses the documented
+development behaviour instead of pretending the service is live.
+
+| Service | Implementation in HYDRA | Configuration each deployment supplies | Guide | Behaviour without configuration (development) |
+| --- | --- | --- | --- | --- |
+| Azure App Service | API hosting (production: `hydra-psg-api`) (Microsoft, 2026a) | App settings, publish profile for the deploy workflow | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | `npm run api` on localhost:4000 |
+| Azure Database for PostgreSQL | Managed database with TLS (`DATABASE_SSL=true`) (Microsoft, 2026c) | `DATABASE_URL` for a least-privilege database role | [docs/AZURE_SETUP.md](docs/AZURE_SETUP.md) | Embedded PostgreSQL on :5433 |
+| Azure Blob Storage | Private container with short-lived SAS links (`@azure/storage-blob`) (Microsoft, 2026b) | `STORAGE_PROVIDER=azure`, connection string, container | [docs/AZURE_SETUP.md](docs/AZURE_SETUP.md) | Local disk storage with HMAC-signed expiring URLs |
+| Azure Key Vault / Application Insights | Secret references and telemetry at App Service level (Microsoft, 2026d) | Key Vault references in app settings; Application Insights connection string | [docs/AZURE_SETUP.md](docs/AZURE_SETUP.md) | Not used |
+| Google Sign-In | Native Google Sign-In in the app; the API verifies Google ID tokens against HYDRA's OAuth client IDs (`google-auth-library`) and issues its own session (Google, 2026b) | `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (EAS environment), API `GOOGLE_*_CLIENT_ID`s, Android OAuth client with the signing-key SHA-1 | [docs/GOOGLE_AUTH.md](docs/GOOGLE_AUTH.md) | Button explains it is not configured — never fakes a login; API answers `503 GOOGLE_NOT_CONFIGURED` |
+| Push notifications (Expo + Firebase Cloud Messaging) | Expo push tokens registered after sign-in; the API sends through the Expo Push Service (`expo-server-sdk`), which delivers via FCM on Android and APNs on iOS, and prunes invalid tokens from receipts (Expo, 2026; Google, 2026a) | `google-services.json` as the EAS file variable `GOOGLE_SERVICES_JSON`, FCM V1 service-account key in EAS credentials, `PUSH_NOTIFICATION_CONFIG=expo` (optional `EXPO_ACCESS_TOKEN`) | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#push-notifications), [docs/EAS_BUILD.md](docs/EAS_BUILD.md) | In-app notifications always available |
+| Payments (Paystack, ZAR) | Transaction initialisation, hosted checkout, HMAC-SHA512 signature-verified idempotent webhooks (`charge.success`) and settlement (Paystack, 2026) | `PAYMENT_PROVIDER=paystack`, secret and public keys, webhook URL in the Paystack dashboard | [docs/PAYMENTS.md](docs/PAYMENTS.md) | Signed-webhook sandbox checkout page (`PAYMENT_PROVIDER=simulated`), clearly labelled and refused in production |
+| SMS / WhatsApp (Twilio) | Twilio Messages API for SMS and WhatsApp, with delivery status recorded (Twilio, 2026) | `SMS_PROVIDER`/`WHATSAPP_PROVIDER=twilio`, credentials and approved sender numbers | [docs/SMS_TWILIO.md](docs/SMS_TWILIO.md) | Messages logged with delivery status `NOT_CONFIGURED`, never marked sent |
+| Email (SMTP) | Password resets and invitations through Nodemailer over SMTP (Nodemailer, 2026) | `EMAIL_PROVIDER=smtp`, SMTP URL and sender address | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#email) | Console outbox |
+| AI provider (Smart Quote) | Google Gemini (`@google/genai`), Anthropic and OpenAI-compatible adapters behind one validated interface (Google, 2026c) | `AI_PROVIDER`, server-side `AI_API_KEY`, `AI_MODEL` | [docs/AI_ASSISTANT.md](docs/AI_ASSISTANT.md#10-configuration) | `AI_PROVIDER=mock` deterministic simulation, labelled in the app; see below |
+| Real-time updates | Socket.IO between the API and the app for live job progress | None | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Same behaviour |
 
 Keep simulated AI/payment modes and console email out of production — the API refuses to start with them.
 Confirm hosting cost and subscription eligibility before provisioning additional services.
 
 ## HYDRA Smart Quote (AI quotation & triage assistant)
 
-Customers describe an electrical/solar problem with photos (Dashboard → **HYDRA Smart Quote**) and get a
+Customers describe an electrical/solar problem with photos (customer Home → **Smart Quote (AI)**) and get a
 preliminary assessment: likely service category, severity 1–5 with the reason, a server-calculated indicative
 price range, the target response window, follow-up questions and a confidence score. Deterministic safety rules
 (fire, smoke, shock, exposed conductors, arcing, flooding, battery events…) can only raise severity; severity
-4–5, low-confidence, unsupported and failed-AI cases go to the administrator review queue (**Admin → More → AI
+4–5, low-confidence, unsupported and failed-AI cases go to the administrator review queue (**Manage → AI
 Review**). Accepting a proposal creates a normal `REQUESTED` service request.
 
 The implementation combines deterministic safety rules, approved knowledge retrieval, validated provider output
 and server-side pricing/escalation rules. The assistant “learns” only from knowledge and staff resolutions an
 admin approves (retrieval) — this does not retrain model weights. The owner configures thresholds, severity
-targets, pricing and the provider in **Settings → AI Assistant** (keys are never shown). Full architecture,
+targets, pricing and the provider in **Manage → AI Assistant settings** (owner only; keys are never shown). Full architecture,
 endpoints, configuration, demonstration scenarios and limitations: [docs/AI_ASSISTANT.md](docs/AI_ASSISTANT.md).
 
 | Provider mode (`AI_PROVIDER`) | Behaviour |
@@ -316,8 +348,8 @@ endpoints, configuration, demonstration scenarios and limitations: [docs/AI_ASSI
 | `anthropic` | Anthropic provider adapter; needs a server-side key and compatible model. |
 | `openai` | OpenAI-compatible adapter; needs a server-side key, model and suitable endpoint. |
 
-Provider adapters in the repository do not prove a successful live integration. Confirm the actual environment
-and provider before demonstrating live AI. Mock responses and development pricing must be identified
+The configured provider of each deployment determines whether live AI analysis is used; confirm the environment's
+provider before demonstrating live AI. Mock responses and development pricing must be identified
 accurately. Smart Quote provides preliminary service triage, not electrical repair instructions or a final
 approved quotation.
 
@@ -340,7 +372,7 @@ npm run typecheck                       # tsc --noEmit: shared, api, mobile (inc
 npm test                                # shared (Vitest) · api (Vitest + Supertest against real PostgreSQL) · mobile (Jest + RNTL)
 npm run build                           # shared + api (tsc) + mobile (expo export → Android & iOS Hermes bundles)
 npm run check:routes -w @hydra/mobile   # static audit: every navigation target resolves to a screen
-npm run doctor -w @hydra/mobile         # expo-doctor: Expo SDK dependency/config validation
+(cd apps/mobile && npx expo-doctor)     # expo-doctor: Expo SDK dependency/config validation (as run in CI)
 ```
 
 The root commands cover all three workspaces. The mobile build exports Android and iOS bundles; it does not by
@@ -368,6 +400,40 @@ the owner's approval.
 Security review should consider request validation, ownership checks, authentication, rate limits, secret
 management and private file access against OWASP guidance (OWASP Foundation, 2021; 2023). These references are
 review criteria, not a certification of security compliance.
+
+## Final testing and validation
+
+The results below were verified for the final submitted code (`main` at `ccfff4b`).
+
+**Continuous integration.** The GitHub Actions CI run on `ccfff4b` (2 November 2026) completed successfully: lint,
+typecheck and shared domain tests; API unit, security and end-to-end workflow tests against PostgreSQL, the API
+build and OpenAPI export; and mobile Jest tests, the navigation audit, Expo configuration checks (including the
+check that the store build requests no call-log access), expo-doctor and the Android and iOS Hermes bundle export.
+
+**Local verification (5 November 2026).** A clean copy of `ccfff4b` was installed with `npm ci` and checked from the
+repository root:
+
+| Check | Result |
+| --- | --- |
+| `npm run lint` (shared, API, mobile) | Passed |
+| `npm run typecheck` (shared, API, mobile including tests) | Passed |
+| `npm test` | Shared 17/17 (2 files) · API 254/254 (11 files, against a real PostgreSQL instance) · mobile 356/356 (34 suites) — all passing |
+| `npm run build` | Passed — shared and API compiled; Android and iOS Hermes bundles exported |
+| `npm run check:routes -w @hydra/mobile` | 232 navigation targets resolve to 88 file routes |
+| `npx expo-doctor` (in `apps/mobile`, as CI runs it) | 20/21 checks passed. The remaining check reports that 11 Expo SDK 57 packages are now behind patch releases published after the 2 November CI run (which passed 21/21). It is a time-dependent dependency-freshness check; dependencies were deliberately left unchanged for the final submission. |
+
+**Client acceptance testing deployment (2 November 2026).** For the PSG Electrical client to test the final
+application on Android, the `main` API build was deployed to a separate Azure staging App Service with its own
+database (see [Deployment environments](#deployment-environments)) and an EAS Android APK was built against it.
+The following were verified: `/health` returned `{"status":"ok","database":"ok"}`; all six migrations applied; the
+seeded demonstration data (users for every role, service types, quotations, jobs, assignments, invoices,
+payments, timesheets and leave) was present; sign-in succeeded for the customer, electrician (email and staff
+number), office administrator and owner accounts, each receiving its own dashboard data; a wrong password returned
+401, customer and electrician access to the admin dashboard returned 403 and unauthenticated access returned 401;
+and the APK was verified as signed (APK Signature Scheme v2) with the staging API as its only server address and
+no embedded secrets. During Android testing the QR scanner kept requesting camera permission after it had been
+granted; it was resolved on the device by setting the app's camera permission to *Allow only while using the app*
+and force-stopping the app (documented in the user guide).
 
 ## Build and deployment
 
@@ -398,6 +464,18 @@ Android AAB/APK and iOS IPA builds and store submission use EAS Build/Submit wit
 [`apps/mobile/eas.json`](apps/mobile/eas.json) (`development`, `preview`, `admin-device`, `production`); the
 hosted profiles point at the production API above. See [docs/EAS_BUILD.md](docs/EAS_BUILD.md) and the
 [EAS build workflow](.github/workflows/eas-build.yml).
+
+### Deployment environments
+
+| Environment | API | Database | Purpose |
+| --- | --- | --- | --- |
+| Local development | `npm run api` (localhost:4000) | Embedded PostgreSQL 18 on :5433 | Development with labelled fallbacks (simulated payments, console email, mock AI) |
+| Production | Azure App Service `hydra-psg-api` | Azure Database for PostgreSQL Flexible Server 16, database `hydra` | PSG Electrical & Cables production service; releases are deployed through the reviewed `production` workflow |
+| Client acceptance testing (staging) | Separate Azure App Service on the same plan | Separate `hydra_staging` database on the same server, with its own least-privilege role that has no access to production data | Client testing of the final application with an EAS Android APK built against the staging API |
+
+The staging deployment runs the same `main` build with demonstration data and development-safe providers
+(simulated payments, console email and mock AI), so client testing never touches production data or moves real
+money. Its URL, credentials and APK build profile are deliberately not published in this repository.
 
 ### Continuous integration
 
@@ -441,6 +519,12 @@ Freedom Conservancy, 2026; GitHub, 2026b).
 
 ### Scope and tools disclosed
 
+Generative AI assistance is disclosed for HYDRA planning, requirements interpretation, documentation, diagram
+review, implementation assistance, troubleshooting and verification support. Claude/Claude Code (Anthropic) was
+used during the project, including development assistance (Anthropic, 2026a; 2026b). ChatGPT (OpenAI) was used
+for guidance, documentation and preparation of this README (OpenAI, 2026). Claude Code also assisted in
+combining the team's two README versions into this document on 5 October 2026.
+
 The submitting team remains responsible for the final code, accuracy of claims, source attribution, test results and compliance with the assessment’s AI-use requirements. This README includes an AI-assisted disclosure and does not create signatures or certify that every team member has reviewed it. Each member should confirm that the final disclosure accurately reflects their actual use of AI tools and that all relevant supporting evidence has been included.
 
 For Part 3 (PSG client change requests, 1 November 2026), Claude Code (Anthropic) assisted with inspecting the
@@ -452,18 +536,27 @@ recreated logo supplied by the team) as follow-up commits, reviewed before commi
 (`HYDRA_PART3_CLIENT_CHANGE_REQUIREMENTS.md`) notes that client screenshots were first attached to ChatGPT; if the
 brief itself was prepared with AI assistance, record that in the disclosure evidence as well.
 
+From 2 to 5 November 2026 Claude Code (Anthropic) also assisted, under the team member's step-by-step approval,
+with the client acceptance testing deployment (read-only inspection of the Azure resources, creating the separate
+staging database and role, preparing the staging configuration and deployment package, seeding demonstration data
+and building the Android APK), with preparing the Word user guide from the application source, and with reviewing
+and updating this README, including re-running the final validation checks (Anthropic, 2026b). No production data
+or settings were changed, and the team reviewed the results.
+
 This declaration covers assistance in producing the assessment and project. The runtime Smart Quote feature
 described above is a separate application capability; a configured provider does not imply that it was used to
-author submitted work. Claude is not a runtime dependency of HYDRA.
+author submitted work. Claude Code, the development assistant, is not part of the HYDRA application; HYDRA's
+optional Anthropic provider adapter is one of several runtime AI options and is used only when a deployment
+selects it.
 
 ### Disclosure record
 
 | Item | Disclosure |
 | --- | --- |
-| Assessment sections/work | HYDRA requirements and planning; supporting documentation and diagrams; code implementation/refinement; debugging and checks; README and reference presentation. |
+| Assessment sections/work | HYDRA requirements and planning; supporting documentation and diagrams; code implementation/refinement; debugging and checks; client acceptance testing deployment; user guide; README and reference presentation. |
 | Tools | Claude/Claude Code by Anthropic; ChatGPT by OpenAI. Exact model/version information should be taken from the retained interaction records rather than inferred. |
 | Purpose | Brainstorming, interpreting requirements, structuring explanations, implementation assistance, investigating errors, suggesting checks and improving clarity. |
-| Documented dates | The supplied annexure records Claude interactions on 10 August 2026 (Screenshots 1–23) and 17 August 2026 (Screenshots 24–32), with a declaration dated 11 September 2026. This README was prepared with ChatGPT assistance on 5 October 2026. Part 3 changes were implemented with Claude Code assistance on 1–2 November 2026. Those dates do not represent the complete development-assistance period. |
+| Documented dates | The supplied annexure records Claude interactions on 10 August 2026 (Screenshots 1–23) and 17 August 2026 (Screenshots 24–32), with a declaration dated 11 September 2026. This README was prepared with ChatGPT assistance on 5 October 2026. Part 3 changes were implemented with Claude Code assistance on 1–2 November 2026; the client acceptance testing deployment, user guide and this README update were prepared with Claude Code assistance on 2–5 November 2026. Those dates do not represent the complete development-assistance period. |
 | Existing evidence | HYDRA_AI_Usage_Disclosure_Annexure.pdf contains 32 interaction screenshots. Its summary states that screenshots were supplied because a shareable chat link was unavailable. |
 | Additional evidence required for complete disclosure | Retain relevant Claude Code implementation/debugging records and this ChatGPT interaction with the submission. The annexure's documentation/planning evidence alone does not document every subsequent coding interaction. |
 
@@ -501,38 +594,45 @@ affected file/function and nature of the adaptation. AI records should identify 
 assistance. Anthropic's product references are included because Claude is explicitly disclosed.
 
 The references below follow the IIE Harvard Anglia guide: alphabetical author ordering, with same-author,
-same-year works distinguished by letters. All sources from both team reference lists are retained, including
+same-year works distinguished by letters, titles in italics and online sources given as
+`Available at: <URL> [Accessed day month year]`. All sources from both team reference lists are retained, including
 Fielding (2000). Access dates match those in the source-file `Code Attribution` comments where a source is cited
 in code; website years and access dates are the details supplied by the team, not independently established
 publication dates.
 
 ### References
 
-- Anthropic 2026a. Claude. [Online]. Available at: https://claude.ai/ [Accessed 5 October 2026].
-- Anthropic 2026b. Claude Code documentation. [Online]. Available at: https://docs.anthropic.com/en/docs/claude-code [Accessed 5 October 2026].
-- ESLint 2026. ESLint documentation. [Online]. Available at: https://eslint.org/docs/latest/ [Accessed 5 September 2026].
-- Expo 2026. Expo documentation. [Online]. Available at: https://docs.expo.dev/ [Accessed 5 September 2026].
-- Fielding, R.T. 2000. Architectural styles and the design of network-based software architectures. Doctoral dissertation. University of California, Irvine.
-- Fowler, M. 2018. Refactoring: Improving the design of existing code. 2nd ed. Boston: Addison-Wesley.
-- GitHub 2026a. GitHub Actions documentation. [Online]. Available at: https://docs.github.com/en/actions [Accessed 2 September 2026].
-- GitHub 2026b. GitHub documentation. [Online]. Available at: https://docs.github.com/ [Accessed 15 September 2026].
-- Martin, R.C. 2017. Clean Architecture: A craftsman’s guide to software structure and design. Boston: Prentice Hall.
-- Meta Open Source 2026. Jest documentation. [Online]. Available at: https://jestjs.io/docs/getting-started [Accessed 9 September 2026].
-- Meta Platforms, Inc. 2026a. React documentation. [Online]. Available at: https://react.dev/ [Accessed 16 September 2026].
-- Meta Platforms, Inc. 2026b. React Native documentation. [Online]. Available at: https://reactnative.dev/docs/getting-started [Accessed 21 August 2026].
-- Microsoft 2026a. Azure App Service documentation. [Online]. Available at: https://learn.microsoft.com/en-us/azure/app-service/ [Accessed 5 October 2026].
-- Microsoft 2026b. Azure Blob Storage documentation. [Online]. Available at: https://learn.microsoft.com/en-us/azure/storage/blobs/ [Accessed 20 August 2026].
-- Microsoft 2026c. Azure Database for PostgreSQL documentation. [Online]. Available at: https://learn.microsoft.com/en-us/azure/postgresql/ [Accessed 1 October 2026].
-- Microsoft 2026d. Azure Key Vault documentation. [Online]. Available at: https://learn.microsoft.com/en-us/azure/key-vault/ [Accessed 5 October 2026].
-- Microsoft 2026e. TypeScript documentation. [Online]. Available at: https://www.typescriptlang.org/docs/ [Accessed 28 August 2026].
-- Microsoft 2026f. Visual Studio Code documentation. [Online]. Available at: https://code.visualstudio.com/docs [Accessed 23 August 2026].
-- npm, Inc. 2026. npm documentation. [Online]. Available at: https://docs.npmjs.com/ [Accessed 5 September 2026].
-- OpenAI 2026. ChatGPT. [Online]. Available at: https://chatgpt.com/ [Accessed 5 October 2026].
-- OpenJS Foundation 2026. Node.js documentation. [Online]. Available at: https://nodejs.org/docs/latest/api/ [Accessed 12 September 2026].
-- OWASP Foundation 2021. OWASP Top Ten Web Application Security Risks. [Online]. Available at: https://owasp.org/www-project-top-ten/ [Accessed 5 September 2026].
-- OWASP Foundation 2023. OWASP API Security Top 10. [Online]. Available at: https://owasp.org/API-Security/ [Accessed 2 September 2026].
-- PostgreSQL Global Development Group 2026. PostgreSQL documentation. [Online]. Available at: https://www.postgresql.org/docs/ [Accessed 26 August 2026].
-- PSG Electrical & Cables 2026a. Company portfolio (presented by K. Govender). Unpublished client document supplied for Part 3.
-- PSG Electrical & Cables 2026b. PSG Electrical and Cables. [Online]. Available at: https://psg-electrical-site.axiomcompute.workers.dev/ [Accessed 1 November 2026].
-- Software Freedom Conservancy 2026. Git documentation. [Online]. Available at: https://git-scm.com/doc [Accessed 28 September 2026].
-- Software Mansion 2026. react-native-svg documentation. [Online]. Available at: https://github.com/software-mansion/react-native-svg [Accessed 1 November 2026].
+- Anthropic. 2026a. *Claude*. [Online]. Available at: <https://claude.ai/> [Accessed 5 October 2026].
+- Anthropic. 2026b. *Claude Code documentation*. [Online]. Available at: <https://docs.anthropic.com/en/docs/claude-code> [Accessed 5 October 2026].
+- ESLint. 2026. *ESLint documentation*. [Online]. Available at: <https://eslint.org/docs/latest/> [Accessed 5 September 2026].
+- Expo. 2026. *Expo documentation*. [Online]. Available at: <https://docs.expo.dev/> [Accessed 5 September 2026].
+- Fielding, R.T. 2000. *Architectural styles and the design of network-based software architectures*. Doctoral dissertation. University of California, Irvine.
+- Fowler, M. 2018. *Refactoring: Improving the design of existing code*. 2nd ed. Boston: Addison-Wesley.
+- GitHub. 2026a. *GitHub Actions documentation*. [Online]. Available at: <https://docs.github.com/en/actions> [Accessed 2 September 2026].
+- GitHub. 2026b. *GitHub documentation*. [Online]. Available at: <https://docs.github.com/> [Accessed 15 September 2026].
+- Google. 2026a. *Firebase Cloud Messaging documentation*. [Online]. Available at: <https://firebase.google.com/docs/cloud-messaging> [Accessed 5 November 2026].
+- Google. 2026b. *Google Sign-In for Android documentation*. [Online]. Available at: <https://developers.google.com/identity/sign-in/android/start> [Accessed 5 November 2026].
+- Google. 2026c. *Gemini API documentation*. [Online]. Available at: <https://ai.google.dev/gemini-api/docs> [Accessed 5 November 2026].
+- Martin, R.C. 2017. *Clean Architecture: A craftsman’s guide to software structure and design*. Boston: Prentice Hall.
+- Meta Open Source. 2026. *Jest documentation*. [Online]. Available at: <https://jestjs.io/docs/getting-started> [Accessed 9 September 2026].
+- Meta Platforms, Inc. 2026a. *React documentation*. [Online]. Available at: <https://react.dev/> [Accessed 16 September 2026].
+- Meta Platforms, Inc. 2026b. *React Native documentation*. [Online]. Available at: <https://reactnative.dev/docs/getting-started> [Accessed 21 August 2026].
+- Microsoft. 2026a. *Azure App Service documentation*. [Online]. Available at: <https://learn.microsoft.com/en-us/azure/app-service/> [Accessed 5 October 2026].
+- Microsoft. 2026b. *Azure Blob Storage documentation*. [Online]. Available at: <https://learn.microsoft.com/en-us/azure/storage/blobs/> [Accessed 20 August 2026].
+- Microsoft. 2026c. *Azure Database for PostgreSQL documentation*. [Online]. Available at: <https://learn.microsoft.com/en-us/azure/postgresql/> [Accessed 1 October 2026].
+- Microsoft. 2026d. *Azure Key Vault documentation*. [Online]. Available at: <https://learn.microsoft.com/en-us/azure/key-vault/> [Accessed 5 October 2026].
+- Microsoft. 2026e. *TypeScript documentation*. [Online]. Available at: <https://www.typescriptlang.org/docs/> [Accessed 28 August 2026].
+- Microsoft. 2026f. *Visual Studio Code documentation*. [Online]. Available at: <https://code.visualstudio.com/docs> [Accessed 23 August 2026].
+- Nodemailer. 2026. *Nodemailer documentation*. [Online]. Available at: <https://nodemailer.com/> [Accessed 5 November 2026].
+- npm, Inc. 2026. *npm documentation*. [Online]. Available at: <https://docs.npmjs.com/> [Accessed 5 September 2026].
+- OpenAI. 2026. *ChatGPT*. [Online]. Available at: <https://chatgpt.com/> [Accessed 5 October 2026].
+- OpenJS Foundation. 2026. *Node.js documentation*. [Online]. Available at: <https://nodejs.org/docs/latest/api/> [Accessed 12 September 2026].
+- OWASP Foundation. 2021. *OWASP Top Ten Web Application Security Risks*. [Online]. Available at: <https://owasp.org/www-project-top-ten/> [Accessed 5 September 2026].
+- OWASP Foundation. 2023. *OWASP API Security Top 10*. [Online]. Available at: <https://owasp.org/API-Security/> [Accessed 2 September 2026].
+- Paystack. 2026. *Paystack developer documentation*. [Online]. Available at: <https://paystack.com/docs/> [Accessed 5 November 2026].
+- PostgreSQL Global Development Group. 2026. *PostgreSQL documentation*. [Online]. Available at: <https://www.postgresql.org/docs/> [Accessed 26 August 2026].
+- PSG Electrical & Cables. 2026a. *Company portfolio* (presented by K. Govender). Unpublished client document supplied for Part 3.
+- PSG Electrical & Cables. 2026b. *PSG Electrical and Cables*. [Online]. Available at: <https://psg-electrical-site.axiomcompute.workers.dev/> [Accessed 1 November 2026].
+- Software Freedom Conservancy. 2026. *Git documentation*. [Online]. Available at: <https://git-scm.com/doc> [Accessed 28 September 2026].
+- Software Mansion. 2026. *react-native-svg documentation*. [Online]. Available at: <https://github.com/software-mansion/react-native-svg> [Accessed 1 November 2026].
+- Twilio. 2026. *Twilio Messaging documentation*. [Online]. Available at: <https://www.twilio.com/docs/messaging> [Accessed 5 November 2026].
