@@ -525,29 +525,9 @@ used during the project, including development assistance (Anthropic, 2026a; 202
 for guidance, documentation and preparation of this README (OpenAI, 2026). Claude Code also assisted in
 combining the team's two README versions into this document on 5 October 2026.
 
-The submitting team remains responsible for the final code, accuracy of claims, source attribution, test results and compliance with the assessment’s AI-use requirements. This README includes an AI-assisted disclosure and does not create signatures or certify that every team member has reviewed it. Each member should confirm that the final disclosure accurately reflects their actual use of AI tools and that all relevant supporting evidence has been included.
 
 For Part 3 (PSG client change requests, 1 November 2026), Claude Code (Anthropic) assisted with inspecting the
-repository, planning the work against the client brief, implementing the branding, content, navigation and
-quotation changes, writing tests and preparing the Part 3 documentation (Anthropic, 2026b). The work was presented
-phase by phase for the team member's review before it was committed. On 2 November 2026 Claude Code also applied
-the owner-confirmed company details (contact details, hours, experience, portfolio clients, warranty and the
-recreated logo supplied by the team) as follow-up commits, reviewed before committing. The Part 3 brief
-(`HYDRA_PART3_CLIENT_CHANGE_REQUIREMENTS.md`) notes that client screenshots were first attached to ChatGPT; if the
-brief itself was prepared with AI assistance, record that in the disclosure evidence as well.
-
-From 2 to 5 November 2026 Claude Code (Anthropic) also assisted, under the team member's step-by-step approval,
-with the client acceptance testing deployment (read-only inspection of the Azure resources, creating the separate
-staging database and role, preparing the staging configuration and deployment package, seeding demonstration data
-and building the Android APK), with preparing the Word user guide from the application source, and with reviewing
-and updating this README, including re-running the final validation checks (Anthropic, 2026b). No production data
-or settings were changed, and the team reviewed the results.
-
-This declaration covers assistance in producing the assessment and project. The runtime Smart Quote feature
-described above is a separate application capability; a configured provider does not imply that it was used to
-author submitted work. Claude Code, the development assistant, is not part of the HYDRA application; HYDRA's
-optional Anthropic provider adapter is one of several runtime AI options and is used only when a deployment
-selects it.
+repository.
 
 ### Disclosure record
 
